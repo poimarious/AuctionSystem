@@ -25,7 +25,7 @@ public class Art extends Item {
 
     @Override
     public String getCategory() {
-        return "";
+        return "Art";
     }
 
     //region Getters

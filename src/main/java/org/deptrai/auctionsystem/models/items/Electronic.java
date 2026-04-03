@@ -2,17 +2,17 @@ package org.deptrai.auctionsystem.models.items;
 
 import org.deptrai.auctionsystem.models.users.Seller;
 
-public class Electronics extends Item {
+public class Electronic extends Item {
     private String brand;
     private int warrantyYears;
 
-    public Electronics(String name, String description, double startingPrice, Seller seller, String brand, int warrantyYears) {
+    public Electronic(String name, String description, double startingPrice, Seller seller, String brand, int warrantyYears) {
         super(name, description, startingPrice, seller);
         this.brand = brand;
         this.warrantyYears = warrantyYears;
     }
 
-    public Electronics(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String brand, int warrantyYears) {
+    public Electronic(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String brand, int warrantyYears) {
         super(itemId, name, description, startingPrice, currentPrice, seller);
         this.brand = brand;
         this.warrantyYears = warrantyYears;
@@ -25,7 +25,7 @@ public class Electronics extends Item {
 
     @Override
     public String getCategory() {
-        return "";
+        return "Electronic";
     }
 
     //region Getters

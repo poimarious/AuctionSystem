@@ -2,7 +2,9 @@ package org.deptrai.auctionsystem.models.items;
 
 import org.deptrai.auctionsystem.models.users.Seller;
 
-public abstract class Item {
+import java.io.Serializable;
+
+public abstract class Item implements Serializable {
     private String itemId; // Database automatically assigns this
     private String name;
     private String description;
@@ -16,7 +18,7 @@ public abstract class Item {
         this.startingPrice = startingPrice;
         this.currentPrice = startingPrice; // currentPrice is the same as startingPrice when starting out
         this.seller = seller;
-    }//For creating a new object
+    } //For creating a new object
 
     public Item(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller){
         this.itemId = itemId;

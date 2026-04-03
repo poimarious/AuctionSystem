@@ -25,7 +25,7 @@ public class Vehicle extends Item {
 
     @Override
     public String getCategory() {
-        return "";
+        return "Vehicle";
     }
 
     //region Getters
