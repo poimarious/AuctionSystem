@@ -6,28 +6,15 @@ import java.util.HashMap;
 
 public class ItemFactory {
 
-
-    public static Item createItem(String type, String id, String name, String description, double startingPrice, double currentPrice, Seller seller, HashMap<String, Object> subParams) {
-        switch(type.toUpperCase()) {
-            case "ELECTRONIC":
-                String brand;
-                int warrantyYears;
-                brand = (String) subParams.get("brand");
-                warrantyYears = (int) subParams.get("warrantyYears");
-                return new Electronic(id, name,description, startingPrice, currentPrice, seller, brand, warrantyYears);
-            case "ART":
-                String artist;
-                int year;
-                artist = (String) subParams.get("artist");
-                year = (int) subParams.get("year");
-                return new Art(id, name, description, startingPrice, currentPrice, seller, artist, year);
-            default: // Vehicle
-                String make;
-                int mileage;
-                make = (String) subParams.get("make");
-                mileage = (int) subParams.get("mileage");
-                return new Vehicle(id, name, description, startingPrice, currentPrice, seller, make, mileage);
-        }
+    public static Electronic createElectronicItem(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String brand, int warrantyYears) {
+        return new Electronic(itemId, name, description, startingPrice, currentPrice, seller, brand, warrantyYears);
     }
 
+    public static Art createArtItem(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String artist, int year) {
+        return new Art(itemId, name, description, startingPrice, currentPrice, seller, artist, year);
+    }
+
+    public static Vehicle createVehicleItem(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String make, int mileage) {
+        return new Vehicle(itemId, name, description, startingPrice, currentPrice, seller, make, mileage);
+    }
 }
