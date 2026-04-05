@@ -1,4 +1,4 @@
-package org.singleton;
+package org.deptrai.auctionsystem.models.auction;
 
 
 import java.time.LocalDateTime;
