@@ -12,12 +12,19 @@ public abstract class Item implements Serializable {
     private double currentPrice;
     private Seller seller;
 
-    public Item(String name, String description, double startingPrice, Seller seller){
-        this.name = name;
-        this.description = description;
-        this.startingPrice = startingPrice;
-        this.currentPrice = startingPrice; // currentPrice is the same as startingPrice when starting out
-        this.seller = seller;
+//    public Item(String name, String description, double startingPrice, Seller seller){
+//        this.name = name;
+//        this.description = description;
+//        this.startingPrice = startingPrice;
+//        this.currentPrice = startingPrice; // currentPrice is the same as startingPrice when starting out
+//        this.seller = seller;
+//    } //For creating a new object
+
+    public Item(Params params) {
+        this.name = params.getName();
+        this.description = params.getDescription();
+        this.startingPrice = params.getStartingPrice(); // currentPrice is the same as startingPrice when starting out
+        this.seller = params.getSeller();
     } //For creating a new object
 
     public Item(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller){
@@ -82,5 +89,6 @@ public abstract class Item implements Serializable {
     public void setSeller(Seller seller) {
         this.seller = seller;
     }
-    //endregion
+    // endregion
+
 }

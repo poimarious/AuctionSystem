@@ -6,10 +6,16 @@ public class Art extends Item {
     private String artist;
     private int year;
 
-    public Art(String name, String description, double startingPrice, Seller seller, String artist, int year) {
-        super(name, description, startingPrice, seller);
-        this.artist = artist;
-        this.year = year;
+//    public Art(String name, String description, double startingPrice, Seller seller, String artist, int year) {
+//        super(name, description, startingPrice, seller);
+//        this.artist = artist;
+//        this.year = year;
+//    }
+
+    public Art(Params p){
+        super(p);
+        this.artist = p.getArtist();
+        this.year = p.getYear();
     }
 
     public Art(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String artist, int year) {
@@ -17,7 +23,7 @@ public class Art extends Item {
         this.artist = artist;
         this.year = year;
     }
-
+    
     @Override
     public void printInfo() {
 
