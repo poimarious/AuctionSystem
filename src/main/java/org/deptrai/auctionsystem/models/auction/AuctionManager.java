@@ -1,6 +1,6 @@
 package org.deptrai.auctionsystem.models.auction;
 
-
+import org.deptrai.auctionsystem.models.items.Item;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -30,7 +30,7 @@ public class AuctionManager {
 
     public Auction getAuction(String id) {
         for (Auction auction: auctions.values()) {
-            if (auction.getId.equals(id)) {
+            if (auction.getAuctionId().equals(id)) {
                 return auction;
             }
         }
