@@ -3,10 +3,11 @@ package org.deptrai.auctionsystem.models.auction;
 import org.deptrai.auctionsystem.models.items.Item;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 
 public class AuctionManager {
-    private SortedMap<String,Auction> auctions = Collections.synchronizedSortedMap(new TreeMap<>());
+    private ConcurrentSkipListMap<String,Auction> auctions = new ConcurrentSkipListMap<>();
     //implement treemap with thread-safe
     private AuctionManager(){}
     private static class SingletonHelper {//Helper class to generate instance,because this class only loads once so it ensures thread-safe
@@ -29,12 +30,7 @@ public class AuctionManager {
     }
 
     public Auction getAuction(String id) {
-        for (Auction auction: auctions.values()) {
-            if (auction.getAuctionId().equals(id)) {
-                return auction;
-            }
-        }
-        return null;
+        return auctions.get(id);
     }
     public List<Auction> getAllAuctions() {
         ArrayList<Auction> auctionlist = new ArrayList<>();
