@@ -29,7 +29,7 @@ public class AuctionManager {
         Auction newAuctions = new Auction(Item item, LocalDateTime startTime, LocalDateTime endTime);
         auctions.put(newAuctions.getAuctionId(),newAuctions);
         return newAuctions;
-        //need initialized first to get auctionId
+        //need initialized after creating object to get auctionId
     }
 
     public Auction getAuction(String id) {
