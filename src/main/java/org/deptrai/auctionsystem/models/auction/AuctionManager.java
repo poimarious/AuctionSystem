@@ -1,6 +1,8 @@
 package org.deptrai.auctionsystem.models.auction;
 
 
+import org.deptrai.auctionsystem.models.items.Item;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -12,7 +14,6 @@ public class AuctionManager {
     private static class SingletonHelper {//Helper class to generate instance,because this class only loads once so it ensures thread-safe
         private static final AuctionManager INSTANCE = new AuctionManager();
     }
-
     public static AuctionManager getInstance() { //Bill Pugh singleton implementation
         return SingletonHelper.INSTANCE;
     }
@@ -30,7 +31,7 @@ public class AuctionManager {
 
     public Auction getAuction(String id) {
         for (Auction auction: auctions.values()) {
-            if (auction.getId.equals(id)) {
+            if (auction.getAuctionId().equals(id)) {
                 return auction;
             }
         }

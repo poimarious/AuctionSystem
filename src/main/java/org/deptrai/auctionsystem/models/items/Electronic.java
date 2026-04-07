@@ -12,7 +12,7 @@ public class Electronic extends Item {
 //        this.warrantyYears = warrantyYears;
 //    }
 
-    public Electronic(Params p){
+    public Electronic(ElectronicParams p){
         super(p);
         this.brand = p.getBrand();
         this.warrantyYears = p.getWarrantyYears();

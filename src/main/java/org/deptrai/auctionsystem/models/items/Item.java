@@ -20,11 +20,11 @@ public abstract class Item implements Serializable {
 //        this.seller = seller;
 //    } //For creating a new object
 
-    public Item(Params params) {
-        this.name = params.getName();
-        this.description = params.getDescription();
-        this.startingPrice = params.getStartingPrice(); // currentPrice is the same as startingPrice when starting out
-        this.seller = params.getSeller();
+    public Item(ItemParams p) {
+        this.name = p.getName();
+        this.description = p.getDescription();
+        this.startingPrice = p.getStartingPrice(); // currentPrice is the same as startingPrice when starting out
+        this.seller = p.getSeller();
     } //For creating a new object
 
     public Item(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller){
@@ -34,7 +34,8 @@ public abstract class Item implements Serializable {
         this.startingPrice = startingPrice;
         this.currentPrice = currentPrice;
         this.seller = seller;
-    }//For loading an object
+    } //For loading an object
+
 
     public abstract void printInfo();
     public abstract String getCategory();

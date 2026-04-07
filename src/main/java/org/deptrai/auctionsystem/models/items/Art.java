@@ -12,7 +12,7 @@ public class Art extends Item {
 //        this.year = year;
 //    }
 
-    public Art(Params p){
+    public Art(ArtParams p){
         super(p);
         this.artist = p.getArtist();
         this.year = p.getYear();

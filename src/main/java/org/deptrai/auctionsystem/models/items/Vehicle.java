@@ -12,7 +12,7 @@ public class Vehicle extends Item {
 //        this.mileage = mileage;
 //    }
 
-    public Vehicle(Params p){
+    public Vehicle(VehicleParams p){
         super(p);
         this.make = p.getMake();
         this.mileage = p.getMileage();
