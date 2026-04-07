@@ -26,7 +26,7 @@ public class AuctionManager {
         bids = new ArrayList<>();
         observers = new ArrayList<>();
          */
-        Auction newAuctions = new Auction(Item item, LocalDateTime startTime, LocalDateTime endTime);
+        Auction newAuctions = new Auction(item,startTime, endTime);
         auctions.put(newAuctions.getAuctionId(),newAuctions);
         return newAuctions;
         //need initialized after creating object to get auctionId
