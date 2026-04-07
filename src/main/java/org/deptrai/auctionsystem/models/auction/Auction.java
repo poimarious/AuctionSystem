@@ -3,20 +3,25 @@ package org.deptrai.auctionsystem.models.auction;
 import org.deptrai.auctionsystem.models.bid.Bid;
 import org.deptrai.auctionsystem.models.items.Item;
 import org.deptrai.auctionsystem.models.users.Bidder;
+import org.deptrai.auctionsystem.observer.AuctionSubject;
+import org.deptrai.auctionsystem.observer.BidObserver;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer; // Deprecated. Can upgrade
+import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Auction {
+public class Auction implements AuctionSubject {
     private String auctionId; // Database automatically assign this
     private Item item;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private AuctionStatus status;
+    private String topBidderName;
     private List<Bid> bids;
-    private List<Observer> observers; //Deprecated. Can upgrade
+    //private List<Observer> observers; //Deprecated. Can upgrade
+    private List<BidObserver> observers;
 
     public Auction(Item item, LocalDateTime startTime, LocalDateTime endTime){
         this.item = item;
@@ -24,7 +29,7 @@ public class Auction {
         this.endTime = endTime;
         status = AuctionStatus.OPEN;
         bids = new ArrayList<>();
-        observers = new ArrayList<>();
+        observers = new CopyOnWriteArrayList<>();
     }// For creating a new object
 
     public Auction(String auctionId, Item item, LocalDateTime startTime, LocalDateTime endTime, AuctionStatus status, List<Bid> bids){
@@ -34,7 +39,7 @@ public class Auction {
         this.endTime = endTime;
         this.status = status;
         this.bids = bids;
-        observers = new ArrayList<>();
+        observers =  new CopyOnWriteArrayList<>(); // use CopyOnWriteArrayList to avoid ConcurrentModificationException
     }// For loading from database
 
     public void placeBid(Bidder bidder, double amount) {
@@ -49,13 +54,32 @@ public class Auction {
         return null;
     }
 
-    public void addObserver(Observer o){
+    public void addObserver(BidObserver o){
 
-    }//Deprecated. Can upgrade
+    }
 
+    @Override
+    public void attach(BidObserver observer) {
+        if(!observers.contains(observer)) {
+            observers.add(observer);
+            System.out.println("Someone just subscribed to the session: " + item.getName());
+        }
+    }
+
+    @Override
+    public void detach(BidObserver observer) {
+        if(observers.contains(observer)) {
+            observers.remove(observer);
+            System.out.println("Someone just unsubscribed to the session: " + item.getName());
+        }
+    }
+
+    @Override
     public void notifyObservers(){
-
-    }//Deprecated. Can upgrade
+        for(BidObserver obs: observers) {
+            obs.update(item.getCurrentPrice(), topBidderName);
+        }
+    }
 
     public void extendIfSniped() {
 
@@ -86,7 +110,7 @@ public class Auction {
         return bids;
     }
 
-    public List<Observer> getObservers() {
+    public List<BidObserver> getObservers() {
         return observers;
     }
     //endregion
@@ -116,7 +140,7 @@ public class Auction {
         this.bids = bids;
     }
 
-    public void setObservers(List<Observer> observers) {
+    public void setObservers(List<BidObserver> observers) {
         this.observers = observers;
     }
     //endregion

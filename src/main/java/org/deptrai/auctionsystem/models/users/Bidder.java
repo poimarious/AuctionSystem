@@ -2,11 +2,12 @@ package org.deptrai.auctionsystem.models.users;
 
 import org.deptrai.auctionsystem.models.auction.Auction;
 import org.deptrai.auctionsystem.models.bid.Bid;
+import org.deptrai.auctionsystem.observer.BidObserver;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Bidder extends User {
+public class Bidder extends User implements BidObserver {
     private double balance;
     private List<Bid> activeBids;
 
@@ -43,6 +44,15 @@ public class Bidder extends User {
     @Override
     public String getInfo() {
         return "";
+    }
+
+    @Override
+    public void update(double newPrice, String topBidderName) {
+        if(super.getUsername() == topBidderName) {
+            System.out.println( "[" + super.getUsername() + "] Nice. you are the top Bidder with $" + newPrice);
+        } else {
+            System.out.print("[" + super.getUsername() + "] Warning: Price has been pushed up to $" + newPrice);
+        }
     }
 
     //region Getters
