@@ -1,9 +1,11 @@
 package org.deptrai.auctionsystem.models.items;
 
-public class ArtFactory extends ItemFactory<ArtParams> {
+import org.deptrai.auctionsystem.models.users.Seller;
+
+public class ArtFactory extends ItemFactory {
 
     @Override
-    public Item createItem(ArtParams p) {
-        return new Art(p);
+    public Item createItem(String name, String description, double startingPrice, Seller seller) {
+        return new Art(name, description, startingPrice, seller);
     }
 }

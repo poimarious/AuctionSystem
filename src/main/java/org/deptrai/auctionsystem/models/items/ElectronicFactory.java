@@ -1,9 +1,12 @@
 package org.deptrai.auctionsystem.models.items;
 
-public class ElectronicFactory extends ItemFactory<ElectronicParams> {
+
+import org.deptrai.auctionsystem.models.users.Seller;
+
+public class ElectronicFactory extends ItemFactory {
 
     @Override
-    public Item createItem(ElectronicParams p) {
-        return new Electronic(p);
+    public Item createItem(String name, String description, double startingPrice, Seller seller) {
+        return new Electronic(name, description, startingPrice, seller);
     }
 }

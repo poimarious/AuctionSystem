@@ -12,10 +12,8 @@ public class Art extends Item {
 //        this.year = year;
 //    }
 
-    public Art(ArtParams p){
-        super(p);
-        this.artist = p.getArtist();
-        this.year = p.getYear();
+    public Art(String name, String description, double startingPrice, Seller seller) {
+        super(name, description, startingPrice, seller);
     }
 
     public Art(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String artist, int year) {

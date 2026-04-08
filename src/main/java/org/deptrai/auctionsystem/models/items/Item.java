@@ -12,19 +12,14 @@ public abstract class Item implements Serializable {
     private double currentPrice;
     private Seller seller;
 
-//    public Item(String name, String description, double startingPrice, Seller seller){
-//        this.name = name;
-//        this.description = description;
-//        this.startingPrice = startingPrice;
-//        this.currentPrice = startingPrice; // currentPrice is the same as startingPrice when starting out
-//        this.seller = seller;
-//    } //For creating a new object
+    public Item() {}
 
-    public Item(ItemParams p) {
-        this.name = p.getName();
-        this.description = p.getDescription();
-        this.startingPrice = p.getStartingPrice(); // currentPrice is the same as startingPrice when starting out
-        this.seller = p.getSeller();
+    public Item(String name, String description, double startingPrice, Seller seller) {
+        this.name = name;
+        this.description = description;
+        this.startingPrice = startingPrice; // currentPrice is the same as startingPrice when starting out
+        this.currentPrice = startingPrice;
+        this.seller = seller;
     } //For creating a new object
 
     public Item(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller){
@@ -67,29 +62,34 @@ public abstract class Item implements Serializable {
     //endregion
 
     //region Setters
-    public void setItemId(String itemId) {
+    public Item setItemId(String itemId) {
         this.itemId = itemId;
+        return this;
     }
 
-    public void setName(String name) {
+    public Item setName(String name) {
         this.name = name;
+        return this;
     }
 
-    public void setDescription(String description) {
+    public Item setDescription(String description) {
         this.description = description;
+        return this;
     }
 
-    public void setStartingPrice(double startingPrice) {
+    public Item setStartingPrice(double startingPrice) {
         this.startingPrice = startingPrice;
+        return this;
     }
 
-    public void setCurrentPrice(double currentPrice) {
+    public Item setCurrentPrice(double currentPrice) {
         this.currentPrice = currentPrice;
+        return this;
     }
 
-    public void setSeller(Seller seller) {
+    public Item setSeller(Seller seller) {
         this.seller = seller;
+        return this;
     }
     // endregion
-
 }

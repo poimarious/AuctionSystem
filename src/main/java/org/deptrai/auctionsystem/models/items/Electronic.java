@@ -6,17 +6,21 @@ public class Electronic extends Item {
     private String brand;
     private int warrantyYears;
 
+    public Electronic(String name, String description, double startingPrice, Seller seller) {
+        super(name, description, startingPrice, seller);
+    }
+
 //    public Electronic(String name, String description, double startingPrice, Seller seller, String brand, int warrantyYears) {
 //        super(name, description, startingPrice, seller);
 //        this.brand = brand;
 //        this.warrantyYears = warrantyYears;
 //    }
 
-    public Electronic(ElectronicParams p){
-        super(p);
-        this.brand = p.getBrand();
-        this.warrantyYears = p.getWarrantyYears();
-    }
+//    private Electronic(String name, String des){
+//        super(builder.name, builder.description, builder.startingPrice, builder.seller);
+//        this.brand = builder.brand;
+//        this.warrantyYears = builder.warrantyYears;
+//    }
 
     public Electronic(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String brand, int warrantyYears) {
         super(itemId, name, description, startingPrice, currentPrice, seller);
@@ -45,12 +49,14 @@ public class Electronic extends Item {
     //endregion
 
     //region Setters
-    public void setBrand(String brand) {
+    public Electronic setBrand(String brand) {
         this.brand = brand;
+        return this;
     }
 
-    public void setWarrantyYears(int warrantyYears) {
+    public Electronic setWarrantyYears(int warrantyYears) {
         this.warrantyYears = warrantyYears;
+        return this;
     }
     //endregion
 }

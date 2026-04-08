@@ -1,10 +1,11 @@
 package org.deptrai.auctionsystem.models.items;
 
-public class VehicleFactory extends ItemFactory<VehicleParams> {
+import org.deptrai.auctionsystem.models.users.Seller;
+
+public class VehicleFactory extends ItemFactory {
 
     @Override
-    public Item createItem(VehicleParams p) {
-        return new Vehicle(p);
+    public Item createItem(String name, String description, double startingPrice, Seller seller){
+        return new Vehicle(name, description, startingPrice, seller);
     }
-
 }

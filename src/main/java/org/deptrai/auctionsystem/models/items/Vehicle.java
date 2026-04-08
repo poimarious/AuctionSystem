@@ -6,16 +6,8 @@ public class Vehicle extends Item {
     private String make;
     private int mileage;
 
-//    public Vehicle(String name, String description, double startingPrice, Seller seller, String make, int mileage) {
-//        super(ps);
-//        this.make = make;
-//        this.mileage = mileage;
-//    }
-
-    public Vehicle(VehicleParams p){
-        super(p);
-        this.make = p.getMake();
-        this.mileage = p.getMileage();
+    public Vehicle(String name, String description, double startingPrice, Seller seller){
+        super(name, description, startingPrice, seller);
     }
 
     public Vehicle(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String make, int mileage) {
