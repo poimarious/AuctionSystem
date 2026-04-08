@@ -16,12 +16,6 @@ public class Electronic extends Item {
         this.warrantyYears = warrantyYears;
     }
 
-    private Electronic(Builder builder){
-        super(builder.name, builder.description, builder.startingPrice, builder.seller);
-        this.brand = builder.brand;
-        this.warrantyYears = builder.warrantyYears;
-    }
-
     @Override
     public void printInfo() {
 
@@ -54,44 +48,5 @@ public class Electronic extends Item {
     }
     //endregion
 
-    public static class Builder {
-        private String name;
-        private String description;
-        private double startingPrice;
-        private Seller seller;
 
-        private String brand;
-        private int warrantyYears;
-
-
-        public Builder setName(String name) {
-            this.name = name;
-            return this;
-        }
-        public Builder setDescription(String description) {
-            this.description = description;
-            return this;
-        }
-        public Builder setStartingPrice(double startingPrice) {
-            this.startingPrice = startingPrice;
-            return this;
-        }
-        public Builder setSeller(Seller seller ) {
-            this.seller = seller;
-            return this;
-        }
-
-        public Builder setBrand(String brand) {
-            this.brand = brand;
-            return this;
-        }
-        public Builder setWarrantyYears(int warrantyYears) {
-            this.warrantyYears = warrantyYears;
-            return this;
-        }
-
-        public Electronic build() {
-            return new Electronic(this);
-        }
-    }
 }
