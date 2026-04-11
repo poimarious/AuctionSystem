@@ -1,0 +1,90 @@
+/* 1. Cấu hình chung cho toàn ứng dụng */
+.root {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-background-color: #f4f7f6; /* Màu nền xám nhạt dịu mắt */
+}
+
+/* 2. Màu sắc cho các nút bấm (Button) */
+.button {
+    -fx-background-color: #2c3e50; /* Màu xanh đậm chuyên nghiệp */
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #34495e; /* Sáng lên một chút khi di chuột vào */
+}
+
+/* 3. Nút "Đặt giá" đặc biệt (Màu xanh lá - Thành công) */
+.btn-bid {
+    -fx-background-color: #27ae60;
+    -fx-font-weight: bold;
+}
+
+/* 4. Đồng hồ đếm ngược (Màu đỏ - Khẩn cấp) */
+.timer-label {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* 5. Khung bao quanh sản phẩm (Card) */
+.item-card {
+    -fx-background-color: white;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+}
+/* 6. Làm đẹp cho Bảng (TableView) */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #dcdde1; /* Màu viền xám nhẹ */
+}
+
+/* Tô màu xanh đậm cho thanh Tiêu đề (Thời gian, Người đặt, Số tiền) */
+.table-view .column-header {
+    -fx-background-color: #2c3e50; /* Màu xanh đậm giống Header */
+    -fx-border-color: #34495e;
+}
+
+/* Chỉnh chữ trong tiêu đề bảng sang màu trắng và in đậm */
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+}
+
+/* 7. Sửa lỗi màu chữ cho TitledPane (Khu vực Auto-Bid) */
+.titled-pane > .title {
+    -fx-background-color: #2c3e50; /* Nền xanh đậm */
+}
+
+/* Chỉ định đích danh chữ bên trong tiêu đề phải là màu trắng */
+.titled-pane > .title > .text {
+    -fx-fill: white;
+}
+
+/* Đảm bảo khi nhấp chuột vào nó vẫn giữ màu trắng */
+.titled-pane:focused > .title > .text {
+    -fx-fill: white;
+}
+
+.titled-pane > .content {
+    -fx-background-color: white;
+    -fx-border-color: #dcdde1;
+}
+/* 8. Nâng cấp nhan sắc cho thông tin sản phẩm */
+.product-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50; /* Màu xanh đậm thương hiệu */
+}
+
+.product-description {
+    -fx-font-size: 15px;
+    -fx-text-fill: #7f8c8d; /* Màu xám để làm nổi bật tiêu đề */
+    -fx-wrap-text: true; /* Cho phép chữ tự xuống dòng */
+    -fx-line-spacing: 5;
+}
