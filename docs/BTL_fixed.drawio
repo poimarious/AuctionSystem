@@ -1,149 +1,264 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15" version="29.6.5" pages="4">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6" pages="4">
   <diagram name="Class Diagram" id="Ejo-MRG7BGzgxQiodua3">
-    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1427" dy="2574" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1600" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="entity" parent="1" style="shape=mxgraph.uml.abstract;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;align=center;" value="&lt;&lt;Abstract&gt;&gt;&#xa;Entity" vertex="1">
-          <mxGeometry height="60" width="160" x="700" y="40" as="geometry" />
+        <mxCell id="entity" parent="1" style="shape=mxgraph.uml.abstract;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;align=left;spacingLeft=5;fontColor=#000000;" value="&lt;&lt;Abstract&gt;&gt;&#xa;Entity&#xa;──────────────&#xa;# id: String&#xa;# createdAt: LocalDateTime&#xa;# updatedAt: LocalDateTime&#xa;──────────────&#xa;+ printInfo(): void {abstract}&#xa;+ markUpdated(): void&#xa;+ equals(o): boolean" vertex="1">
+          <mxGeometry height="220" width="210" x="790" y="-60" as="geometry" />
         </mxCell>
-        <mxCell id="user" parent="1" style="shape=mxgraph.uml.abstract;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacingLeft=5;" value="&lt;&lt;Abstract&gt;&gt;&#xa;User&#xa;──────────────&#xa;- userId: String&#xa;- username: String&#xa;- password: String&#xa;- email: String&#xa;──────────────&#xa;+ login(): boolean&#xa;+ logout(): void&#xa;+ getInfo(): String" vertex="1">
-          <mxGeometry height="190" width="200" x="290" y="100" as="geometry" />
+        <mxCell id="user" parent="1" style="shape=mxgraph.uml.abstract;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacingLeft=5;fontColor=#000000;" value="&lt;&lt;Abstract&gt;&gt;&#xa;User&#xa;──────────────&#xa;# username: String&#xa;# passwordHash: String&#xa;# email: String&#xa;# fullName: String&#xa;# active: boolean&#xa;──────────────&#xa;+ getRole(): Role {abstract}&#xa;+ getDisplayName(): String&#xa;+ printInfo(): void" vertex="1">
+          <mxGeometry height="220" width="210" x="380" y="120" as="geometry" />
         </mxCell>
-        <mxCell id="item" parent="1" style="shape=mxgraph.uml.abstract;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacingLeft=5;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;&lt;Abstract&gt;&gt; //  Might not be abstract&#xa;Item&#xa;──────────────&#xa;- itemId: String&#xa;- name: String&#xa;- description: String&#xa;- startingPrice: double&#xa;- currentPrice: double&#xa;- seller: Seller&#xa;──────────────&#xa;+ printInfo(): void&#xa;+ getCategory(): String" vertex="1">
-          <mxGeometry height="190" width="210" x="1060" y="40" as="geometry" />
+        <mxCell id="item" parent="1" style="shape=mxgraph.uml.abstract;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacingLeft=5;fontColor=#000000;" value="&lt;&lt;Abstract&gt;&gt;&#xa;Item&#xa;──────────────&#xa;# name: String&#xa;# description: String&#xa;# startingPrice: double&#xa;# condition: String&#xa;# imageUrl: String&#xa;# seller: Seller&#xa;──────────────&#xa;+ getCategory(): ItemCategory {abstract}&#xa;+ printInfo(): void {abstract}&#xa;+ getShortDescription(): String&#xa;+ hasImage(): boolean&#xa;+ belongsTo(seller): boolean" vertex="1">
+          <mxGeometry height="250" width="225" x="1260" y="60" as="geometry" />
         </mxCell>
-        <mxCell id="bidder" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;" value="Bidder&#xa;──────────────&#xa;- balance: double&#xa;- activeBids: List&lt;Bid&gt;&#xa;──────────────&#xa;+ placeBid(auction, amount)&#xa;+ setAutoBid(maxBid, incr)&#xa;+ getActiveBids(): List" vertex="1">
-          <mxGeometry height="150" width="200" x="90" y="410" as="geometry" />
+        <mxCell id="bidder" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;fontColor=#000000;" value="Bidder&#xa;──────────────&#xa;- balance: double&#xa;- bidHistory: List&lt;BidTransaction&gt;&#xa;- watchlist: List&lt;String&gt;&#xa;──────────────&#xa;+ getRole(): Role&#xa;+ hasSufficientBalance(amount): boolean&#xa;+ addBidToHistory(bid): void&#xa;+ addToWatchlist(auctionId): void&#xa;+ removeFromWatchlist(auctionId): void&#xa;+ getBidHistory(): List" vertex="1">
+          <mxGeometry height="210" width="220" x="60" y="460" as="geometry" />
         </mxCell>
-        <mxCell id="seller" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;" value="Seller&#xa;──────────────&#xa;- listings: List&lt;Item&gt;&#xa;- rating: double&#xa;──────────────&#xa;+ addItem(item): void&#xa;+ removeItem(id): void&#xa;+ getListings(): List" vertex="1">
-          <mxGeometry height="150" width="200" x="330" y="410" as="geometry" />
+        <mxCell id="seller" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;fontColor=#000000;" value="Seller&#xa;──────────────&#xa;- listings: List&lt;Item&gt;&#xa;- rating: double&#xa;- totalSales: int&#xa;──────────────&#xa;+ getRole(): Role&#xa;+ addListing(item): void&#xa;+ removeListing(item): void&#xa;+ ownsItem(itemId): boolean&#xa;+ getListings(): List" vertex="1">
+          <mxGeometry height="200" width="210" x="340" y="460" as="geometry" />
         </mxCell>
-        <mxCell id="admin" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;" value="Admin&#xa;──────────────&#xa;- adminLevel: int&#xa;──────────────&#xa;+ manageUsers(): void&#xa;+ closeAuction(id): void&#xa;+ generateReport(): void" vertex="1">
-          <mxGeometry height="130" width="200" x="590" y="390" as="geometry" />
+        <mxCell id="admin" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;fontColor=#000000;" value="Admin&#xa;──────────────&#xa;- adminLevel: int&#xa;- permissions: List&lt;String&gt;&#xa;──────────────&#xa;+ getRole(): Role&#xa;+ hasPermission(p): boolean&#xa;+ grantPermission(p): void&#xa;+ isSuperAdmin(): boolean" vertex="1">
+          <mxGeometry height="180" width="200" x="610" y="460" as="geometry" />
         </mxCell>
-        <mxCell id="electronics" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;" value="Electronics&#xa;──────────────&#xa;- brand: String&#xa;- warrantyYears: int&#xa;──────────────&#xa;+ printInfo(): void&#xa;+ getCategory(): String" vertex="1">
-          <mxGeometry height="130" width="190" x="860" y="310" as="geometry" />
+        <mxCell id="electronics" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;fontColor=#000000;" value="Electronics&#xa;──────────────&#xa;- brand: String&#xa;- model: String&#xa;- warrantyYears: int&#xa;- specs: Map&lt;String, String&gt;&#xa;──────────────&#xa;+ getCategory(): ItemCategory&#xa;+ printInfo(): void&#xa;+ addSpec(key, value): void" vertex="1">
+          <mxGeometry height="190" width="215" x="940" y="390" as="geometry" />
         </mxCell>
-        <mxCell id="art" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;" value="Art&#xa;──────────────&#xa;- artist: String&#xa;- year: int&#xa;──────────────&#xa;+ printInfo(): void&#xa;+ getCategory(): String" vertex="1">
-          <mxGeometry height="130" width="180" x="1360" y="160" as="geometry" />
+        <mxCell id="art" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;fontColor=#000000;" value="Art&#xa;──────────────&#xa;- artist: String&#xa;- yearCreated: int&#xa;- medium: String&#xa;- authenticated: boolean&#xa;──────────────&#xa;+ getCategory(): ItemCategory&#xa;+ printInfo(): void&#xa;+ getProvenanceInfo(): String" vertex="1">
+          <mxGeometry height="190" width="210" x="1200" y="390" as="geometry" />
         </mxCell>
-        <mxCell id="vehicle" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;" value="Vehicle&#xa;──────────────&#xa;- make: String&#xa;- mileage: int&#xa;──────────────&#xa;+ printInfo(): void&#xa;+ getCategory(): String" vertex="1">
-          <mxGeometry height="130" width="180" x="1260" y="350" as="geometry" />
+        <mxCell id="vehicle" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;fontColor=#000000;" value="Vehicle&#xa;──────────────&#xa;- make: String&#xa;- vehicleModel: String&#xa;- year: int&#xa;- mileage: int&#xa;- vin: String&#xa;──────────────&#xa;+ getCategory(): ItemCategory&#xa;+ printInfo(): void&#xa;+ getVehicleDetails(): String" vertex="1">
+          <mxGeometry height="200" width="210" x="1460" y="390" as="geometry" />
         </mxCell>
-        <mxCell id="auction" parent="1" style="shape=mxgraph.uml.class;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=5;fontStyle=1;" value="Auction&#xa;──────────────&#xa;- auctionId: String&#xa;- item: Item&#xa;- startTime: LocalDateTime&#xa;- endTime: LocalDateTime&#xa;- status: AuctionStatus&#xa;- bids: List&lt;BidTransaction&gt;&#xa;- observers: List&lt;Observer&gt;&#xa;──────────────&#xa;+ placeBid(bidder, amount): void&#xa;+ close(): void&#xa;+ getWinner(): Bidder&#xa;+ addObserver(o): void&#xa;+ notifyObservers(): void&#xa;+ extendIfSniped(): void" vertex="1">
-          <mxGeometry height="240" width="230" x="350" y="760" as="geometry" />
+        <mxCell id="auction" parent="1" style="shape=mxgraph.uml.class;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=5;fontStyle=1;fontColor=#000000;" value="Auction&#xa;──────────────&#xa;- item: Item&#xa;- currentPrice: double&#xa;- currentLeader: Bidder&#xa;- status: AuctionStatus&#xa;- startTime: LocalDateTime&#xa;- endTime: LocalDateTime&#xa;- bids: List&lt;BidTransaction&gt;&#xa;- observers: List&lt;AuctionObserver&gt;&#xa;- lock: ReentrantLock&#xa;──────────────&#xa;+ addObserver(o): void&#xa;+ removeObserver(o): void&#xa;+ notifyObservers(event): void&#xa;+ notifyStatusChanged(): void&#xa;+ recordBid(bid): void&#xa;+ extendEndTime(seconds): void&#xa;+ start() / finish() / cancel() / pay()&#xa;+ isAcceptingBids(): boolean&#xa;+ isExpired(): boolean&#xa;+ getSecondsRemaining(): long&#xa;+ getWinner(): Bidder&#xa;+ getLock(): ReentrantLock" vertex="1">
+          <mxGeometry height="370" width="255" x="460" y="820" as="geometry" />
         </mxCell>
-        <mxCell id="bid" parent="1" style="shape=mxgraph.uml.class;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=5;" value="BidTransaction&#xa;──────────────&#xa;- bidId: String&#xa;- bidder: Bidder&#xa;- auction: Auction&#xa;- amount: double&#xa;- timestamp: LocalDateTime&#xa;- isAutoBid: boolean&#xa;──────────────&#xa;+ validate(): boolean&#xa;+ getDetails(): String" vertex="1">
-          <mxGeometry height="180" width="210" x="700" y="620" as="geometry" />
+        <mxCell id="bid" parent="1" style="shape=mxgraph.uml.class;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=5;fontColor=#000000;" value="BidTransaction&#xa;──────────────&#xa;- bidder: Bidder&#xa;- auction: Auction&#xa;- amount: double&#xa;- status: BidStatus&#xa;- autoBid: boolean&#xa;- timestamp: LocalDateTime&#xa;──────────────&#xa;+ markOutbid(): void&#xa;+ markRejected(): void&#xa;+ markWinning(): void&#xa;+ printInfo(): void" vertex="1">
+          <mxGeometry height="240" width="220" x="800" y="720" as="geometry" />
         </mxCell>
-        <mxCell id="autobid" parent="1" style="shape=mxgraph.uml.class;fillColor=#f8cecc;strokeColor=#b85450;align=left;spacingLeft=5;" value="AutoBidConfig&#xa;──────────────&#xa;- bidder: Bidder&#xa;- maxBid: double&#xa;- increment: double&#xa;- registeredAt: LocalDateTime&#xa;──────────────&#xa;+ execute(currentPrice): double" vertex="1">
-          <mxGeometry height="140" width="210" x="722" y="990" as="geometry" />
+        <mxCell id="autobid" parent="1" style="shape=mxgraph.uml.class;fillColor=#f8cecc;strokeColor=#b85450;align=left;spacingLeft=5;fontColor=#000000;" value="AutoBidConfig&#xa;implements Comparable&lt;AutoBidConfig&gt;&#xa;──────────────&#xa;- bidder: Bidder&#xa;- auctionId: String&#xa;- maxBid: double&#xa;- increment: double&#xa;- active: boolean&#xa;- registeredAt: LocalDateTime&#xa;──────────────&#xa;+ nextBidAmount(currentPrice): double&#xa;+ canBid(currentPrice): boolean&#xa;+ deactivate(): void&#xa;+ compareTo(other): int" vertex="1">
+          <mxGeometry height="250" width="250" x="790" y="1030" as="geometry" />
         </mxCell>
-        <mxCell id="status" parent="1" style="shape=mxgraph.uml.class;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=5;" value="&lt;&lt;enum&gt;&gt;&#xa;AuctionStatus&#xa;──────────────&#xa;OPEN&#xa;RUNNING&#xa;FINISHED&#xa;PAID&#xa;CANCELED" vertex="1">
-          <mxGeometry height="140" width="160" x="100" y="810" as="geometry" />
+        <mxCell id="bidevent" parent="1" style="shape=mxgraph.uml.class;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=5;fontColor=#000000;" value="BidEvent&#xa;──────────────&#xa;- auctionId: String&#xa;- newPrice: double&#xa;- bidderUsername: String&#xa;- timestamp: LocalDateTime&#xa;- eventType: String&#xa;- isAutoBid: boolean&#xa;──────────────&#xa;+ statusChanged(id): BidEvent {static}" vertex="1">
+          <mxGeometry height="220" width="225" x="1090" y="660" as="geometry" />
         </mxCell>
-        <mxCell id="auctionmgr" parent="1" style="shape=mxgraph.uml.class;fillColor=#f8cecc;strokeColor=#b85450;align=left;spacingLeft=5;" value="&lt;&lt;Singleton&gt;&gt;&#xa;AuctionManager&#xa;──────────────&#xa;- instance: AuctionManager&#xa;- auctions: Map&lt;String,Auction&gt;&#xa;──────────────&#xa;+ getInstance(): AuctionManager&#xa;+ createAuction(...): Auction&#xa;+ getAuction(id): Auction&#xa;+ getAllAuctions(): List" vertex="1">
-          <mxGeometry height="180" width="220" x="1300" y="550" as="geometry" />
+        <mxCell id="status" parent="1" style="shape=mxgraph.uml.class;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=5;fontColor=#000000;" value="&lt;&lt;enum&gt;&gt;&#xa;AuctionStatus&#xa;──────────────&#xa;OPEN / RUNNING&#xa;FINISHED / PAID / CANCELED&#xa;──────────────&#xa;+ isAcceptingBids(): boolean&#xa;+ isTerminal(): boolean" vertex="1">
+          <mxGeometry height="170" width="185" x="140" y="860" as="geometry" />
         </mxCell>
-        <mxCell id="e1" edge="1" parent="1" source="user" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;" target="entity">
+        <mxCell id="bidstatus" parent="1" style="shape=mxgraph.uml.class;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=5;fontColor=#000000;" value="&lt;&lt;enum&gt;&gt;&#xa;BidStatus&#xa;──────────────&#xa;WINNING / OUTBID / REJECTED&#xa;──────────────&#xa;+ isWinning(): boolean&#xa;+ isAccepted(): boolean" vertex="1">
+          <mxGeometry height="150" width="185" x="140" y="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="roleEnum" parent="1" style="shape=mxgraph.uml.class;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=5;fontColor=#000000;" value="&lt;&lt;enum&gt;&gt;&#xa;Role&#xa;──────────────&#xa;BIDDER / SELLER / ADMIN&#xa;──────────────&#xa;+ canBid(): boolean&#xa;+ canSell(): boolean&#xa;+ isAdmin(): boolean" vertex="1">
+          <mxGeometry height="150" width="170" x="80" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="itemcat" parent="1" style="shape=mxgraph.uml.class;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=5;fontColor=#000000;" value="&lt;&lt;enum&gt;&gt;&#xa;ItemCategory&#xa;──────────────&#xa;ELECTRONICS / ART&#xa;VEHICLE / OTHER&#xa;──────────────&#xa;+ getDisplayName(): String" vertex="1">
+          <mxGeometry height="160" width="175" x="1630" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="iObserver" parent="1" style="shape=mxgraph.uml.abstract;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=5;fontColor=#000000;" value="&lt;&lt;interface&gt;&gt;&#xa;AuctionObserver&#xa;──────────────&#xa;+ onBidPlaced(event: BidEvent): void&#xa;+ onAuctionStatusChanged(a: Auction): void" vertex="1">
+          <mxGeometry height="120" width="245" x="1090" y="1070" as="geometry" />
+        </mxCell>
+        <mxCell id="auctionmgr" parent="1" style="shape=mxgraph.uml.class;fillColor=#f8cecc;strokeColor=#b85450;align=left;spacingLeft=5;fontColor=#000000;" value="&lt;&lt;Singleton&gt;&gt;&#xa;AuctionManager&#xa;──────────────&#xa;- instance: AuctionManager (volatile)&#xa;- auctions: Map&lt;String, Auction&gt;&#xa;- scheduler: ScheduledExecutorService&#xa;──────────────&#xa;+ getInstance(): AuctionManager&#xa;+ createAuction(item, start, end): Auction&#xa;+ getAuction(id): Auction&#xa;+ getAllAuctions(): List&lt;Auction&gt;&#xa;+ getActiveAuctions(): List&#xa;+ scheduleClose(auction): void" vertex="1">
+          <mxGeometry height="230" width="255" x="1530" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="bidservice" parent="1" style="shape=mxgraph.uml.class;fillColor=#f8cecc;strokeColor=#b85450;align=left;spacingLeft=5;fontColor=#000000;" value="BidService&#xa;──────────────&#xa;- auctionLocks: Map&lt;String, ReentrantLock&gt;&#xa;──────────────&#xa;+ placeBid(auctionId, bidderId, amount): BidTransaction&#xa;  1. lock = auction.getLock()&#xa;  2. validate: isAcceptingBids() &amp;&amp; amount &gt; price&#xa;  3. new BidTransaction(bidder, auction, amount)&#xa;  4. auction.recordBid(bid)&#xa;  5. bidDAO.save(bid)&#xa;  6. autoBidEngine.process(auction)&#xa;  7. unlock&#xa;+ validateBid(auction, bidder, amount): void" vertex="1">
+          <mxGeometry height="250" width="310" x="390" y="1330" as="geometry" />
+        </mxCell>
+        <mxCell id="itemcreator" parent="1" style="shape=mxgraph.uml.abstract;fillColor=#f8cecc;strokeColor=#b85450;align=left;spacingLeft=5;fontColor=#000000;" value="&lt;&lt;Abstract&gt;&gt; ItemCreator&#xa;[Factory Method Pattern]&#xa;──────────────&#xa;# name, description: String&#xa;# startingPrice: double&#xa;# condition: String&#xa;# seller: Seller&#xa;──────────────&#xa;+ createItem(): Item {abstract}&#xa;# validateCommon(): void" vertex="1">
+          <mxGeometry height="220" width="230" x="1085" y="1300" as="geometry" />
+        </mxCell>
+        <mxCell id="elcreator" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;fontColor=#000000;" value="ElectronicsCreator&#xa;──────────────&#xa;- brand, model: String&#xa;- warrantyYears: int&#xa;──────────────&#xa;+ createItem(): Item" vertex="1">
+          <mxGeometry height="140" width="200" x="810" y="1580" as="geometry" />
+        </mxCell>
+        <mxCell id="artcreator" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;fontColor=#000000;" value="ArtCreator&#xa;──────────────&#xa;- artist: String&#xa;- yearCreated: int&#xa;- medium: String&#xa;- authenticated: boolean&#xa;──────────────&#xa;+ createItem(): Item" vertex="1">
+          <mxGeometry height="160" width="195" x="1030" y="1580" as="geometry" />
+        </mxCell>
+        <mxCell id="vehcreator" parent="1" style="shape=mxgraph.uml.class;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=5;fontColor=#000000;" value="VehicleCreator&#xa;──────────────&#xa;- make, vehicleModel: String&#xa;- year, mileage: int&#xa;- vin: String&#xa;──────────────&#xa;+ createItem(): Item" vertex="1">
+          <mxGeometry height="160" width="200" x="1245" y="1580" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="user" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;fontColor=#000000;" target="entity">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e2" edge="1" parent="1" source="item" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;" target="entity">
+        <mxCell id="e2" edge="1" parent="1" source="item" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;fontColor=#000000;" target="entity">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e3" edge="1" parent="1" source="bidder" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;" target="user">
+        <mxCell id="e3" edge="1" parent="1" source="bidder" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;fontColor=#000000;" target="user">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="190" y="350" />
-              <mxPoint x="360" y="350" />
+              <mxPoint x="170" y="380" />
+              <mxPoint x="450" y="380" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e4" edge="1" parent="1" source="seller" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;" target="user">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="430" y="310" />
-              <mxPoint x="430" y="310" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="e5" edge="1" parent="1" source="admin" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;exitX=0.442;exitY=-0.006;exitDx=0;exitDy=0;exitPerimeter=0;">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="678" y="365" />
-              <mxPoint x="470" y="365" />
-            </Array>
-            <mxPoint x="680" y="365.0666666666666" as="sourcePoint" />
-            <mxPoint x="470.0666666666666" y="290" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="e6" edge="1" parent="1" source="electronics" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;" target="item">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="960" y="280" />
-              <mxPoint x="1080" y="280" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="e7" edge="1" parent="1" source="art" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;" target="item">
+        <mxCell id="e4" edge="1" parent="1" source="seller" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;fontColor=#000000;" target="user">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e8" edge="1" parent="1" source="vehicle" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;" target="item">
+        <mxCell id="e5" edge="1" parent="1" source="admin" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;fontColor=#000000;" target="user">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1340" y="310" />
-              <mxPoint x="1120" y="310" />
+              <mxPoint x="690" y="380" />
+              <mxPoint x="520" y="380" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e9" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;entryX=0.633;entryY=1.012;entryDx=0;entryDy=0;entryPerimeter=0;" target="item" value="contains 1">
+        <mxCell id="e6" edge="1" parent="1" source="electronics" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;fontColor=#000000;" target="item">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1170" y="840" />
-              <mxPoint x="1170" y="280" />
-              <mxPoint x="1173" y="280" />
+              <mxPoint x="1050" y="340" />
+              <mxPoint x="1320" y="340" />
             </Array>
-            <mxPoint x="580" y="840" as="sourcePoint" />
-            <mxPoint x="1169.9999999999995" y="229.9999999999999" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e10" edge="1" parent="1" source="auction" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="bid" value="1..*">
+        <mxCell id="e7" edge="1" parent="1" source="art" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;fontColor=#000000;" target="item">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1305" y="340" />
+              <mxPoint x="1375" y="340" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="vehicle" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;fontColor=#000000;" target="item">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1565" y="340" />
+              <mxPoint x="1440" y="340" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="auction" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;fontColor=#000000;" target="item" value="1 contains 1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1390" y="1005" />
+              <mxPoint x="1390" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="auction" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;fontColor=#000000;" target="bid" value="1..*">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e11" edge="1" parent="1" source="bid" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="bidder" value="placed by">
+        <mxCell id="e11" edge="1" parent="1" source="bid" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;fontColor=#000000;" target="bidder" value="placed by">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="190" y="670" />
+              <mxPoint x="800" y="800" />
+              <mxPoint x="170" y="800" />
+              <mxPoint x="170" y="670" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e12" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="autobid" value="configures">
+        <mxCell id="e12" edge="1" parent="1" source="autobid" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;fontColor=#000000;" target="bidder" value="belongs to">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="240" y="600" />
-              <mxPoint x="1090" y="600" />
-              <mxPoint x="1090" y="940" />
-              <mxPoint x="1160" y="940" />
-              <mxPoint x="1160" y="1000" />
-              <mxPoint x="1090" y="1000" />
-              <mxPoint x="1090" y="950" />
-              <mxPoint x="1040" y="950" />
-              <mxPoint x="1040" y="940" />
-              <mxPoint x="915" y="940" />
+              <mxPoint x="790" y="1155" />
+              <mxPoint x="170" y="1155" />
+              <mxPoint x="170" y="670" />
             </Array>
-            <mxPoint x="240" y="560" as="sourcePoint" />
-            <mxPoint x="1085" y="980" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e13" edge="1" parent="1" source="auction" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;" target="status" value="has status">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e14" edge="1" parent="1" source="auctionmgr" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="auction" value="manages *">
+        <mxCell id="e13" edge="1" parent="1" source="auction" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;fontColor=#000000;" target="status" value="has status">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="930" y="790" />
-              <mxPoint x="930" y="910" />
+              <mxPoint x="460" y="1005" />
+              <mxPoint x="232" y="1005" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_bidstatus" edge="1" parent="1" source="bid" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;fontColor=#000000;" target="bidstatus" value="has status">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="800" y="870" />
+              <mxPoint x="700" y="870" />
+              <mxPoint x="700" y="1155" />
+              <mxPoint x="325" y="1155" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_role" edge="1" parent="1" source="user" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;fontColor=#000000;" target="roleEnum" value="has role">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="380" y="240" />
+              <mxPoint x="170" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_cat" edge="1" parent="1" source="item" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;fontColor=#000000;" target="itemcat" value="has category">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1710" y="185" />
+              <mxPoint x="1798" y="185" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="auctionmgr" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;fontColor=#000000;" target="auction" value="manages *">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1530" y="935" />
+              <mxPoint x="715" y="935" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_obs" edge="1" parent="1" source="auction" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;fontColor=#000000;" target="iObserver" value="notifies">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="715" y="1110" />
+              <mxPoint x="1110" y="1110" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_event" edge="1" parent="1" source="auction" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;fontColor=#000000;" target="bidevent" value="emits">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="715" y="980" />
+              <mxPoint x="1120" y="980" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_svc" edge="1" parent="1" source="bidservice" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;fontColor=#000000;" target="auction" value="uses">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="535" y="1270" />
+              <mxPoint x="535" y="1190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_svc2" edge="1" parent="1" source="bidservice" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;fontColor=#000000;" target="bid" value="creates">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="690" y="1330" />
+              <mxPoint x="910" y="1330" />
+              <mxPoint x="910" y="960" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_fac" edge="1" parent="1" source="itemcreator" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;dashed=1;fontColor=#000000;" target="item" value="&lt;&lt;creates&gt;&gt;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1125" y="1290" />
+              <mxPoint x="1380" y="1290" />
+              <mxPoint x="1380" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_el" edge="1" parent="1" source="elcreator" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;fontColor=#000000;" target="itemcreator">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="910" y="1530" />
+              <mxPoint x="1125" y="1530" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_ar" edge="1" parent="1" source="artcreator" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;fontColor=#000000;" target="itemcreator">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1128" y="1540" />
+              <mxPoint x="1128" y="1510" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_vh" edge="1" parent="1" source="vehcreator" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;fontColor=#000000;" target="itemcreator">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1345" y="1540" />
+              <mxPoint x="1195" y="1540" />
             </Array>
           </mxGeometry>
         </mxCell>
