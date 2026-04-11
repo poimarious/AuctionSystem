@@ -1,4 +1,4 @@
-package com.example.gd;
+package org.deptrai.auctionsystem.views;
 
 public enum AuctionStatus {
     OPEN,

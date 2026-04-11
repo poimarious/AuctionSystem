@@ -1,4 +1,4 @@
-package com.example.gd;
+package org.deptrai.auctionsystem.views;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;

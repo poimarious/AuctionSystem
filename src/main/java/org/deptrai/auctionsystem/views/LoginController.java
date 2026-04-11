@@ -1,4 +1,4 @@
-package com.example.gd;
+package org.deptrai.auctionsystem.views;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
