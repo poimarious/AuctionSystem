@@ -4,16 +4,16 @@ import org.deptrai.auctionsystem.models.users.Seller;
 
 public class Art extends Item {
     private String artist;
-    private int year;
+    private int yearCreated;
 
     public Art(String name, String description, double startingPrice, Seller seller) {
         super(name, description, startingPrice, seller);
     }
 
-    public Art(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String artist, int year) {
+    public Art(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String artist, int yearCreated) {
         super(itemId, name, description, startingPrice, currentPrice, seller);
         this.artist = artist;
-        this.year = year;
+        this.yearCreated = yearCreated;
     }
     
     @Override
@@ -31,8 +31,8 @@ public class Art extends Item {
         return artist;
     }
 
-    public int getYear() {
-        return year;
+    public int getYearCreated() {
+        return yearCreated;
     }
     //endregion
 
@@ -42,10 +42,9 @@ public class Art extends Item {
         return this;
     }
 
-    public Art setYear(int year) {
-        this.year = year;
+    public Art setYearCreated(int yearCreated) {
+        this.yearCreated = yearCreated;
         return this;
     }
     //endregion
-
 }

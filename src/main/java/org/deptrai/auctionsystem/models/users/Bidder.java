@@ -8,26 +8,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bidder extends User implements BidObserver {
-    private double balance;
-    private List<Bid> activeBids;
+    private List<Bid> bidHistory;
 
     public Bidder(String username, String password, String email) {
         super(username, password, email);
-        balance = 0.0;
-        activeBids = new ArrayList<>();
+        bidHistory = new ArrayList<>();
     }
 
-    public Bidder(String userId, String username, String password, String email, double balance, List<Bid> activeBids) {
+    public Bidder(String userId, String username, String password, String email, double balance, List<Bid> bidHistory) {
         super(userId, username, password, email);
-        this.balance = balance;
-        this.activeBids = activeBids;
+        this.bidHistory = bidHistory;
     }
 
     public void placeBid(Auction auction, double amount){
-
-    }
-
-    public void setAutoBid(double maxBid, double incr){
 
     }
 
@@ -56,22 +49,14 @@ public class Bidder extends User implements BidObserver {
     }
 
     //region Getters
-    public double getBalance() {
-        return balance;
-    }
-
-    public List<Bid> getActiveBids() {
-        return activeBids;
+    public List<Bid> getBidHistory() {
+        return bidHistory;
     }
     //endregion
 
     //region Setters
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
-
-    public void setActiveBids(List<Bid> activeBids) {
-        this.activeBids = activeBids;
+    public void setBidHistory(List<Bid> bidHistory) {
+        this.bidHistory = bidHistory;
     }
     //endregion
 }

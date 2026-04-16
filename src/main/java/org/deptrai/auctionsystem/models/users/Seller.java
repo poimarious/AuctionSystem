@@ -4,27 +4,24 @@ import org.deptrai.auctionsystem.models.items.Item;
 import java.util.List;
 
 public class Seller extends User {
-    private List<Item> listings;
-    private double rating;
+    private List<Item> listedItems;
 
     public Seller(String username, String password, String email) {
         super(username, password, email);
-        rating = -1.0; // No rating yet
     }
 
     public Seller(String userId, String username, String password, String email, double rating) {
         super(userId, username, password, email);
-        this.rating = rating;
     }
 
     public void addItem(Item item){
-        listings.add(item);
+        listedItems.add(item);
     }
 
     public void removeItem(String id){
-        for (Item item : listings){
+        for (Item item : listedItems){
             if (item.getItemId().equals(id)){
-                listings.remove(item);
+                listedItems.remove(item);
                 break;
             }
         }
@@ -45,23 +42,12 @@ public class Seller extends User {
         return "";
     }
 
-    //region Getters
-    public double getRating() {
-        return rating;
+    //region Getter & Setter
+    public List<Item> getListedItems(){
+        return listedItems;
     }
-
-    public List<Item> getListings(){
-        return listings;
-    }
-    //endregion
-
-    //region Setters
-    public void setListings(List<Item> listings) {
-        this.listings = listings;
-    }
-
-    public void setRating(double rating) {
-        this.rating = rating;
+    public void setListedItems(List<Item> listedItems) {
+        this.listedItems = listedItems;
     }
     //endregion
 }

@@ -47,5 +47,4 @@ public class Vehicle extends Item {
         return this;
     }
     //endregion
-
 }

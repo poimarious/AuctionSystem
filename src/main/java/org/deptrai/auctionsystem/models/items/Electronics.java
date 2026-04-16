@@ -2,18 +2,18 @@ package org.deptrai.auctionsystem.models.items;
 
 import org.deptrai.auctionsystem.models.users.Seller;
 
-public class Electronic extends Item {
+public class Electronics extends Item {
     private String brand;
-    private int warrantyYears;
+    private int warrantyMonths;
 
-    public Electronic(String name, String description, double startingPrice, Seller seller) {
+    public Electronics(String name, String description, double startingPrice, Seller seller) {
         super(name, description, startingPrice, seller);
     }
 
-    public Electronic(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String brand, int warrantyYears) {
+    public Electronics(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller, String brand, int warrantyMonths) {
         super(itemId, name, description, startingPrice, currentPrice, seller);
         this.brand = brand;
-        this.warrantyYears = warrantyYears;
+        this.warrantyMonths = warrantyMonths;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class Electronic extends Item {
 
     @Override
     public String getCategory() {
-        return "Electronic";
+        return "Electronics";
     }
 
     //region Getters
@@ -31,19 +31,19 @@ public class Electronic extends Item {
         return brand;
     }
 
-    public int getWarrantyYears() {
-        return warrantyYears;
+    public int getWarrantyMonths() {
+        return warrantyMonths;
     }
     //endregion
 
     //region Setters
-    public Electronic setBrand(String brand) {
+    public Electronics setBrand(String brand) {
         this.brand = brand;
         return this;
     }
 
-    public Electronic setWarrantyYears(int warrantyYears) {
-        this.warrantyYears = warrantyYears;
+    public Electronics setWarrantyMonths(int warrantyMonths) {
+        this.warrantyMonths = warrantyMonths;
         return this;
     }
     //endregion
