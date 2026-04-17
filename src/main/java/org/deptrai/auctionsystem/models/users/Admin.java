@@ -1,5 +1,7 @@
 package org.deptrai.auctionsystem.models.users;
 
+import org.deptrai.auctionsystem.models.items.Item;
+
 public class Admin extends User {
     private int adminLevel;
 
@@ -13,15 +15,11 @@ public class Admin extends User {
         this.adminLevel = adminLevel;
     }
 
-    public void manageUsers(){
-
-    }
-
     public void closeAuction(String id){
 
     }
 
-    public void generateReport(){
+    public void removeItem(Item item){
 
     }
 

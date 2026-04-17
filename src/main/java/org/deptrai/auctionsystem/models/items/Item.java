@@ -9,7 +9,6 @@ public abstract class Item implements Serializable {
     private String name;
     private String description;
     private double startingPrice;
-    private double currentPrice;
     private Seller seller;
 
     public Item() {}
@@ -18,7 +17,6 @@ public abstract class Item implements Serializable {
         this.name = name;
         this.description = description;
         this.startingPrice = startingPrice; // currentPrice is the same as startingPrice when starting out
-        this.currentPrice = startingPrice;
         this.seller = seller;
     } //For creating a new object
 
@@ -27,7 +25,6 @@ public abstract class Item implements Serializable {
         this.name = name;
         this.description = description;
         this.startingPrice = startingPrice;
-        this.currentPrice = currentPrice;
         this.seller = seller;
     } //For loading an object
 
@@ -50,10 +47,6 @@ public abstract class Item implements Serializable {
 
     public double getStartingPrice() {
         return startingPrice;
-    }
-
-    public double getCurrentPrice() {
-        return currentPrice;
     }
 
     public Seller getSeller() {
@@ -79,11 +72,6 @@ public abstract class Item implements Serializable {
 
     public Item setStartingPrice(double startingPrice) {
         this.startingPrice = startingPrice;
-        return this;
-    }
-
-    public Item setCurrentPrice(double currentPrice) {
-        this.currentPrice = currentPrice;
         return this;
     }
 

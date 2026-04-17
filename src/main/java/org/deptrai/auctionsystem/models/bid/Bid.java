@@ -1,6 +1,7 @@
 package org.deptrai.auctionsystem.models.bid;
 
 import org.deptrai.auctionsystem.models.auction.Auction;
+import org.deptrai.auctionsystem.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.models.users.Bidder;
 
 import java.time.LocalDateTime;
@@ -11,14 +12,12 @@ public class Bid {
     private Auction auction;
     private double amount;
     private LocalDateTime timestamp;
-    private boolean isAutoBid;
 
     public Bid(Bidder bidder, Auction auction, double amount, LocalDateTime timestamp){
         this.bidder = bidder;
         this.auction = auction;
         this.amount = amount;
         this.timestamp = timestamp;
-        isAutoBid = false;
     }// For creating a new object
 
     public Bid(String bidId, Bidder bidder, Auction auction, double amount, LocalDateTime timestamp){
@@ -27,15 +26,14 @@ public class Bid {
         this.auction = auction;
         this.amount = amount;
         this.timestamp = timestamp;
-        isAutoBid = false;
     }// For loading from database
 
     public boolean validate(){
-        return false;
+        return auction.getStatus() == AuctionStatus.RUNNING && amount > auction.getCurrentPrice();
     }
 
     public String getDetails(){
-        return null;
+        return String.format("[%s] %s bid $%.2f", timestamp, bidder.getUsername(), amount);
     }
 
     //region Getters
@@ -59,9 +57,6 @@ public class Bid {
         return timestamp;
     }
 
-    public boolean isAutoBid() {
-        return isAutoBid;
-    }
     //endregion
 
     //region Setters
@@ -85,8 +80,5 @@ public class Bid {
         this.timestamp = timestamp;
     }
 
-    public void setAutoBid(boolean autoBid) {
-        isAutoBid = autoBid;
-    }
     //endregion
 }
