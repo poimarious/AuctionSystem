@@ -1,6 +1,7 @@
 package org.deptrai.auctionsystem.models.bid;
 
 import org.deptrai.auctionsystem.models.auction.Auction;
+import org.deptrai.auctionsystem.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.models.users.Bidder;
 
 import java.time.LocalDateTime;
@@ -28,11 +29,11 @@ public class Bid {
     }// For loading from database
 
     public boolean validate(){
-        return false;
+        return auction.getStatus() == AuctionStatus.RUNNING && amount > auction.getCurrentPrice();
     }
 
     public String getDetails(){
-        return null;
+        return String.format("[%s] %s bid $%.2f", timestamp, bidder.getUsername(), amount);
     }
 
     //region Getters
