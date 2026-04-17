@@ -1,0 +1,279 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36">
+  <diagram name="Auction System - Class Diagram" id="WRgy2YIKS7oSTvICyGOH">
+    <mxGraphModel dx="2004" dy="1615" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ELrp7GKIvxSUEEktG43t-1" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;&lt;abstract&gt;&gt;&#xa;User" vertex="1">
+          <mxGeometry height="160" width="240" x="190" y="-200" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-2" parent="ELrp7GKIvxSUEEktG43t-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="- userId: String&#xa;- username: String&#xa;- password: String&#xa;- email: String" vertex="1">
+          <mxGeometry height="68" width="240" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-3" parent="ELrp7GKIvxSUEEktG43t-1" style="line;strokeColor=#6c8ebf;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="240" y="98" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-4" parent="ELrp7GKIvxSUEEktG43t-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ login(password: String): boolean&#xa;+ logout(): void&#xa;+ getUserId(): String" vertex="1">
+          <mxGeometry height="57" width="240" y="103" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-5" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;" value="Bidder" vertex="1">
+          <mxGeometry height="115" width="220" x="-20" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-6" parent="ELrp7GKIvxSUEEktG43t-5" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="- bidHistory: List&lt;Bid&gt;" vertex="1">
+          <mxGeometry height="28" width="220" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-7" parent="ELrp7GKIvxSUEEktG43t-5" style="line;strokeColor=#82b366;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="220" y="58" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-8" parent="ELrp7GKIvxSUEEktG43t-5" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ placeBid(a: Auction, amt: double): void&#xa;+ getBidHistory(): List&lt;Bid&gt;" vertex="1">
+          <mxGeometry height="52" width="220" y="63" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-9" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;" value="Seller" vertex="1">
+          <mxGeometry height="115" width="220" x="260" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-10" parent="ELrp7GKIvxSUEEktG43t-9" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="- listedItems: List&lt;Item&gt;" vertex="1">
+          <mxGeometry height="28" width="220" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-11" parent="ELrp7GKIvxSUEEktG43t-9" style="line;strokeColor=#82b366;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="220" y="58" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-12" parent="ELrp7GKIvxSUEEktG43t-9" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ listItem(item: Item): void&#xa;+ getListedItems(): List&lt;Item&gt;" vertex="1">
+          <mxGeometry height="52" width="220" y="63" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-13" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;" value="Admin" vertex="1">
+          <mxGeometry height="115" width="220" x="430" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-14" parent="ELrp7GKIvxSUEEktG43t-13" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="- adminLevel: int" vertex="1">
+          <mxGeometry height="28" width="220" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-15" parent="ELrp7GKIvxSUEEktG43t-13" style="line;strokeColor=#82b366;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="220" y="58" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-16" parent="ELrp7GKIvxSUEEktG43t-13" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ forceCloseAuction(a: Auction): void&#xa;+ removeItem(item: Item): void" vertex="1">
+          <mxGeometry height="52" width="220" y="63" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-17" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#ffe6cc;strokeColor=#d6b656;" value="&lt;&lt;abstract&gt;&gt;&#xa;Item" vertex="1">
+          <mxGeometry height="160" width="240" x="970" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-18" parent="ELrp7GKIvxSUEEktG43t-17" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="- itemId: String&#xa;- name: String&#xa;- description: String&#xa;- startingPrice: double&#xa;- seller: Seller" vertex="1">
+          <mxGeometry height="83" width="240" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-19" parent="ELrp7GKIvxSUEEktG43t-17" style="line;strokeColor=#d6b656;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="240" y="113" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-20" parent="ELrp7GKIvxSUEEktG43t-17" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ getItemId(): String&#xa;+ getStartingPrice(): double" vertex="1">
+          <mxGeometry height="42" width="240" y="118" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-21" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;" value="Electronics" vertex="1">
+          <mxGeometry height="100" width="200" x="810" y="217.5" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-22" parent="ELrp7GKIvxSUEEktG43t-21" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="- brand: String&#xa;- warrantyMonths: int" vertex="1">
+          <mxGeometry height="35" width="200" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-23" parent="ELrp7GKIvxSUEEktG43t-21" style="line;strokeColor=#d6b656;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="200" y="65" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-24" parent="ELrp7GKIvxSUEEktG43t-21" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ getWarranty(): int" vertex="1">
+          <mxGeometry height="30" width="200" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-25" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;" value="Art" vertex="1">
+          <mxGeometry height="100" width="190" x="1030" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-84" edge="1" parent="ELrp7GKIvxSUEEktG43t-25" source="ELrp7GKIvxSUEEktG43t-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ELrp7GKIvxSUEEktG43t-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-26" parent="ELrp7GKIvxSUEEktG43t-25" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="- artist: String&#xa;- yearCreated: int" vertex="1">
+          <mxGeometry height="35" width="190" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-27" parent="ELrp7GKIvxSUEEktG43t-25" style="line;strokeColor=#d6b656;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="190" y="65" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-28" parent="ELrp7GKIvxSUEEktG43t-25" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ getArtist(): String" vertex="1">
+          <mxGeometry height="30" width="190" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-29" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;" value="Vehicle" vertex="1">
+          <mxGeometry height="100" width="190" x="1335" y="225" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-82" edge="1" parent="ELrp7GKIvxSUEEktG43t-29" source="ELrp7GKIvxSUEEktG43t-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ELrp7GKIvxSUEEktG43t-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-30" parent="ELrp7GKIvxSUEEktG43t-29" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="- make: String&#xa;- mileage: int" vertex="1">
+          <mxGeometry height="30" width="190" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-31" parent="ELrp7GKIvxSUEEktG43t-29" style="line;strokeColor=#d6b656;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="190" y="65" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-32" parent="ELrp7GKIvxSUEEktG43t-29" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ getMileage(): int" vertex="1">
+          <mxGeometry height="30" width="190" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-33" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#f8cecc;strokeColor=#b85450;" value="Bid" vertex="1">
+          <mxGeometry height="180" width="220" x="-30" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-34" parent="ELrp7GKIvxSUEEktG43t-33" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="- bidId: String&#xa;- bidder: Bidder&#xa;- auction: Auction&#xa;- amount: double&#xa;- timestamp: LocalDateTime" vertex="1">
+          <mxGeometry height="70" width="220" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-35" parent="ELrp7GKIvxSUEEktG43t-33" style="line;strokeColor=#b85450;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="220" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-36" parent="ELrp7GKIvxSUEEktG43t-33" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ getAmount(): double&#xa;+ getBidder(): Bidder" vertex="1">
+          <mxGeometry height="60" width="220" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-37" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#f8cecc;strokeColor=#b85450;" value="Auction" vertex="1">
+          <mxGeometry height="240" width="270" x="260" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-38" parent="ELrp7GKIvxSUEEktG43t-37" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="- auctionId: String&#xa;- item: Item&#xa;- currentPrice: double&#xa;- status: AuctionStatus&#xa;- endTime: LocalDateTime&#xa;- bids: List&lt;Bid&gt;&#xa;- observers: List&lt;AuctionObserver&gt;&#xa;" vertex="1">
+          <mxGeometry height="115" width="270" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-39" parent="ELrp7GKIvxSUEEktG43t-37" style="line;strokeColor=#b85450;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="270" y="145" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-40" parent="ELrp7GKIvxSUEEktG43t-37" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ placeBid(bid: Bid): void&#xa;+ closeAuction(): void&#xa;+ getWinner(): Bidder&#xa;+ addObserver(o: AuctionObserver): void&#xa;+ notifyObservers(): void" vertex="1">
+          <mxGeometry height="90" width="270" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-41" parent="1" style="swimlane;fontStyle=3;align=center;startSize=40;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;&lt;interface&gt;&gt; AuctionObserver" vertex="1">
+          <mxGeometry height="100" width="255" x="660" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-42" parent="ELrp7GKIvxSUEEktG43t-41" style="line;strokeColor=#9673a6;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="255" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-43" parent="ELrp7GKIvxSUEEktG43t-41" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ onBidPlaced(a: Auction, b: Bid): void&#xa;+ onAuctionClosed(a: Auction): void" vertex="1">
+          <mxGeometry height="55" width="255" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-44" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;&lt;enum&gt;&gt;&#xa;AuctionStatus" vertex="1">
+          <mxGeometry height="135" width="200" x="660" y="599" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-45" parent="ELrp7GKIvxSUEEktG43t-44" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="OPEN&#xa;RUNNING&#xa;FINISHED&#xa;PAID&#xa;CANCELED" vertex="1">
+          <mxGeometry height="105" width="200" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-46" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="AuctionManager  &lt;&lt;Singleton&gt;&gt;" vertex="1">
+          <mxGeometry height="155" width="270" x="260" y="710" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-47" parent="ELrp7GKIvxSUEEktG43t-46" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="- instance: AuctionManager  {static}&#xa;- auctions: List&lt;Auction&gt;" vertex="1">
+          <mxGeometry height="45" width="270" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-48" parent="ELrp7GKIvxSUEEktG43t-46" style="line;strokeColor=#6c8ebf;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="270" y="75" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-49" parent="ELrp7GKIvxSUEEktG43t-46" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ getInstance(): AuctionManager  {static}&#xa;+ createAuction(item, endTime): Auction&#xa;+ getAuctions(): List&lt;Auction&gt;&#xa;+ findAuction(id: String): Auction" vertex="1">
+          <mxGeometry height="75" width="270" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-50" parent="1" style="swimlane;fontStyle=1;align=center;startSize=30;fillColor=#ffe6cc;strokeColor=#d6b656;" value="ItemFactory  &lt;&lt;Factory&gt;&gt;" vertex="1">
+          <mxGeometry height="100" width="240" x="1355" y="-5" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-51" parent="ELrp7GKIvxSUEEktG43t-50" style="line;strokeColor=#d6b656;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="5" width="240" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-52" parent="ELrp7GKIvxSUEEktG43t-50" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=11;" value="+ createItem(type: String,&#xa;name: String, desc: String,&#xa;  price: double, seller: Seller): Item" vertex="1">
+          <mxGeometry height="65" width="240" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-53" parent="1" style="swimlane;fontStyle=1;align=center;startSize=42;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" value="&lt;&lt;exception&gt;&gt;&#xa;InvalidBidException" vertex="1">
+          <mxGeometry height="42" width="225" x="-20" y="644" as="geometry">
+            <mxRectangle height="42" width="140" x="-10" y="640" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-54" parent="1" style="swimlane;fontStyle=1;align=center;startSize=42;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" value="&lt;&lt;exception&gt;&gt;&#xa;AuctionClosedException" vertex="1">
+          <mxGeometry height="42" width="225" x="-20" y="712" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-55" parent="1" style="swimlane;fontStyle=1;align=center;startSize=42;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" value="&lt;&lt;exception&gt;&gt;&#xa;AuthenticationException" vertex="1">
+          <mxGeometry height="42" width="225" x="-20" y="774" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-57" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;" value="&lt;b&gt;LEGEND&lt;/b&gt;" vertex="1">
+          <mxGeometry height="20" width="100" x="1010" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-58" parent="1" style="text;html=1;align=left;fontSize=10;spacingLeft=4;" value="Inheritance (extends)" vertex="1">
+          <mxGeometry height="18" width="180" x="1060" y="646" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-59" edge="1" parent="1" style="edgeStyle=none;endArrow=block;endFill=0;startArrow=none;strokeColor=#6c8ebf;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="1015" y="655" as="sourcePoint" />
+            <mxPoint x="1055" y="655" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-60" parent="1" style="text;html=1;align=left;fontSize=10;spacingLeft=4;" value="Implements (interface)" vertex="1">
+          <mxGeometry height="18" width="180" x="1060" y="668" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-61" edge="1" parent="1" style="edgeStyle=none;endArrow=block;endFill=0;startArrow=none;dashed=1;strokeColor=#9673a6;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1015" y="677" as="sourcePoint" />
+            <mxPoint x="1055" y="677" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-62" parent="1" style="text;html=1;align=left;fontSize=10;spacingLeft=4;" value="Composition (contains)" vertex="1">
+          <mxGeometry height="18" width="180" x="1060" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-63" edge="1" parent="1" style="edgeStyle=none;endArrow=open;startArrow=diamond;startFill=1;strokeColor=#b85450;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1015" y="699" as="sourcePoint" />
+            <mxPoint x="1055" y="699" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-64" parent="1" style="text;html=1;align=left;fontSize=10;spacingLeft=4;" value="Association (uses/has)" vertex="1">
+          <mxGeometry height="18" width="180" x="1060" y="712" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-65" edge="1" parent="1" style="edgeStyle=none;endArrow=open;startArrow=none;strokeColor=#82b366;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1015" y="721" as="sourcePoint" />
+            <mxPoint x="1055" y="721" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-66" parent="1" style="text;html=1;align=left;fontSize=10;spacingLeft=4;" value="Dependency (creates/notifies)" vertex="1">
+          <mxGeometry height="18" width="200" x="1060" y="734" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-67" edge="1" parent="1" style="edgeStyle=none;endArrow=open;startArrow=none;dashed=1;strokeColor=#666666;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1015" y="743" as="sourcePoint" />
+            <mxPoint x="1055" y="743" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-68" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-5" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;startArrow=none;strokeColor=#6c8ebf;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="ELrp7GKIvxSUEEktG43t-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-69" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-9" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;startArrow=none;strokeColor=#6c8ebf;" target="ELrp7GKIvxSUEEktG43t-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-70" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-13" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;startArrow=none;strokeColor=#6c8ebf;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="ELrp7GKIvxSUEEktG43t-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-71" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-21" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;startArrow=none;strokeColor=#d6b656;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="ELrp7GKIvxSUEEktG43t-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-72" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-25" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;startArrow=none;strokeColor=#d6b656;" target="ELrp7GKIvxSUEEktG43t-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-73" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-29" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=0;startArrow=none;strokeColor=#d6b656;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="ELrp7GKIvxSUEEktG43t-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-74" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-37" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;startArrow=diamond;startFill=1;strokeColor=#b85450;" target="ELrp7GKIvxSUEEktG43t-33" value="1        *">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-75" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-37" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;startArrow=none;strokeColor=#d6b656;" target="ELrp7GKIvxSUEEktG43t-17" value="has">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1260" y="528" />
+              <mxPoint x="1260" y="45" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-76" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-37" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;startArrow=none;dashed=1;strokeColor=#9673a6;" target="ELrp7GKIvxSUEEktG43t-41" value="notifies">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-77" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-37" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;startArrow=none;dashed=1;strokeColor=#9673a6;" target="ELrp7GKIvxSUEEktG43t-44" value="uses">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-78" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-46" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;startArrow=diamond;startFill=1;strokeColor=#6c8ebf;" target="ELrp7GKIvxSUEEktG43t-37" value="manages">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-79" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-33" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;startArrow=none;strokeColor=#82b366;" target="ELrp7GKIvxSUEEktG43t-5" value="placed by">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-80" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-50" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;startArrow=none;dashed=1;strokeColor=#d6b656;" target="ELrp7GKIvxSUEEktG43t-17" value="creates">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ELrp7GKIvxSUEEktG43t-81" edge="1" parent="1" source="ELrp7GKIvxSUEEktG43t-17" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;startArrow=none;strokeColor=#82b366;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ELrp7GKIvxSUEEktG43t-9" value="sold by">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
