@@ -1,5 +1,8 @@
 package org.deptrai.auctionsystem.models.auctions;
 
+import org.deptrai.auctionsystem.exceptions.AuctionClosedException;
+import org.deptrai.auctionsystem.exceptions.DataErrorException;
+import org.deptrai.auctionsystem.exceptions.InvalidBidException;
 import org.deptrai.auctionsystem.models.auction.Auction;
 import org.deptrai.auctionsystem.models.items.ArtFactory;
 import org.deptrai.auctionsystem.models.items.Item;
@@ -28,7 +31,7 @@ public class PlaceBidTest {
 
 
     @Test
-    void PlaceBidWhenAuctionIsClosingTest() {
+    void PlaceBidWhenAuctionIsClosingTest() throws InvalidBidException, AuctionClosedException, DataErrorException {
         // Test if bidder places bid when auction is closing
         System.out.println("[TEST 1]");
         double amount = 65;
@@ -37,7 +40,7 @@ public class PlaceBidTest {
     }
 
     @Test
-    void PlaceBidWhenAuctionIsOpeningTest() {
+    void PlaceBidWhenAuctionIsOpeningTest() throws InvalidBidException, AuctionClosedException, DataErrorException {
         // Test if bidder places bid when auction is opening
         System.out.println("[TEST 2]");
         auction.startAuction();
@@ -49,7 +52,7 @@ public class PlaceBidTest {
     }
 
     @Test
-    void TooLowPlaceBidTest() {
+    void TooLowPlaceBidTest() throws InvalidBidException, AuctionClosedException, DataErrorException {
         // Test if bidder places bid when auction is opening, but amount is too low
         System.out.println("[TEST 3]");
         auction.startAuction();
@@ -59,7 +62,7 @@ public class PlaceBidTest {
     }
 
     @Test
-    void ObserverTest() {
+    void ObserverTest() throws InvalidBidException, AuctionClosedException, DataErrorException {
         // Test if Obserer is OK
         System.out.println("[TEST 4]");
         auction.startAuction();

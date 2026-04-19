@@ -23,7 +23,8 @@ public class BiddingDetailController {
         String amount = bidAmountField.getText();
         if (amount.isEmpty()) {
             System.out.println("Vui lòng nhập số tiền!");
-        } else {
+        }
+        else {
             System.out.println("Đã ghi nhận mức giá mới: " + amount);
             // Sau này logic xử lý tiền tệ sẽ nằm ở đây
         }

@@ -1,6 +1,10 @@
 package org.deptrai.auctionsystem.models.users;
 
+import org.deptrai.auctionsystem.exceptions.AuctionClosedException;
+import org.deptrai.auctionsystem.exceptions.DataErrorException;
+import org.deptrai.auctionsystem.exceptions.InvalidBidException;
 import org.deptrai.auctionsystem.models.auction.Auction;
+import org.deptrai.auctionsystem.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.models.bid.Bid;
 import org.deptrai.auctionsystem.models.observer.AuctionObserver;
 
@@ -21,17 +25,21 @@ public class Bidder extends User implements AuctionObserver {
         this.bidHistory = bidHistory;
     }
 
-    public void placeBid(Auction auction, double amount){
+    public void placeBid(Auction auction, double amount) throws AuctionClosedException, InvalidBidException, DataErrorException {
         Bid newBid = new Bid(this, auction, amount, LocalDateTime.now());
 
-        // Attempt to place the bid on the auction
-        boolean success = auction.placeBid(newBid);
-
-        if(success) {
+        if(auction.getStatus() != AuctionStatus.RUNNING) {
+            throw new AuctionClosedException("Error when place bid: Auction has been closed!");
+        }
+        else if(amount < 0) {
+            throw new DataErrorException("Error when place bid: amount is lower then 0$.");
+        }
+        else if(auction.getCurrentPrice() >= amount) {
+            throw new InvalidBidException("Error when place bid: amount is lower than or equal current price(" + auction.getCurrentPrice() + ")");
+        }
+        else {
             this.bidHistory.add(newBid);
             System.out.println("Bid placed successfully by " + super.getUsername());
-        } else {
-            System.out.println("Failed to place bid. The amount is too low or auction is closed.");
         }
     }
 
