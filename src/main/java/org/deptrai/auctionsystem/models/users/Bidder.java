@@ -25,7 +25,7 @@ public class Bidder extends User implements AuctionObserver {
         this.bidHistory = bidHistory;
     }
 
-    public void placeBid(Auction auction, double amount) throws AuctionClosedException, InvalidBidException, DataErrorException {
+    public void placeBid(Auction auction, double amount) throws InvalidBidException, DataErrorException {
         Bid newBid = new Bid(this, auction, amount, LocalDateTime.now());
 
         if(auction.getStatus() != AuctionStatus.RUNNING) {

@@ -1,6 +1,6 @@
 package org.deptrai.auctionsystem.exceptions;
 
-public class AuctionClosedException extends Exception {
+public class AuctionClosedException extends RuntimeException {
 
     public AuctionClosedException() {
         super("Auction has closed");
