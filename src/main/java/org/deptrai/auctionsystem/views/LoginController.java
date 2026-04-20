@@ -15,7 +15,7 @@ public class LoginController {
     private void handleLogin(ActionEvent event) {
         try {
             // 1. Tải file giao diện màn hình chính (hoặc bidding-detail.fxml)
-            Parent root = FXMLLoader.load(getClass().getResource("main-view.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/main-view.fxml"));
 
             // 2. Lấy thông tin "Sân khấu" (Stage) hiện tại từ cái nút vừa bấm
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
