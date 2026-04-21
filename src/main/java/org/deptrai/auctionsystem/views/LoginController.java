@@ -14,13 +14,13 @@ public class LoginController {
     @FXML
     private void handleLogin(ActionEvent event) {
         try {
-            // 1. Tải file giao diện màn hình chính (hoặc bidding-detail.fxml)
-            Parent root = FXMLLoader.load(getClass().getResource("main-view.fxml"));
+
+            Parent root = FXMLLoader.load(getClass().getResource("/main-view.fxml"));
 
             // 2. Lấy thông tin "Sân khấu" (Stage) hiện tại từ cái nút vừa bấm
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
-            // 3. Tạo "Phân cảnh" (Scene) mới với giao diện đã tải
+            // . Tạo "Phân cảnh" (Scene) mới với giao diện đã tải
             Scene scene = new Scene(root);
 
             // 4. Đặt cảnh mới lên sân khấu và hiển thị

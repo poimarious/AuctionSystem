@@ -9,8 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.views.MainController">
    <top>
       <HBox prefHeight="100.0" prefWidth="200.0" spacing="20.0" style="-fx-background-color: #2c3e50;" BorderPane.alignment="CENTER">
          <opaqueInsets>
@@ -37,8 +36,8 @@
             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
          </padding>
          <children>
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="SÀN ĐẤU GIÁ" />
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="QUẢN LÝ KHO" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleAuctionFloor" text="SÀN ĐẤU GIÁ" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleInventory" text="QUẢN LÝ KHO" />
             <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="BÁO CÁO HỆ THỐNG" />
          </children>
       </VBox>
@@ -46,4 +45,5 @@
    <center>
       <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
+
 </BorderPane>

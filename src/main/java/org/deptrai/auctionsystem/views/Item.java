@@ -15,7 +15,7 @@ public class Item {
         this.currentPrice = currentPrice;
     }
 
-    // Getter để hiển thị lên UI
+
     public String getName() { return name; }
     public String getDescription() { return description; }
     public double getStartingPrice() { return startingPrice; }
