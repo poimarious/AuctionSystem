@@ -1,6 +1,6 @@
 package org.deptrai.auctionsystem.exceptions;
 
-public class InvalidBidException extends Exception {
+public class InvalidBidException extends RuntimeException {
     public InvalidBidException() {
         super("Error: Invalid Bid.");
     }

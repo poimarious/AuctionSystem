@@ -1,7 +1,6 @@
 package org.deptrai.auctionsystem;
 
 import org.deptrai.auctionsystem.exceptions.AuctionClosedException;
-import org.deptrai.auctionsystem.exceptions.DataErrorException;
 import org.deptrai.auctionsystem.exceptions.InvalidBidException;
 import org.deptrai.auctionsystem.models.auction.Auction;
 import org.deptrai.auctionsystem.models.auction.AuctionManager;
@@ -14,7 +13,7 @@ import org.deptrai.auctionsystem.views.HelloApplication; // UI stuff in main
 import java.time.LocalDateTime;
 
 public class Main {
-    public static void main(String[] args) throws InvalidBidException, AuctionClosedException, DataErrorException {
+    public static void main(String[] args) throws InvalidBidException,AuctionClosedException{
         System.out.println("=== 1. KHỞI TẠO DỮ LIỆU ===");
         Seller seller = new Seller("ShopDoCongNghe", "pass123", "seller@gmail.com");
         Electronics laptop = new Electronics("Macbook Pro", "Chip M3 Max", 1500.0, seller);

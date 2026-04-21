@@ -1,7 +1,6 @@
 package org.deptrai.auctionsystem.models.users;
 
 import org.deptrai.auctionsystem.exceptions.AuctionClosedException;
-import org.deptrai.auctionsystem.exceptions.DataErrorException;
 import org.deptrai.auctionsystem.exceptions.InvalidBidException;
 import org.deptrai.auctionsystem.models.auction.Auction;
 import org.deptrai.auctionsystem.models.auction.AuctionStatus;
@@ -25,14 +24,14 @@ public class Bidder extends User implements AuctionObserver {
         this.bidHistory = bidHistory;
     }
 
-    public void placeBid(Auction auction, double amount) throws InvalidBidException, DataErrorException {
+    public void placeBid(Auction auction, double amount) {
         Bid newBid = new Bid(this, auction, amount, LocalDateTime.now());
 
         if(auction.getStatus() != AuctionStatus.RUNNING) {
             throw new AuctionClosedException("Error when place bid: Auction has been closed!");
         }
         else if(amount < 0) {
-            throw new DataErrorException("Error when place bid: amount is lower then 0$.");
+            throw new InvalidBidException("Error when place bid: amount is lower then 0$.");
         }
         else if(auction.getCurrentPrice() >= amount) {
             throw new InvalidBidException("Error when place bid: amount is lower than or equal current price(" + auction.getCurrentPrice() + ")");
