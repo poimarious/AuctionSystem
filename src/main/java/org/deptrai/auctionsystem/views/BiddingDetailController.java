@@ -14,10 +14,7 @@ import org.deptrai.auctionsystem.models.users.Bidder;
 
 import java.time.LocalDateTime;
 
-/**
- * Controller cho màn hình chi tiết đấu giá (Tuần 8).
- * Chịu trách nhiệm hiển thị thông tin sản phẩm và cập nhật dữ liệu thời gian thực.
- */
+
 public class BiddingDetailController implements AuctionObserver {
 
     // --- 1. KẾT NỐI LINH KIỆN FXML ---

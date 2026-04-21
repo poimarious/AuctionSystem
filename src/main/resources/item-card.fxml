@@ -23,4 +23,5 @@
         <Label styleClass="timer-label" text="00:10:45" />
         <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn-bid" text="ĐẶT GIÁ NGAY" />
     </children>
+
 </VBox>

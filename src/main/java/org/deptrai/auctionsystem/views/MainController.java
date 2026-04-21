@@ -44,7 +44,7 @@ import java.net.URL;
 
 public class MainController {
 
-    // --- 1. CHUYỂN SANG SÀN ĐẤU GIÁ ---
+    // --- 1. CHUYỂN SANG SÀN ĐẤU GIÁ --
     @FXML
     private void handleAuctionFloor(ActionEvent event) {
         // Chuyển sang màn hình bidding-detail.fxml (Trang bạn vừa làm xong)
