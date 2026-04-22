@@ -1,13 +1,16 @@
 package org.deptrai.auctionsystem.models.auction;
 
 import org.deptrai.auctionsystem.exceptions.AuctionClosedException;
+import org.deptrai.auctionsystem.exceptions.AuthenticationException;
 import org.deptrai.auctionsystem.exceptions.InvalidBidException;
 import org.deptrai.auctionsystem.models.auction.Auction;
+import org.deptrai.auctionsystem.models.bid.Bid;
 import org.deptrai.auctionsystem.models.items.ArtFactory;
 import org.deptrai.auctionsystem.models.items.Item;
 import org.deptrai.auctionsystem.models.items.ItemFactory;
 import org.deptrai.auctionsystem.models.users.Bidder;
 import org.deptrai.auctionsystem.models.users.Seller;
+import org.deptrai.auctionsystem.models.users.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,11 +27,12 @@ public class PlaceBidTest {
     private Bidder bidder1;
     private Bidder bidder2;
     private Item item;
+    private Seller seller;
 
     @BeforeEach
     void setUp() {
         ItemFactory itemFactory = new ArtFactory();
-        Seller seller = new Seller("poi",
+        seller = new Seller("poi",
                 "poi1",
                 "poimarious@gmail.com");
 
@@ -76,12 +80,37 @@ public class PlaceBidTest {
 
     @Test
     void testPlaceBidValidBoundary() {
+
         auction.startAuction();
         double validAmount = 60.01;
 
         assertDoesNotThrow(() -> {
             bidder1.placeBid(auction, validAmount);
         }, "Pass");
+    }
+
+    @Test
+    void testSellerPlaceBid() {
+        // Seller cannot place bid in his auction
+
+        auction.startAuction();
+        double amount = 80;
+
+        if (seller.getUserId() == null) {
+            seller.setUserId("Seller_01");
+        }
+
+        Bidder bidder3 = new Bidder(
+                seller.getUserId(),
+                seller.getUsername(),
+                seller.getPassword(),
+                seller.getEmail(),
+                new java.util.ArrayList<>()
+        );
+
+        assertThrows(AuthenticationException.class, () -> {
+            bidder3.placeBid(auction, amount);
+        });
     }
 
     // Observer test
