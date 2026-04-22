@@ -1,6 +1,7 @@
 package org.deptrai.auctionsystem.models.bid;
 
 import org.deptrai.auctionsystem.exceptions.AuctionClosedException;
+import org.deptrai.auctionsystem.exceptions.AuthenticationException;
 import org.deptrai.auctionsystem.exceptions.InvalidBidException;
 import org.deptrai.auctionsystem.models.auction.Auction;
 import org.deptrai.auctionsystem.models.auction.AuctionStatus;
@@ -32,11 +33,14 @@ public class Bid {
 
     public boolean validate() {
         if (auction.getStatus() != AuctionStatus.RUNNING) {
-            throw new AuctionClosedException("Fail when place bid: Auction is closed.");
+            throw new AuctionClosedException("Failed when place bid: Auction is closed.");
         } else if (amount < 0) {
-            throw new InvalidBidException("Fail when place bid: amount is lower then zero.");
+            throw new InvalidBidException("Failed when place bid: amount is lower then zero.");
         } else if (amount <= auction.getCurrentPrice()) {
-            throw new InvalidBidException("Fail when place bid: amount is lower than or equal current price.");
+            throw new InvalidBidException("Failed when place bid: amount is lower than or equal current price.");
+        }
+        else if(bidder.getUserId().equals(auction.getItem().getSeller().getUserId())) {
+            throw new AuthenticationException("Failed when place bid: the seller cannot place bid.");
         }
         return true;
     }
