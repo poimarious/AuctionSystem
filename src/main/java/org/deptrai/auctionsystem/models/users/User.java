@@ -6,13 +6,13 @@ public abstract class User {
     private String password;
     private String email;
 
-    public User(String username, String password, String email){
+    public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
     }// For creating a new object
 
-    public User(String userId, String username, String password, String email){
+    public User(String userId, String username, String password, String email) {
         this.userId = userId;
         this.username = username;
         this.password = password;
@@ -20,7 +20,9 @@ public abstract class User {
     }// For loading an object
 
     public abstract boolean login();
+
     public abstract void logout();
+
     public abstract String getInfo();
 
     //region Getters

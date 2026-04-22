@@ -15,10 +15,15 @@ public class Art extends Item {
         this.artist = artist;
         this.yearCreated = yearCreated;
     }
-    
+
     @Override
     public void printInfo() {
-
+        System.out.println("[ART]");
+        System.out.println("Name :" + super.getName());
+        System.out.println("Description: " + super.getDescription());
+        System.out.println("Starting price: " + super.getStartingPrice() + "$");
+        System.out.println("Seller: " + super.getSeller().getUsername());
+        System.out.println();
     }
 
     @Override

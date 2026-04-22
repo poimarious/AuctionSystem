@@ -15,11 +15,11 @@ public class Admin extends User {
         this.adminLevel = adminLevel;
     }
 
-    public void closeAuction(String id){
+    public void closeAuction(String id) {
 
     }
 
-    public void removeItem(Item item){
+    public void removeItem(Item item) {
 
     }
 

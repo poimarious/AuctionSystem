@@ -1,5 +1,7 @@
 package org.deptrai.auctionsystem;
 
+import org.deptrai.auctionsystem.exceptions.AuctionClosedException;
+import org.deptrai.auctionsystem.exceptions.InvalidBidException;
 import org.deptrai.auctionsystem.models.auction.Auction;
 import org.deptrai.auctionsystem.models.auction.AuctionManager;
 import org.deptrai.auctionsystem.models.items.Electronics;
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
 
 public class Main {
     public static void main(String[] args) {
+        org.deptrai.auctionsystem.utils.DatabaseConnection.initializeDatabase();
         System.out.println("=== 1. KHỞI TẠO DỮ LIỆU ===");
         Seller seller = new Seller("ShopDoCongNghe", "pass123", "seller@gmail.com");
         Electronics laptop = new Electronics("Macbook Pro", "Chip M3 Max", 1500.0, seller);
@@ -34,8 +37,8 @@ public class Main {
 
         System.out.println("\n=== 5. TIẾN HÀNH ĐẶT GIÁ ===");
         // ThoSanSale đặt giá bằng với giá khởi điểm (1500) -> Sẽ thất bại vì phải lớn hơn hiện tại
-        System.out.println("-> ThoSanSale thử đặt 1500.0");
-        bidder2.placeBid(auction, 1500.0);
+//        System.out.println("-> ThoSanSale thử đặt 1500.0");
+//        bidder2.placeBid(auction, 1500.0);
 
         // PhuGia đặt giá hợp lệ
         System.out.println("\n-> PhuGia đặt 1600.0");

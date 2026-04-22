@@ -20,7 +20,7 @@ public abstract class Item implements Serializable {
         this.seller = seller;
     } //For creating a new object
 
-    public Item(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller){
+    public Item(String itemId, String name, String description, double startingPrice, double currentPrice, Seller seller) {
         this.itemId = itemId;
         this.name = name;
         this.description = description;
@@ -30,6 +30,7 @@ public abstract class Item implements Serializable {
 
 
     public abstract void printInfo();
+
     public abstract String getCategory();
 
     //region Getters
@@ -80,4 +81,5 @@ public abstract class Item implements Serializable {
         return this;
     }
     // endregion
+
 }

@@ -23,23 +23,23 @@ public class Auction implements AuctionSubject {
 
     private final ReentrantLock lock = new ReentrantLock();
 
-    public Auction(Item item, LocalDateTime endTime){
+    public Auction(Item item, LocalDateTime endTime) {
         this.item = item;
         this.currentPrice = item.getStartingPrice();
         this.status = AuctionStatus.OPEN;
         this.endTime = endTime;
-        this.bids = new ArrayList<>();
+        this.bids = new CopyOnWriteArrayList<>();
         this.observers = new CopyOnWriteArrayList<>();
     }// For creating a new object
 
-    public Auction(String auctionId, Item item, double currentPrice, LocalDateTime startTime, AuctionStatus status, LocalDateTime endTime, List<Bid> bids){
+    public Auction(String auctionId, Item item, double currentPrice, AuctionStatus status, LocalDateTime endTime, List<Bid> bids) {
         this.auctionId = auctionId;
         this.item = item;
         this.currentPrice = currentPrice;
         this.status = status;
         this.endTime = endTime;
         this.bids = bids;
-        observers =  new CopyOnWriteArrayList<>(); // use CopyOnWriteArrayList to avoid ConcurrentModificationException
+        observers = new CopyOnWriteArrayList<>(); // use CopyOnWriteArrayList to avoid ConcurrentModificationException
     }// For loading from database
 
     public void startAuction() {
@@ -96,7 +96,7 @@ public class Auction implements AuctionSubject {
         return false; // Invalid bid
     }
 
-    public Bidder getWinner(){
+    public Bidder getWinner() {
         lock.lock();
         try {
             if (bids.isEmpty()) return null;
@@ -109,7 +109,7 @@ public class Auction implements AuctionSubject {
 
     @Override
     public void attach(AuctionObserver observer) {
-        if(!observers.contains(observer)) {
+        if (!observers.contains(observer)) {
             observers.add(observer);
             System.out.println("Someone just subscribed to the session: " + item.getName());
         }
@@ -117,7 +117,7 @@ public class Auction implements AuctionSubject {
 
     @Override
     public void detach(AuctionObserver observer) {
-        if(observers.contains(observer)) {
+        if (observers.contains(observer)) {
             observers.remove(observer);
             System.out.println("Someone just unsubscribed to the session: " + item.getName());
         }
@@ -125,14 +125,14 @@ public class Auction implements AuctionSubject {
 
     @Override
     public void notifyBidPlaced(Bid bid) {
-        for(AuctionObserver obs: observers) {
+        for (AuctionObserver obs : observers) {
             obs.onBidPlaced(this, bid);
         }
     }
 
     @Override
     public void notifyStatusChanged() {
-        for(AuctionObserver obs: observers) {
+        for (AuctionObserver obs : observers) {
             obs.onAuctionStatusChanged(this);
         }
     }
