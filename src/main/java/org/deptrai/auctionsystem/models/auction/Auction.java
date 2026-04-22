@@ -28,7 +28,7 @@ public class Auction implements AuctionSubject {
         this.currentPrice = item.getStartingPrice();
         this.status = AuctionStatus.OPEN;
         this.endTime = endTime;
-        this.bids = new ArrayList<>();
+        this.bids = new CopyOnWriteArrayList<>();
         this.observers = new CopyOnWriteArrayList<>();
     }// For creating a new object
 

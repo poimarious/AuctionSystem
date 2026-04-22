@@ -19,22 +19,22 @@ public class Bidder extends User implements AuctionObserver {
         bidHistory = new ArrayList<>();
     }
 
-    public Bidder(String userId, String username, String password, String email, double balance, List<Bid> bidHistory) {
+    public Bidder(String userId, String username, String password, String email, List<Bid> bidHistory) {
         super(userId, username, password, email);
         this.bidHistory = bidHistory;
     }
 
     public void placeBid(Auction auction, double amount){
-        Bid newBid = new Bid(this, auction, amount, LocalDateTime.now());
+        try {
+            Bid newBid = new Bid(this, auction, amount, LocalDateTime.now());
 
-        // Attempt to place the bid on the auction
-        boolean success = auction.placeBid(newBid);
+            auction.placeBid(newBid); // Error prone
 
-        if(success) {
             this.bidHistory.add(newBid);
             System.out.println("Bid placed successfully by " + super.getUsername());
-        } else {
-            System.out.println("Failed to place bid. The amount is too low or auction is closed.");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw e;
         }
     }
 

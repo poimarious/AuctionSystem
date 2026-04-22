@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 
 public class Main {
     public static void main(String[] args){
+        org.deptrai.auctionsystem.utils.DatabaseConnection.initializeDatabase();
         System.out.println("=== 1. KHỞI TẠO DỮ LIỆU ===");
         Seller seller = new Seller("ShopDoCongNghe", "pass123", "seller@gmail.com");
         Electronics laptop = new Electronics("Macbook Pro", "Chip M3 Max", 1500.0, seller);

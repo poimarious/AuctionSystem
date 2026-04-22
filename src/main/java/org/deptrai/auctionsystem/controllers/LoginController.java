@@ -1,4 +1,4 @@
-package org.deptrai.auctionsystem.views;
+package org.deptrai.auctionsystem.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

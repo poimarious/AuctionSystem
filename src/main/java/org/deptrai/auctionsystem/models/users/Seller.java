@@ -10,7 +10,7 @@ public class Seller extends User {
         super(username, password, email);
     }
 
-    public Seller(String userId, String username, String password, String email, double rating) {
+    public Seller(String userId, String username, String password, String email) {
         super(userId, username, password, email);
     }
 
