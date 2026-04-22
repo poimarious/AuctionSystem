@@ -32,7 +32,7 @@ public class Auction implements AuctionSubject {
         this.observers = new CopyOnWriteArrayList<>();
     }// For creating a new object
 
-    public Auction(String auctionId, Item item, double currentPrice, LocalDateTime startTime, AuctionStatus status, LocalDateTime endTime, List<Bid> bids) {
+    public Auction(String auctionId, Item item, double currentPrice, AuctionStatus status, LocalDateTime endTime, List<Bid> bids) {
         this.auctionId = auctionId;
         this.item = item;
         this.currentPrice = currentPrice;

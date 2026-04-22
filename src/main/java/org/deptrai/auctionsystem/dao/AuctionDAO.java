@@ -1,6 +1,8 @@
 package org.deptrai.auctionsystem.dao;
 
 import org.deptrai.auctionsystem.models.auction.Auction;
+import org.deptrai.auctionsystem.models.auction.AuctionStatus;
+import org.deptrai.auctionsystem.models.bid.Bid;
 import org.deptrai.auctionsystem.models.items.Item;
 import org.deptrai.auctionsystem.utils.DatabaseConnection;
 
@@ -8,7 +10,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class AuctionDAO {
     public boolean insertAuction(Auction auction) {
@@ -22,8 +27,8 @@ public class AuctionDAO {
             pstmt.setString(1, auction.getAuctionId()); // Always has id if it is handled in AuctionManager
             pstmt.setString(2, auction.getItem().getItemId());
             pstmt.setDouble(3, auction.getCurrentPrice());
-            pstmt.setString(4, auction.getStatus().name()); // Chuyển Enum thành String
-            pstmt.setString(5, auction.getEndTime().toString()); // Chuyển LocalDateTime thành String
+            pstmt.setString(4, auction.getStatus().name());
+            pstmt.setString(5, auction.getEndTime().toString());
 
             pstmt.executeUpdate();
             return true;
@@ -70,20 +75,22 @@ public class AuctionDAO {
                 ItemDAO itemDAO = new ItemDAO();
                 Item item = itemDAO.getItemById(itemId);
 
-                org.deptrai.auctionsystem.models.auction.AuctionStatus status =
-                        org.deptrai.auctionsystem.models.auction.AuctionStatus.valueOf(statusStr);
-                java.time.LocalDateTime endTime = java.time.LocalDateTime.parse(endTimeStr);
+                AuctionStatus status = AuctionStatus.valueOf(statusStr);
+                LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
 
-                // Gonna fix starTime bs
-                return new Auction(
+                Auction auction = new Auction(
                         auctionId,
                         item,
                         currentPrice,
-                        null,
                         status,
                         endTime,
-                        new java.util.concurrent.CopyOnWriteArrayList<>()
+                        new CopyOnWriteArrayList<>()
                 );
+                BidDAO bidDAO = new BidDAO();
+                List<Bid> auctionBids = bidDAO.getBidsByAuctionId(auctionId, auction);
+                auction.setBids(auctionBids);
+
+                return auction;
             }
         } catch (SQLException e) {
             System.out.println("Lỗi tìm Auction theo ID: " + e.getMessage());

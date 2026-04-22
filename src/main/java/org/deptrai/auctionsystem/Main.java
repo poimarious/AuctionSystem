@@ -37,8 +37,8 @@ public class Main {
 
         System.out.println("\n=== 5. TIẾN HÀNH ĐẶT GIÁ ===");
         // ThoSanSale đặt giá bằng với giá khởi điểm (1500) -> Sẽ thất bại vì phải lớn hơn hiện tại
-        System.out.println("-> ThoSanSale thử đặt 1500.0");
-        bidder2.placeBid(auction, 1500.0);
+//        System.out.println("-> ThoSanSale thử đặt 1500.0");
+//        bidder2.placeBid(auction, 1500.0);
 
         // PhuGia đặt giá hợp lệ
         System.out.println("\n-> PhuGia đặt 1600.0");

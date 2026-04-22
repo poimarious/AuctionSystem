@@ -40,7 +40,7 @@ public class BidDAO {
 
     public List<Bid> getBidsByBidderId(String bidderId) {
         List<Bid> history = new CopyOnWriteArrayList<>();
-        // Sắp xếp theo thời gian mới nhất (DESC)
+        // Order by descending timestamps
         String sql = "SELECT * FROM Bids WHERE bidderId = ? ORDER BY timestamp DESC";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -52,7 +52,7 @@ public class BidDAO {
             UserDAO userDAO = new UserDAO();
             AuctionDAO auctionDAO = new AuctionDAO();
 
-            Bidder currentBidder = (Bidder) userDAO.getUserById(rs.getString(bidderId));
+            Bidder currentBidder = (Bidder) userDAO.getUserById(bidderId); // Can pass in a Bidder instance from method
 
             while (rs.next()) {
                 String bidId = rs.getString("bidId");
@@ -70,6 +70,37 @@ public class BidDAO {
 
         } catch (SQLException e) {
             System.out.println("Lỗi tải lịch sử Bid: " + e.getMessage());
+        }
+        return history;
+    }
+
+    public List<Bid> getBidsByAuctionId(String auctionId, Auction auctionInstance) {
+        List<Bid> history = new CopyOnWriteArrayList<>();
+        // Order by descending timestamps
+        String sql = "SELECT * FROM Bids WHERE auctionId = ? ORDER BY timestamp DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, auctionId);
+            ResultSet rs = pstmt.executeQuery();
+
+            UserDAO userDAO = new UserDAO();
+
+            while (rs.next()) {
+                String bidId = rs.getString("bidId");
+                double amount = rs.getDouble("amount");
+                String bidderId = rs.getString("bidderId");
+                LocalDateTime timestamp = LocalDateTime.parse(rs.getString("timestamp"));
+
+                Bidder bidder = (Bidder) userDAO.getUserById(bidderId);
+
+                // Passing in an auctionInstance to stop infinite loops of methods calling each other
+                Bid bid = new Bid(bidId, bidder, auctionInstance, amount, timestamp);
+                history.add(bid);
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi tải danh sách Bid của Auction: " + e.getMessage());
         }
         return history;
     }

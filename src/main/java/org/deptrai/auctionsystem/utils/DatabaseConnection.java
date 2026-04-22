@@ -61,11 +61,13 @@ public class DatabaseConnection {
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
 
+            stmt.execute("PRAGMA foreign_keys = ON;"); // Turning on foreign keys in Sqlite
+
             stmt.execute(sqlCreateUsers);
             stmt.execute(sqlCreateItems);
             stmt.execute(sqlCreateAuctions);
             stmt.execute(sqlCreateBids);
-            System.out.println("Cơ sở dữ liệu đã sẵn sàng!");
+            System.out.println("Cơ sở dữ liệu đã sẵn sàng");
 
         } catch (SQLException e) {
             System.out.println("Lỗi khởi tạo DB: " + e.getMessage());
