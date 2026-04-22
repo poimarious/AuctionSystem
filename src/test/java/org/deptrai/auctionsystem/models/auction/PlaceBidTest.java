@@ -35,7 +35,7 @@ public class PlaceBidTest {
         seller = new Seller("poi",
                 "poi1",
                 "poimarious@gmail.com");
-
+        seller.setUserId("seller_01");
         item = itemFactory.createItem("Kabuto Kunaigun",
                 "Kabuto's personal sidearm...",
                 60.0,
@@ -46,9 +46,11 @@ public class PlaceBidTest {
         bidder1 = new Bidder("poimarious",
                 "poimaious1",
                 "pomarious@gmail.com");
+        bidder1.setUserId("bidder_01");
         bidder2 = new Bidder("TusBeo",
                 "TusBeo123@",
                 "TusBeo123@gmail.com");
+        bidder2.setUserId("bidder_02");
     }
 
     @Test
