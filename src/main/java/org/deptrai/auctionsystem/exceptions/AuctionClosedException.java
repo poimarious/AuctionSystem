@@ -9,4 +9,9 @@ public class AuctionClosedException extends RuntimeException {
     public AuctionClosedException(String msg) {
         super(msg);
     }
+
+    @Override
+    public String toString() {
+        return getMessage();
+    }
 }
