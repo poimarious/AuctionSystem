@@ -30,12 +30,13 @@ public class ItemDAO {
             pstmt.setString(5, item.getCategory());
             pstmt.setString(6, item.getSeller().getUserId());
 
+            // Default missing variables to null and -1
             String brand = null;
-            int warrantyMonths = 0;
+            int warrantyMonths = -1;
             String artist = null;
-            int yearCreated = 0;
+            int yearCreated = -1;
             String make = null;
-            int mileage = 0;
+            int mileage = -1;
 
             if (item instanceof Electronics) {
                 Electronics e = (Electronics) item;
@@ -51,7 +52,7 @@ public class ItemDAO {
                 mileage = v.getMileage();
             }
 
-            // Value of non-properties will be NULL
+            // Value of non-properties will be null/-1
             pstmt.setString(7, brand);
             pstmt.setInt(8, warrantyMonths);
             pstmt.setString(9, artist);
@@ -67,6 +68,7 @@ public class ItemDAO {
         }
     }
 
+    // Use for Seller only
     public Item getItemById(String itemId) {
         String sql = "SELECT * FROM Items WHERE itemId = ?";
 
