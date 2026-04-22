@@ -12,7 +12,6 @@ public class ItemFactoryTest {
     private Seller seller;
 
     @Test
-
     void testCreateElectronicItem() {
 
         ItemFactory electronicsFactory = new ElectronicsFactory();
@@ -23,8 +22,7 @@ public class ItemFactoryTest {
         seller = new Seller("poi", "**+", "poimarious@gmail.com");
 
 
-
-        Item item1 =  electronicsFactory.createItem(name, description, startingPrice,seller);
+        Item item1 = electronicsFactory.createItem(name, description, startingPrice, seller);
         item1.printInfo();
     }
 

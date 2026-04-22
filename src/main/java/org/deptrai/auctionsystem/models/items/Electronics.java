@@ -18,12 +18,12 @@ public class Electronics extends Item {
 
     @Override
     public void printInfo() {
-         System.out.println("[ELECTRONIC]");
-         System.out.println("Name :" + super.getName());
-         System.out.println("Description: " + super.getDescription());
-         System.out.println("Starting price: " + super.getStartingPrice() + "$");
-         System.out.println("Seller: " + super.getSeller().getUsername());
-         System.out.println();
+        System.out.println("[ELECTRONIC]");
+        System.out.println("Name :" + super.getName());
+        System.out.println("Description: " + super.getDescription());
+        System.out.println("Starting price: " + super.getStartingPrice() + "$");
+        System.out.println("Seller: " + super.getSeller().getUsername());
+        System.out.println();
     }
 
     @Override

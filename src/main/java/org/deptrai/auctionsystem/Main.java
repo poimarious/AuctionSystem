@@ -13,7 +13,7 @@ import org.deptrai.auctionsystem.views.HelloApplication; // UI stuff in main
 import java.time.LocalDateTime;
 
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         org.deptrai.auctionsystem.utils.DatabaseConnection.initializeDatabase();
         System.out.println("=== 1. KHỞI TẠO DỮ LIỆU ===");
         Seller seller = new Seller("ShopDoCongNghe", "pass123", "seller@gmail.com");

@@ -19,8 +19,8 @@ public class DatabaseConnection {
                 + "username TEXT UNIQUE NOT NULL, "
                 + "password TEXT NOT NULL, "
                 + "email TEXT, "
-                + "role TEXT NOT NULL"
-                + "adminLevel INTEGER, "
+                + "role TEXT NOT NULL,"
+                + "adminLevel INTEGER "
                 + ");";
 
         String sqlCreateItems = "CREATE TABLE IF NOT EXISTS Items ("

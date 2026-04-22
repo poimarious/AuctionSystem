@@ -37,6 +37,7 @@
     -fx-background-radius: 10;
     -fx-padding: 10;
 }
+
 /* 6. Làm đẹp cho Bảng (TableView) */
 .table-view {
     -fx-background-color: transparent;
@@ -75,6 +76,7 @@
     -fx-background-color: white;
     -fx-border-color: #dcdde1;
 }
+
 /* 8. Nâng cấp nhan sắc cho thông tin sản phẩm */
 .product-title {
     -fx-font-size: 28px;

@@ -18,19 +18,30 @@ import java.time.LocalDateTime;
 public class BiddingDetailController implements AuctionObserver {
 
     // --- 1. KẾT NỐI LINH KIỆN FXML ---
-    @FXML private ImageView productImageView;
-    @FXML private Label nameLabel;
-    @FXML private Label descriptionLabel;
-    @FXML private Label currentPriceLabel;
+    @FXML
+    private ImageView productImageView;
+    @FXML
+    private Label nameLabel;
+    @FXML
+    private Label descriptionLabel;
+    @FXML
+    private Label currentPriceLabel;
 
-    @FXML private TableView<Bid> bidHistoryTable;
-    @FXML private TableColumn<Bid, String> timeColumn;
-    @FXML private TableColumn<Bid, String> bidderColumn;
-    @FXML private TableColumn<Bid, Double> amountColumn;
+    @FXML
+    private TableView<Bid> bidHistoryTable;
+    @FXML
+    private TableColumn<Bid, String> timeColumn;
+    @FXML
+    private TableColumn<Bid, String> bidderColumn;
+    @FXML
+    private TableColumn<Bid, Double> amountColumn;
 
-    @FXML private TextField bidAmountField;
-    @FXML private TextField maxBidField;
-    @FXML private TextField incrementField;
+    @FXML
+    private TextField bidAmountField;
+    @FXML
+    private TextField maxBidField;
+    @FXML
+    private TextField incrementField;
 
     // Đối tượng phiên đấu giá hiện tại đang quản lý
     private Auction currentAuction;

@@ -15,14 +15,14 @@ public class Bid {
     private double amount;
     private LocalDateTime timestamp;
 
-    public Bid(Bidder bidder, Auction auction, double amount, LocalDateTime timestamp){
+    public Bid(Bidder bidder, Auction auction, double amount, LocalDateTime timestamp) {
         this.bidder = bidder;
         this.auction = auction;
         this.amount = amount;
         this.timestamp = timestamp;
     }// For creating a new object
 
-    public Bid(String bidId, Bidder bidder, Auction auction, double amount, LocalDateTime timestamp){
+    public Bid(String bidId, Bidder bidder, Auction auction, double amount, LocalDateTime timestamp) {
         this.bidId = bidId;
         this.bidder = bidder;
         this.auction = auction;
@@ -31,19 +31,17 @@ public class Bid {
     }// For loading from database
 
     public boolean validate() {
-        if(auction.getStatus() != AuctionStatus.RUNNING) {
+        if (auction.getStatus() != AuctionStatus.RUNNING) {
             throw new AuctionClosedException("Fail when place bid: Auction is closed.");
-        }
-        else if(amount < 0) {
-            throw  new InvalidBidException("Fail when place bid: amount is lower then zero.");
-        }
-        else if(amount <= auction.getCurrentPrice()) {
+        } else if (amount < 0) {
+            throw new InvalidBidException("Fail when place bid: amount is lower then zero.");
+        } else if (amount <= auction.getCurrentPrice()) {
             throw new InvalidBidException("Fail when place bid: amount is lower than or equal current price.");
         }
         return true;
     }
 
-    public String getDetails(){
+    public String getDetails() {
         return String.format("[%s] %s bid $%.2f", timestamp, bidder.getUsername(), amount);
     }
 

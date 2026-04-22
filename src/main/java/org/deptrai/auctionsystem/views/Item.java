@@ -16,8 +16,8 @@ public class Item {
     }
 
 
-    public String getName() { return name; }
-    public String getDescription() { return description; }
-    public double getStartingPrice() { return startingPrice; }
-    public double getCurrentPrice() { return currentPrice; }
+    public String getName() {return name;}
+    public String getDescription() {return description;}
+    public double getStartingPrice() {return startingPrice;}
+    public double getCurrentPrice() {return currentPrice;}
 }

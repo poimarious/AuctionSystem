@@ -7,21 +7,23 @@
 <?import javafx.scene.text.Font?>
 
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="320.0" prefWidth="220.0" styleClass="item-card" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="320.0"
+      prefWidth="220.0" styleClass="item-card" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true"/>
         <Label text="Tên sản phẩm">
             <font>
-                <Font name="System Bold" size="16.0" />
+                <Font name="System Bold" size="16.0"/>
             </font>
         </Label>
         <Label text="Gía hiện tại" textFill="#27ae60">
             <font>
-                <Font size="14.0" />
+                <Font size="14.0"/>
             </font>
         </Label>
-        <Label styleClass="timer-label" text="00:10:45" />
-        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn-bid" text="ĐẶT GIÁ NGAY" />
+        <Label styleClass="timer-label" text="00:10:45"/>
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn-bid" text="ĐẶT GIÁ NGAY"/>
     </children>
 
 </VBox>

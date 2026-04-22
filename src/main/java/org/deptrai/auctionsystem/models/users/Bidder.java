@@ -24,7 +24,7 @@ public class Bidder extends User implements AuctionObserver {
         this.bidHistory = bidHistory;
     }
 
-    public void placeBid(Auction auction, double amount){
+    public void placeBid(Auction auction, double amount) {
         try {
             Bid newBid = new Bid(this, auction, amount, LocalDateTime.now());
 
@@ -55,7 +55,7 @@ public class Bidder extends User implements AuctionObserver {
 
     @Override
     public void onBidPlaced(Auction a, Bid b) {
-        if(this.getUsername().equals(b.getBidder().getUsername())) {
+        if (this.getUsername().equals(b.getBidder().getUsername())) {
             System.out.println("[" + this.getUsername() + "] Nice! You are leading! '" + a.getItem().getName() + "' with $" + b.getAmount());
         } else {
             System.out.println("[" + this.getUsername() + "] Notice: " + b.getBidder().getUsername() + " just increased the bid for '" + a.getItem().getName() + "' by $" + b.getAmount());

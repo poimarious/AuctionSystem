@@ -6,7 +6,7 @@ public class Vehicle extends Item {
     private String make;
     private int mileage;
 
-    public Vehicle(String name, String description, double startingPrice, Seller seller){
+    public Vehicle(String name, String description, double startingPrice, Seller seller) {
         super(name, description, startingPrice, seller);
     }
 

@@ -1,6 +1,7 @@
 package org.deptrai.auctionsystem.models.auction;
 
 import org.deptrai.auctionsystem.models.items.Item;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -8,8 +9,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 public class AuctionManager {
     //implement treemap with thread-safe
-    private ConcurrentSkipListMap<String,Auction> auctions = new ConcurrentSkipListMap<>();
-    private AuctionManager(){}
+    private ConcurrentSkipListMap<String, Auction> auctions = new ConcurrentSkipListMap<>();
+    private AuctionManager() {}
 
     private static class SingletonHelper {//Helper class to generate instance,because this class only loads once so it ensures thread-safe
         private static final AuctionManager INSTANCE = new AuctionManager();
@@ -25,7 +26,7 @@ public class AuctionManager {
         String tempId = UUID.randomUUID().toString();
         newAuction.setAuctionId(tempId);
 
-        auctions.put(newAuction.getAuctionId(),newAuction);
+        auctions.put(newAuction.getAuctionId(), newAuction);
         return newAuction;
     }
 

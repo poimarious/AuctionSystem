@@ -30,9 +30,12 @@ public class ItemDAO {
             pstmt.setString(5, item.getCategory());
             pstmt.setString(6, item.getSeller().getUserId());
 
-            String brand = null; int warrantyMonths = 0;
-            String artist = null; int yearCreated = 0;
-            String make = null; int mileage = 0;
+            String brand = null;
+            int warrantyMonths = 0;
+            String artist = null;
+            int yearCreated = 0;
+            String make = null;
+            int mileage = 0;
 
             if (item instanceof Electronics) {
                 Electronics e = (Electronics) item;
@@ -86,9 +89,15 @@ public class ItemDAO {
                 // Using Factory Method to create new Item
                 ItemFactory factory = null;
                 switch (category) {
-                    case "Electronics": factory = new ElectronicsFactory(); break;
-                    case "Art": factory = new ArtFactory(); break;
-                    case "Vehicle": factory = new VehicleFactory(); break;
+                    case "Electronics":
+                        factory = new ElectronicsFactory();
+                        break;
+                    case "Art":
+                        factory = new ArtFactory();
+                        break;
+                    case "Vehicle":
+                        factory = new VehicleFactory();
+                        break;
                 }
 
                 if (factory != null) {

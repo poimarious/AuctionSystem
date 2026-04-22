@@ -66,7 +66,6 @@ public class PlaceBidTest {
             45.0,
             60.0
     })
-
     void testPlaceBidInvalidBoundaries(double invalidAmount) {
         auction.startAuction();
 

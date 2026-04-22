@@ -15,7 +15,7 @@ public class Art extends Item {
         this.artist = artist;
         this.yearCreated = yearCreated;
     }
-    
+
     @Override
     public void printInfo() {
         System.out.println("[ART]");
