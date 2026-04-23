@@ -33,14 +33,13 @@ public class Bid {
 
     public boolean validate() {
         if (auction.getStatus() != AuctionStatus.RUNNING) {
-            throw new AuctionClosedException("Failed when place bid: Auction is closed.");
+            throw new AuctionClosedException( "[" + bidder.getUsername() + "]" + "Failed when place bid: Auction is closed.");
         } else if (amount < 0) {
-            throw new InvalidBidException("Failed when place bid: amount is lower then zero.");
+            throw new InvalidBidException("[" + bidder.getUsername() + "]" + "Failed when place bid: amount is lower then zero.");
         } else if (amount <= auction.getCurrentPrice()) {
-            throw new InvalidBidException("Failed when place bid: amount is lower than or equal current price.");
-        }
-        else if(bidder.getUserId().equals(auction.getItem().getSeller().getUserId())) {
-            throw new AuthenticationException("Failed when place bid: the seller cannot place bid.");
+            throw new InvalidBidException("[" + bidder.getUsername() + "]" + "Failed when place bid: amount is lower than or equal current price.");
+        } else if (bidder.getUserId().equals(auction.getItem().getSeller().getUserId())) {
+            throw new AuthenticationException("[" + bidder.getUsername() + "]" + "Failed when place bid: the seller cannot place bid.");
         }
         return true;
     }
