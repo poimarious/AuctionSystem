@@ -164,7 +164,6 @@ public class PlaceBidTest {
 
                     assertDoesNotThrow(() -> {
                         Bid bid = new Bid(null, bidder1, auction, targetBidAmount, LocalDateTime.now());
-
                         boolean success = auction.placeBid(bid);
                         if (success) {
                             successfulBids.incrementAndGet();
@@ -179,22 +178,18 @@ public class PlaceBidTest {
             });
         }
 
-        // BẮT ĐẦU! Phát súng lệnh cho 100 thread cùng chạy vào placeBid
         readyLatch.countDown();
 
         boolean completed = doneLatch.await(5, TimeUnit.SECONDS);
-        assertTrue(completed, "Các luồng không thể hoàn thành trong thời gian quy định (Có thể bị Deadlock)");
+        assertTrue(completed, "Couldn't finish all in time probably deadlocked");
 
-        System.out.println("Số lượt đặt giá thành công: " + successfulBids.get());
+        System.out.println("Number of successful bid(s): " + successfulBids.get());
 
-        // 1. Chỉ có ĐÚNG 1 lượt đặt giá thành công
-        assertEquals(1, successfulBids.get(), "Chỉ được phép có 1 người đặt thành công mức giá 100$");
+        assertEquals(1, successfulBids.get(), "Should only take in 1 successful bid by the first person");
 
-        // 2. Giá hiện tại của sản phẩm phải khớp đúng 100$
-        assertEquals(100.0, auction.getCurrentPrice(), "Giá hiện tại phải là 100$");
+        assertEquals(100.0, auction.getCurrentPrice(), "Current auction price should be 100$");
 
-        // 3. Danh sách Bid chỉ chứa đúng 1 đối tượng Bid
-        assertEquals(1, auction.getBids().size(), "Lịch sử đặt giá chỉ được chứa 1 bản ghi");
+        assertEquals(1, auction.getBids().size(), "Auction's history of bids should only contain 1 bid");
 
         executor.shutdown();
     }
