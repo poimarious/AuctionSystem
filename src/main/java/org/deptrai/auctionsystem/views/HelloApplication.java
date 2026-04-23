@@ -11,7 +11,7 @@ public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/login-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/org.deptrai.auctionsystem.views/login-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 800, 600); // Kích thước cửa sổ
         stage.setTitle("Hệ thống Đấu giá trực tuyến");
         stage.setScene(scene);

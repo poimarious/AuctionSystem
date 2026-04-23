@@ -18,6 +18,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -134,5 +139,63 @@ public class PlaceBidTest {
         assertDoesNotThrow(() -> {
             auction.closeAuction();
         });
+    }
+
+    @Test
+    void testConcurrentBidding() throws InterruptedException {
+        auction.startAuction();
+
+        int numberOfThreads = 100;
+        double targetBidAmount = 100.0;
+
+        ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
+
+        // CountDownLatch hold the threads to start them at the same time
+        CountDownLatch readyLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(numberOfThreads);
+
+        // AtomicInteger to reflect accurate count (thread-safe)
+        AtomicInteger successfulBids = new AtomicInteger(0);
+
+        for (int i = 0; i < numberOfThreads; i++) {
+            executor.submit(() -> {
+                try {
+                    readyLatch.await();
+
+                    assertDoesNotThrow(() -> {
+                        Bid bid = new Bid(null, bidder1, auction, targetBidAmount, LocalDateTime.now());
+
+                        boolean success = auction.placeBid(bid);
+                        if (success) {
+                            successfulBids.incrementAndGet();
+                        }
+                    });
+
+                } catch (Exception e) {
+                    // All later threads that come will throw InvalidBidException here since bid <=  currentPrice
+                } finally {
+                    doneLatch.countDown();
+                }
+            });
+        }
+
+        // BẮT ĐẦU! Phát súng lệnh cho 100 thread cùng chạy vào placeBid
+        readyLatch.countDown();
+
+        boolean completed = doneLatch.await(5, TimeUnit.SECONDS);
+        assertTrue(completed, "Các luồng không thể hoàn thành trong thời gian quy định (Có thể bị Deadlock)");
+
+        System.out.println("Số lượt đặt giá thành công: " + successfulBids.get());
+
+        // 1. Chỉ có ĐÚNG 1 lượt đặt giá thành công
+        assertEquals(1, successfulBids.get(), "Chỉ được phép có 1 người đặt thành công mức giá 100$");
+
+        // 2. Giá hiện tại của sản phẩm phải khớp đúng 100$
+        assertEquals(100.0, auction.getCurrentPrice(), "Giá hiện tại phải là 100$");
+
+        // 3. Danh sách Bid chỉ chứa đúng 1 đối tượng Bid
+        assertEquals(1, auction.getBids().size(), "Lịch sử đặt giá chỉ được chứa 1 bản ghi");
+
+        executor.shutdown();
     }
 }

@@ -48,7 +48,7 @@ public class MainController {
     @FXML
     private void handleAuctionFloor(ActionEvent event) {
         // Chuyển sang màn hình bidding-detail.fxml (Trang bạn vừa làm xong)
-        changeScene(event, "/bidding-detail.fxml", "Sàn Đấu Giá");
+        changeScene(event, "/org.deptrai.auctionsystem.views/bidding-detail.fxml", "Sàn Đấu Giá");
     }
 
     // --- 2. CHUYỂN SANG QUẢN LÝ KHO ---
@@ -65,7 +65,7 @@ public class MainController {
      */
     public void goToAuctionDetail(ActionEvent event, Auction selectedAuction) {
         try {
-            URL url = getClass().getResource("/bidding-detail.fxml");
+            URL url = getClass().getResource("/org.deptrai.auctionsystem.views/bidding-detail.fxml");
             if (url == null) {
                 throw new IOException("Không tìm thấy file: /bidding-detail.fxml");
             }

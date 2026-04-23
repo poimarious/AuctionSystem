@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 
 <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="512.0"
-      prefWidth="789.0" spacing="30.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21"
+      prefWidth="789.0" spacing="30.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.controllers.BiddingDetailController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
