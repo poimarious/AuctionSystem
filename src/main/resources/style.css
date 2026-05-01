@@ -1,92 +1,248 @@
-/* 1. Cấu hình chung cho toàn ứng dụng */
+/*
+    FILE: style.css
+    Dự án: AuctionSystem - UET
+    Phong cách: High-Contrast Modern UI (Kết hợp sự sắc nét của ảnh 1 và độ mượt của ảnh 2)
+*/
+
+/* --- 1. THIẾT LẬP CHUNG --- */
 .root {
-    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
-    -fx-background-color: #f4f7f6; /* Màu nền xám nhạt dịu mắt */
+    -fx-font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #f0f2f5; /* Nền xám nhạt để làm nổi bật các khối trắng */
+    -fx-text-fill: #2c3e50;
 }
 
-/* 2. Màu sắc cho các nút bấm (Button) */
-.button {
-    -fx-background-color: #2c3e50; /* Màu xanh đậm chuyên nghiệp */
-    -fx-text-fill: white;
-    -fx-background-radius: 5;
-    -fx-cursor: hand;
-}
-
-.button:hover {
-    -fx-background-color: #34495e; /* Sáng lên một chút khi di chuột vào */
-}
-
-/* 3. Nút "Đặt giá" đặc biệt (Màu xanh lá - Thành công) */
-.btn-bid {
-    -fx-background-color: #27ae60;
-    -fx-font-weight: bold;
-}
-
-/* 4. Đồng hồ đếm ngược (Màu đỏ - Khẩn cấp) */
-.timer-label {
-    -fx-text-fill: #e74c3c;
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-}
-
-/* 5. Khung bao quanh sản phẩm (Card) */
-.item-card {
+/* --- 2. BẢNG LỊCH SỬ (TABLE VIEW) - LẤY LẠI ĐỘ ĐẬM ĐÀ --- */
+.table-view {
     -fx-background-color: white;
+    -fx-background-radius: 8;
     -fx-border-color: #dcdde1;
-    -fx-border-radius: 10;
-    -fx-background-radius: 10;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+.table-view .column-header {
+    -fx-background-color: #2c3e50; /* Màu xanh đen đậm từ ảnh 1 */
+    -fx-padding: 12;
+    -fx-border-color: #34495e;
+    -fx-border-width: 0 1 0 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white; /* Chữ trắng nổi bật */
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.table-view .cell {
+    -fx-padding: 10;
+    -fx-border-color: transparent;
+    -fx-text-fill: #2c3e50;
+}
+
+/* --- 3. KHỐI TỰ ĐỘNG ĐẤU GIÁ (TITLED PANE) --- */
+.titled-pane {
+    -fx-background-radius: 8;
+}
+
+.titled-pane > .title {
+    -fx-background-color: #2c3e50; /* Quay lại màu đậm như ảnh 1 */
+    -fx-background-radius: 8 8 0 0;
     -fx-padding: 10;
 }
 
-/* 6. Làm đẹp cho Bảng (TableView) */
-.table-view {
-    -fx-background-color: transparent;
-    -fx-border-color: #dcdde1; /* Màu viền xám nhẹ */
-}
-
-/* Tô màu xanh đậm cho thanh Tiêu đề (Thời gian, Người đặt, Số tiền) */
-.table-view .column-header {
-    -fx-background-color: #2c3e50; /* Màu xanh đậm giống Header */
-    -fx-border-color: #34495e;
-}
-
-/* Chỉnh chữ trong tiêu đề bảng sang màu trắng và in đậm */
-.table-view .column-header .label {
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-alignment: CENTER;
-}
-
-/* 7. Sửa lỗi màu chữ cho TitledPane (Khu vực Auto-Bid) */
-.titled-pane > .title {
-    -fx-background-color: #2c3e50; /* Nền xanh đậm */
-}
-
-/* Chỉ định đích danh chữ bên trong tiêu đề phải là màu trắng */
 .titled-pane > .title > .text {
-    -fx-fill: white;
-}
-
-/* Đảm bảo khi nhấp chuột vào nó vẫn giữ màu trắng */
-.titled-pane:focused > .title > .text {
-    -fx-fill: white;
+    -fx-fill: white; /* Chữ trắng */
+    -fx-font-weight: bold;
 }
 
 .titled-pane > .content {
     -fx-background-color: white;
     -fx-border-color: #dcdde1;
+    -fx-border-width: 0 1 1 1;
+    -fx-border-radius: 0 0 8 8;
+    -fx-background-radius: 0 0 8 8;
 }
 
-/* 8. Nâng cấp nhan sắc cho thông tin sản phẩm */
-.product-title {
-    -fx-font-size: 28px;
+/* --- 4. NÚT ĐẶT GIÁ (BUTTON) - GIỮ MÀU XANH LÁ RỰC RỠ --- */
+.btn-bid {
+    -fx-background-color: #27ae60; /* Màu xanh lá truyền cảm hứng từ ảnh 1 */
+    -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-text-fill: #2c3e50; /* Màu xanh đậm thương hiệu */
+    -fx-background-radius: 5; /* Bo góc nhẹ nhàng chuyên nghiệp */
+    -fx-padding: 8 20 8 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(39, 174, 96, 0.3), 10, 0, 0, 3);
 }
 
-.product-description {
-    -fx-font-size: 15px;
-    -fx-text-fill: #7f8c8d; /* Màu xám để làm nổi bật tiêu đề */
-    -fx-wrap-text: true; /* Cho phép chữ tự xuống dòng */
-    -fx-line-spacing: 5;
+.btn-bid:hover {
+    -fx-background-color: #2ecc71; /* Sáng hơn khi di chuột */
+    -fx-effect: dropshadow(three-pass-box, rgba(46, 204, 113, 0.4), 12, 0, 0, 4);
+}
+
+.btn-bid:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* --- 5. THẺ SẢN PHẨM (ITEM CARD) --- */
+.item-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 15, 0, 0, 5);
+}
+
+.item-card:hover {
+    -fx-translate-y: -5; /* Hiệu ứng bay lên nhẹ của Web */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 20, 0, 0, 10);
+}
+
+/* --- 6. CÁC NHÃN THÔNG TIN (LABELS) --- */
+.product-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.price-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e74c3c; /* Màu đỏ nổi bật cho giá tiền */
+}
+
+.timer-label {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #dc2626;
+    -fx-padding: 5 12 5 12;
+    -fx-background-radius: 15;
+    -fx-font-weight: bold;
+    -fx-border-color: #fca5a5;
+    -fx-border-radius: 15;
+}
+
+/* --- 7. Ô NHẬP LIỆU (INPUTS) --- */
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 8;
+}
+
+.text-field:focused {
+    -fx-border-color: #3498db;
+    -fx-border-width: 1.5;
+}
+
+/* --- THANH NAVBAR SIÊU SẮC NÉT --- */
+.header-bar {
+    -fx-background-color: #2c3e50; /* Màu xanh Midnight chủ đạo */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 2);
+}
+
+/* --- HIỆU ỨNG NÚT ĐĂNG NHẬP (OUTLINE) --- */
+.btn-login {
+    -fx-background-color: transparent;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5;
+    -fx-border-width: 1.5;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 8 20 8 20;
+}
+
+/* Khi di chuột vào: Nút to lên một chút và đổi màu nền */
+.btn-login:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1); /* Nền trắng mờ nhẹ */
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(three-pass-box, rgba(255,255,255,0.3), 10, 0, 0, 0);
+}
+
+/* Khi nhấn vào: Nút co nhỏ lại tạo cảm giác bị lún xuống */
+.btn-login:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* --- HIỆU ỨNG NÚT ĐĂNG KÝ (SOLID GREEN) --- */
+.btn-register {
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-padding: 8 20 8 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
+}
+
+.btn-register:hover {
+    -fx-background-color: #2ecc71; /* Xanh lá sáng hơn */
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(three-pass-box, rgba(46, 204, 113, 0.5), 15, 0, 0, 0);
+}
+
+.btn-register:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* --- HIỆU ỨNG ICON NAVBAR --- */
+.nav-icon:hover {
+    -fx-text-fill: #3498db;
+    -fx-scale-x: 1.2;
+    -fx-scale-y: 1.2;
+}
+
+/* Các Icon (Chuông, Người dùng) trắng tinh khiết */
+.nav-icon {
+    -fx-text-fill: white;
+    -fx-opacity: 1.0; /* Khử mờ tuyệt đối */
+    -fx-font-size: 20px;
+    -fx-cursor: hand;
+}
+
+.nav-icon:hover { -fx-text-fill: #3498db; }
+
+/* Làm đẹp cho nút Menu Icon người dùng */
+.user-menu-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+}
+
+.user-menu-button:hover {
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+/* Ẩn mũi tên mặc định của MenuButton */
+.user-menu-button > .arrow-button {
+    -fx-padding: 0;
+}
+.user-menu-button > .arrow-button > .arrow {
+    -fx-background-color: transparent;
+}
+
+/* Làm đẹp cho bảng menu hiện ra */
+.context-menu {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 5);
+}
+
+.menu-item {
+    -fx-padding: 10 20;
+}
+
+.menu-item:hover {
+    -fx-background-color: #f8f9fa;
+}
+
+.menu-item .label {
+    -fx-text-fill: #2c3e50;
+    -fx-font-family: "Segoe UI";
 }

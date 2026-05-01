@@ -1,28 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="400.0" prefWidth="600.0" spacing="20.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/25"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.controllers.LoginController">
+<StackPane prefHeight="500.0" prefWidth="700.0" style="-fx-background-color: #2c3e50;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <ImageView fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true"/>
-        <Label text="ĐĂNG NHẬP HỆ THỐNG." textFill="#2c3e50">
-            <font>
-                <Font name="System Bold" size="20.0"/>
-            </font>
-        </Label>
-        <TextField maxWidth="250.0" promptText="Tên đăng nhập hoặc Email"/>
-        <PasswordField maxWidth="250.0" promptText="Mật khẩu"/>
-        <Button mnemonicParsing="false" onAction="#handleLogin"
-                style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-padding: 10 40 10 40; -fx-font-weight: bold;"
-                text="ĐĂNG NHẬP"/>
-    </children>
+        <VBox alignment="CENTER" maxWidth="350.0" spacing="25.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 20, 0, 0, 0);">
+            <padding>
+                <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+            </padding>
+            <children>
+                <Label style="-fx-font-size: 24; -fx-font-weight: bold;" text="ĐĂNG NHẬP" textFill="#2c3e50" />
 
-</VBox>
+                <VBox spacing="15.0">
+                    <children>
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="Tên đăng nhập" textFill="#7f8c8d" />
+                                <TextField fx:id="usernameField" promptText="Nhập username..." styleClass="text-field" />
+                            </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="Mật khẩu" textFill="#7f8c8d" />
+                                <PasswordField fx:id="passwordField" promptText="Nhập mật khẩu..." styleClass="password-field" />
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn-bid" text="TRUY CẬP HỆ THỐNG" />
+
+                <Hyperlink text="Quên mật khẩu?" textFill="#3498db" />
+            </children>
+        </VBox>
+    </children>
+</StackPane>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.controllers.MainController">
+    <content>
+        <VBox spacing="0.0" style="-fx-background-color: #f0f2f5;">
+            <children>
+
+                <!-- 1. THANH NAVBAR CHUYÊN NGHIỆP -->
+                <HBox alignment="CENTER_LEFT" prefHeight="85.0" spacing="25.0" styleClass="header-bar">
+                    <padding>
+                        <Insets left="40.0" right="40.0" />
+                    </padding>
+                    <children>
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 26; -fx-letter-spacing: 1;" text="AUCTION.UET" textFill="WHITE" />
+
+                        <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 5; -fx-padding: 0 10 0 10;">
+                            <children>
+                                <TextField prefHeight="40.0" prefWidth="350.0" promptText="Tìm kiếm sản phẩm, nghệ sĩ..." style="-fx-background-color: transparent;" />
+                                <Label text="🔍" textFill="#7f8c8d" />
+                            </children>
+                        </HBox>
+
+                        <ComboBox prefHeight="40.0" prefWidth="140.0" promptText="Danh mục" style="-fx-background-radius: 5;" />
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <HBox alignment="CENTER" spacing="15.0">
+                            <children>
+                                <!-- NHÓM CHO KHÁCH (GUEST) -->
+                                <HBox fx:id="guestBox" alignment="CENTER" spacing="15.0">
+                                    <children>
+                                        <Button mnemonicParsing="false" onAction="#handleLogin" styleClass="btn-login" text="ĐĂNG NHẬP" />
+                                        <Button mnemonicParsing="false" styleClass="btn-register" text="ĐĂNG KÝ" />
+                                    </children>
+                                </HBox>
+
+                                <!-- NHÓM CHO NGƯỜI DÙNG (ĐÃ TÍCH HỢP MENUBUTTON) -->
+                                <HBox fx:id="userBox" alignment="CENTER" managed="false" spacing="20.0" visible="false">
+                                    <children>
+                                        <VBox alignment="CENTER_RIGHT">
+                                            <children>
+                                                <Label fx:id="userNameLabel" style="-fx-font-weight: bold; -fx-font-size: 16;" text="Bùi Duy Tuấn Anh" textFill="WHITE" />
+                                                <Label fx:id="walletLabel" style="-fx-font-weight: bold; -fx-font-size: 14;" text="Ví: $15,000" textFill="#27ae60" />
+                                            </children>
+                                        </VBox>
+
+                                        <!-- ICON NGƯỜI DÙNG VỚI MENU THẢ XUỐNG -->
+                                        <MenuButton fx:id="userMenu" mnemonicParsing="false" styleClass="user-menu-button" text="👤" textFill="WHITE">
+                                            <items>
+                                                <MenuItem mnemonicParsing="false" onAction="#handleShowProfile" text="👤 Hồ sơ cá nhân" />
+                                                <MenuItem mnemonicParsing="false" onAction="#handleShowBidHistory" text="📜 Lịch sử đặt giá" />
+                                                <SeparatorMenuItem mnemonicParsing="false" />
+                                                <MenuItem mnemonicParsing="false" onAction="#handleLogout" text="🚪 Đăng xuất" />
+                                            </items>
+                                            <font>
+                                                <Font size="18.0" />
+                                            </font>
+                                        </MenuButton>
+                                    </children>
+                                </HBox>
+
+                                <Separator orientation="VERTICAL" prefHeight="30.0" />
+
+                                <Label styleClass="nav-icon" text="🔔" />
+                            </children>
+                        </HBox>
+                    </children>
+                </HBox>
+
+                <!-- 2. BANNER QUẢNG CÁO -->
+                <StackPane prefHeight="400.0" style="-fx-background-color: #1a252f;">
+                    <children>
+                        <ImageView fitHeight="400.0" fitWidth="1300.0" opacity="0.4" pickOnBounds="true" preserveRatio="true" />
+                        <VBox alignment="CENTER_LEFT" spacing="20.0">
+                            <padding> <Insets left="100.0" /> </padding>
+                            <children>
+                                <Label style="-fx-font-weight: bold;" text="TRANG THÔNG TIN ĐẤU GIÁ TRỰC TUYẾN" textFill="#27ae60">
+                                    <font> <Font size="16.0" /> </font>
+                                </Label>
+                                <Label lineSpacing="10.0" text="Khám phá những bộ sưu tập&#10;độc bản và giá trị nhất." textFill="WHITE">
+                                    <font> <Font name="System Bold" size="44.0" /> </font>
+                                </Label>
+                                <Button prefHeight="55.0" prefWidth="220.0" styleClass="btn-register" text="TÌM HIỂU THÊM" />
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+
+                <!-- 3. DANH SÁCH SẢN PHẨM -->
+                <VBox spacing="30.0">
+                    <padding>
+                        <Insets bottom="60.0" left="60.0" right="60.0" top="40.0" />
+                    </padding>
+                    <children>
+                        <HBox alignment="BOTTOM_LEFT" spacing="15.0">
+                            <children>
+                                <Label style="-fx-font-size: 30; -fx-font-weight: bold;" text="Sản phẩm đang đấu giá" textFill="#2c3e50" />
+                                <Label style="-fx-font-size: 18;" text="(15 sản phẩm mới hôm nay)" textFill="#7f8c8d" />
+                            </children>
+                        </HBox>
+
+                        <FlowPane fx:id="productsContainer" alignment="TOP_LEFT" hgap="40.0" vgap="40.0">
+                            <!-- Code Java sẽ nạp item-card.fxml vào đây -->
+                        </FlowPane>
+                    </children>
+                </VBox>
+
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>

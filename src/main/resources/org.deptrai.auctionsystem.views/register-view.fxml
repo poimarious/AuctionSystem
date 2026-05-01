@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<StackPane prefHeight="650.0" prefWidth="850.0" style="-fx-background-color: #2c3e50;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <VBox alignment="CENTER" maxWidth="450.0" spacing="25.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 20, 0, 0, 0);">
+            <padding>
+                <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+            </padding>
+            <children>
+                <Label text="TẠO TÀI KHOẢN MỚI" textFill="#2c3e50">
+                    <font>
+                        <Font name="System Bold" size="26.0" />
+                    </font>
+                </Label>
+
+                <VBox spacing="15.0">
+                    <children>
+                        <!-- Thông tin cá nhân -->
+                        <TextField fx:id="fullNameField" prefHeight="40.0" promptText="Họ và tên đầy đủ" styleClass="text-field" />
+                        <TextField fx:id="emailField" prefHeight="40.0" promptText="Địa chỉ Email" styleClass="text-field" />
+
+                        <Separator />
+
+                        <!-- Thông tin tài khoản -->
+                        <TextField fx:id="regUsernameField" prefHeight="40.0" promptText="Tên đăng nhập" styleClass="text-field" />
+                        <PasswordField fx:id="regPasswordField" prefHeight="40.0" promptText="Mật khẩu" styleClass="password-field" />
+                        <PasswordField fx:id="confirmPasswordField" prefHeight="40.0" promptText="Xác nhận mật khẩu" styleClass="password-field" />
+
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="Bạn muốn tham gia với vai trò:" textFill="#7f8c8d" />
+                                <HBox spacing="20.0">
+                                    <children>
+                                        <RadioButton mnemonicParsing="false" selected="true" text="Người mua (Bidder)">
+                                            <toggleGroup>
+                                                <ToggleGroup fx:id="roleGroup" />
+                                            </toggleGroup>
+                                        </RadioButton>
+                                        <RadioButton mnemonicParsing="false" text="Người bán (Seller)" toggleGroup="$roleGroup" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+
+                <Button maxWidth="Infinity" mnemonicParsing="false" prefHeight="45.0" styleClass="btn-register" text="HOÀN TẤT ĐĂNG KÝ" />
+
+                <Hyperlink onAction="#handleBackToLogin" text="Đã có tài khoản? Đăng nhập ngay" textFill="#3498db" />
+            </children>
+        </VBox>
+    </children>
+</StackPane>
