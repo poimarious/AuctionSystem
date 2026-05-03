@@ -9,6 +9,7 @@ import org.deptrai.auctionsystem.models.observer.AuctionSubject;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -126,14 +127,29 @@ public class Auction implements AuctionSubject {
     @Override
     public void notifyBidPlaced(Bid bid) {
         for (AuctionObserver obs : observers) {
-            obs.onBidPlaced(this, bid);
+            //obs.onBidPlaced(this, bid);
+            CompletableFuture.runAsync(() -> {
+                try {
+                    obs.onBidPlaced(this, bid);
+                } catch(Exception e) {
+                    System.err.println("Failed when notify bid placed to observer: " + e.getMessage());
+                }
+            });
         }
     }
 
     @Override
     public void notifyStatusChanged() {
         for (AuctionObserver obs : observers) {
-            obs.onAuctionStatusChanged(this);
+            //obs.onAuctionStatusChanged(this);
+
+            CompletableFuture.runAsync(() -> {
+                try {
+                    obs.onAuctionStatusChanged(this);
+                } catch(Exception e) {
+                    System.err.println("Failed when notify status change to observer: " + e.getMessage());
+                }
+            });
         }
     }
 

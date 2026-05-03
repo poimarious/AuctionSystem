@@ -1,130 +1,107 @@
-//package org.deptrai.auctionsystem.views;
-//
-//import javafx.fxml.FXML;
-//import javafx.fxml.FXMLLoader;
-//import javafx.scene.layout.StackPane;
-//import javafx.scene.Parent;
-//import java.io.IOException;
-//
-//public class MainController {
-//
-//    @FXML
-//    private StackPane contentArea; // Đây là cái ô trống CENTER chúng ta tạo lúc đầu
-//
-//    // Hàm này để đổi nội dung ở giữa màn hình mà không làm mất Menu bên trái
-//    @FXML
-//    private void showBiddingFloor() {
-//        loadView("/bidding-detail.fxml");
-//    }
-//
-//    private void loadView(String fxmlFile) {
-//        try {
-//            Parent root = FXMLLoader.load(getClass().getResource(fxmlFile));
-//            contentArea.getChildren().removeAll();
-//            contentArea.getChildren().setAll(root);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//}
 package org.deptrai.auctionsystem.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.stage.Stage;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
 import org.deptrai.auctionsystem.models.auction.Auction;
+import org.deptrai.auctionsystem.models.auction.AuctionManager;
+import org.deptrai.auctionsystem.models.items.ArtFactory;
+import org.deptrai.auctionsystem.models.items.ElectronicsFactory;
+import org.deptrai.auctionsystem.models.items.Item;
+import org.deptrai.auctionsystem.models.items.ItemFactory;
+import org.deptrai.auctionsystem.models.users.Seller;
 
 import java.io.IOException;
-import java.net.URL;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class MainController {
 
-    // --- 1. CHUYỂN SANG SÀN ĐẤU GIÁ --
     @FXML
-    private void handleAuctionFloor(ActionEvent event) {
-        // Chuyển sang màn hình bidding-detail.fxml (Trang bạn vừa làm xong)
-        changeScene(event, "/org.deptrai.auctionsystem.views/bidding-detail.fxml", "Sàn Đấu Giá");
+    private FlowPane productsContainer;
+
+    @FXML
+    public void initialize() {
+        // 1. Tạo Mock Data (Dữ liệu giả)
+        createMockData();
+
+        // 2. Lấy dữ liệu từ Manager và in ra giao diện
+        loadAuctionsToGrid();
     }
 
-    // --- 2. CHUYỂN SANG QUẢN LÝ KHO ---
     @FXML
-    private void handleInventory(ActionEvent event) {
-        // Chuyển sang màn hình quản lý kho
-        changeScene(event, "/inventory-view.fxml", "Quản Lý Kho");
+    public void handleAuctionFloor(javafx.event.ActionEvent event) {
+        System.out.println("Đã bấm nút chuyển sang Sàn Đấu Giá");
+        // Tương lai có thể dùng SceneManager đổi nội dung ở giữa tại đây
     }
 
-    // --- 3. CHUYỂN SANG CHI TIẾT (CÓ TRUYỀN DỮ LIỆU) ---
-    /**
-     * Hàm này dùng khi bạn chọn một món hàng cụ thể và muốn xem chi tiết.
-     * Nó sẽ truyền đối tượng Auction sang cho BiddingDetailController.
-     */
-    public void goToAuctionDetail(ActionEvent event, Auction selectedAuction) {
-        try {
-            URL url = getClass().getResource("/org.deptrai.auctionsystem.views/bidding-detail.fxml");
-            if (url == null) {
-                throw new IOException("Không tìm thấy file: /bidding-detail.fxml");
+    @FXML
+    public void handleInventory(javafx.event.ActionEvent event) {
+        System.out.println("Đã bấm nút chuyển sang Quản lý Kho");
+        // Tương lai gọi SceneManager nạp inventory-view.fxml
+    }
+
+    // Các hàm cho Header (nếu main-view.fxml của bạn có chứa Header từ source 6)
+    @FXML
+    public void handleLogin(javafx.event.ActionEvent event) {
+        System.out.println("Đã bấm Đăng nhập");
+    }
+
+    @FXML
+    public void handleLogout(javafx.event.ActionEvent event) {
+        System.out.println("Đã bấm Đăng xuất");
+    }
+
+    @FXML
+    public void handleShowProfile(javafx.event.ActionEvent event) {
+        System.out.println("Đã bấm Xem Hồ sơ");
+    }
+
+    @FXML
+    public void handleShowBidHistory(javafx.event.ActionEvent event) {
+        System.out.println("Đã bấm Xem Lịch sử đặt giá");
+    }
+
+    private void loadAuctionsToGrid() {
+        List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
+
+        for (Auction auction : allAuctions) {
+            try {
+                // Tải file FXML của một thẻ sản phẩm
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org.deptrai.auctionsystem.views/item-card.fxml"));
+                VBox itemCard = loader.load();
+
+                // Lấy Controller của thẻ đó và truyền dữ liệu vào
+                ItemCardController cardController = loader.getController();
+                cardController.setData(auction);
+
+                // Thêm thẻ vào FlowPane
+                productsContainer.getChildren().add(itemCard);
+
+            } catch (IOException e) {
+                System.err.println("Lỗi khi nạp item-card.fxml: " + e.getMessage());
             }
-
-            FXMLLoader loader = new FXMLLoader(url);
-            Parent root = loader.load();
-
-            // Lấy controller của trang đích để đổ dữ liệu vào
-            BiddingDetailController detailController = loader.getController();
-            detailController.setAuctionData(selectedAuction);
-
-            // Thực hiện thay đổi màn hình
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Chi tiết đấu giá: " + selectedAuction.getItem().getName());
-            stage.show();
-
-        } catch (IOException e) {
-            showError("Lỗi hệ thống", "Không thể mở trang chi tiết: " + e.getMessage());
         }
     }
 
-    /**
-     * HÀM DÙNG CHUNG: Để chuyển các trang đơn giản (không cần truyền dữ liệu)
-     */
-    private void changeScene(ActionEvent event, String fxmlPath, String title) {
-        try {
-            URL url = getClass().getResource(fxmlPath);
-            if (url == null) {
-                throw new IOException("Đường dẫn file không tồn tại: " + fxmlPath);
-            }
+    // Giả lập tạo các phiên đấu giá mẫu để test giao diện
+    private void createMockData() {
+        // Chỉ tạo giả nếu danh sách đang trống để tránh bị lặp khi chuyển đi chuyển lại giữa các Scene
+        if (AuctionManager.getInstance().getAllAuctions().isEmpty()) {
+            Seller mockSeller = new Seller("seller1", "pass123", "seller@uet.edu.vn");
 
-            FXMLLoader loader = new FXMLLoader(url);
-            Parent root = loader.load();
+            ItemFactory artFactory = new ArtFactory();
+            ItemFactory elecFactory = new ElectronicsFactory();
 
-            // Lấy Stage (Cửa sổ) hiện tại từ sự kiện click
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Item item1 = artFactory.createItem("Tranh Mona Lisa (Bản rep 1:1)", "Tranh sơn dầu tái bản chất lượng cao", 5000.0, mockSeller);
+            Item item2 = elecFactory.createItem("MacBook Pro M3 Max", "Máy tính xách tay cấu hình cao cấp nhất, bảo hành 12 tháng", 2500.0, mockSeller);
+            Item item3 = elecFactory.createItem("PlayStation 5 Pro", "Máy chơi game thế hệ mới nguyên seal", 800.0, mockSeller);
 
-            stage.setScene(new Scene(root));
-            stage.setTitle(title);
-            stage.centerOnScreen(); // Đưa cửa sổ ra giữa màn hình
-            stage.show();
-
-            System.out.println("Chuyển trang thành công: " + title);
-
-        } catch (IOException e) {
-            showError("Lỗi chuyển trang", "Chi tiết: " + e.getMessage());
-            e.printStackTrace();
+            // Thời gian kết thúc sau 2 giờ, 1 ngày, và thời gian ở quá khứ (để test hết hạn)
+            AuctionManager.getInstance().createAuction(item1, LocalDateTime.now().plusHours(2));
+            AuctionManager.getInstance().createAuction(item2, LocalDateTime.now().plusDays(1));
+            AuctionManager.getInstance().createAuction(item3, LocalDateTime.now().minusHours(1));
         }
-    }
-
-    /**
-     * Hàm hiển thị thông báo lỗi nhanh
-     */
-    private void showError(String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Thông báo");
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }

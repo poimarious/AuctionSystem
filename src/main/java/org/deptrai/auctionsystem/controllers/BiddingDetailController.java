@@ -96,7 +96,7 @@ public class BiddingDetailController implements AuctionObserver {
             Bidder currentBidder = null;
 
             Bid newBid = new Bid(currentBidder, currentAuction, amount, LocalDateTime.now());
-            currentAuction.placeBid(newBid);
+            currentBidder.placeBid(currentAuction, amount);
 
             // Xóa nội dung ô nhập sau khi đặt thành công
             bidAmountField.clear();

@@ -2,38 +2,89 @@ package org.deptrai.auctionsystem.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import org.deptrai.auctionsystem.models.users.Admin;
+import org.deptrai.auctionsystem.models.users.Bidder;
+import org.deptrai.auctionsystem.models.users.Seller;
+import org.deptrai.auctionsystem.models.users.User;
+import org.deptrai.auctionsystem.utils.SceneManager;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoginController {
 
+    // Khớp với fx:id trong file login-view.fxml
     @FXML
-    private void handleLogin(ActionEvent event) {
-        try {
+    private TextField usernameField;
 
-            Parent root = FXMLLoader.load(getClass().getResource("/org.deptrai.auctionsystem.views/main-view.fxml"));
+    @FXML
+    private PasswordField passwordField;
 
-            // 2. Lấy thông tin "Sân khấu" (Stage) hiện tại từ cái nút vừa bấm
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+    // Giả lập Database chứa thông tin User
+    private List<User> userDatabase;
 
-            // . Tạo "Phân cảnh" (Scene) mới với giao diện đã tải
-            Scene scene = new Scene(root);
+    @FXML
+    public void initialize() {
+        // Khởi tạo dữ liệu mẫu khi màn hình vừa được load
+        userDatabase = new ArrayList<>();
 
-            // 4. Đặt cảnh mới lên sân khấu và hiển thị
-            stage.setScene(scene);
-            stage.centerOnScreen(); // Căn giữa màn hình cho đẹp
-            stage.show();
+        // Test account
+        userDatabase.add(new Bidder("Poi", "1", "poimarious@gmail.com"));
+    }
 
-            System.out.println("Đăng nhập thành công! Đang chuyển trang...");
+    @FXML
+    public void handleLoginAction(ActionEvent event) {
+        String inputUsername = usernameField.getText();
+        String inputPassword = passwordField.getText();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Lỗi: Không tìm thấy file giao diện màn hình chính!");
+        if (inputUsername.isEmpty() || inputPassword.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Lỗi đăng nhập", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!");
+            return;
         }
+
+        // Tìm user trong danh sách giả lập
+        User loggedInUser = authenticate(inputUsername, inputPassword);
+
+        if (loggedInUser != null) {
+            if (loggedInUser instanceof Admin) {
+                showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chào mừng Admin " + loggedInUser.getUsername());
+                // Chuyển sang trang Admin
+                SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/admin.fxml", "Admin Panel");
+
+            } else if (loggedInUser instanceof Bidder) {
+                showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chào mừng Bidder " + loggedInUser.getUsername());
+                // Chuyển sang trang chủ người dùng
+                SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/main-view.fxml", "Sàn Đấu Giá");
+
+            } else if (loggedInUser instanceof Seller) {
+                showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chào mừng Seller " + loggedInUser.getUsername());
+                // Chuyển sang trang kho hàng
+                SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/inventory-view.fxml", "Quản lý Kho Hàng");
+            }
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Thất bại", "Sai tên đăng nhập hoặc mật khẩu.");
+        }
+    }
+
+    // Hàm giả lập logic kiểm tra thông tin đăng nhập
+    private User authenticate(String username, String password) {
+        for (User user : userDatabase) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    // Tiện ích hiển thị thông báo popup
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

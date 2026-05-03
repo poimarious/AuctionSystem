@@ -1,5 +1,7 @@
 package org.deptrai.auctionsystem.models.auction;
 
+import org.deptrai.auctionsystem.dao.ItemDAO;
+import org.deptrai.auctionsystem.dao.UserDAO;
 import org.deptrai.auctionsystem.exceptions.AuctionClosedException;
 import org.deptrai.auctionsystem.exceptions.AuthenticationException;
 import org.deptrai.auctionsystem.exceptions.InvalidBidException;
@@ -34,28 +36,54 @@ public class PlaceBidTest {
     private Item item;
     private Seller seller;
 
+//    @BeforeEach
+//    void setUp() {
+//        ItemFactory itemFactory = new ArtFactory();
+//        seller = new Seller("poi",
+//                "poi1",
+//                "poimarious@gmail.com");
+//        seller.setUserId("seller_01");
+//        item = itemFactory.createItem("Kabuto Kunaigun",
+//                "Kabuto's personal sidearm...",
+//                60.0,
+//                seller);
+//        LocalDateTime endTime = LocalDateTime.of(2026, Month.MAY, 30, 0, 0);
+//
+//        auction = new Auction(item, endTime);
+//        bidder1 = new Bidder("poimarious",
+//                "poimaious1",
+//                "pomarious@gmail.com");
+//        bidder1.setUserId("bidder_01");
+//        bidder2 = new Bidder("TusBeo",
+//                "TusBeo123@",
+//                "TusBeo123@gmail.com");
+//        bidder2.setUserId("bidder_02");
+//    }
+
     @BeforeEach
     void setUp() {
-        ItemFactory itemFactory = new ArtFactory();
-        seller = new Seller("poi",
-                "poi1",
-                "poimarious@gmail.com");
-        seller.setUserId("seller_01");
-        item = itemFactory.createItem("Kabuto Kunaigun",
-                "Kabuto's personal sidearm...",
-                60.0,
-                seller);
-        LocalDateTime endTime = LocalDateTime.of(2026, Month.MAY, 30, 0, 0);
+        UserDAO userDAO = new UserDAO();
+        ItemDAO itemDAO = new ItemDAO();
 
+        ItemFactory itemFactory = new ArtFactory();
+
+        // --- SỬA Ở ĐÂY: Gắn thêm thời gian hiện tại vào username để KHÔNG BAO GIỜ TRÙNG ---
+        long timeStamp = System.currentTimeMillis();
+
+        seller = new Seller("poi", "poi1_" + timeStamp, "poimarious@gmail.com");
+        userDAO.insertUser(seller, "SELLER");
+
+        item = itemFactory.createItem("Kabuto Kunaigun", "Desc...", 60.0, seller);
+        itemDAO.insertItem(item);
+
+        LocalDateTime endTime = LocalDateTime.now().plusDays(1);
         auction = new Auction(item, endTime);
-        bidder1 = new Bidder("poimarious",
-                "poimaious1",
-                "pomarious@gmail.com");
-        bidder1.setUserId("bidder_01");
-        bidder2 = new Bidder("TusBeo",
-                "TusBeo123@",
-                "TusBeo123@gmail.com");
-        bidder2.setUserId("bidder_02");
+
+        bidder1 = new Bidder("poimarious", "poimaious1_" + timeStamp, "pomarious@gmail.com");
+        userDAO.insertUser(bidder1, "BIDDER");
+
+        bidder2 = new Bidder("TusBeo", "TusBeo123_" + timeStamp, "TusBeo123@gmail.com");
+        userDAO.insertUser(bidder2, "BIDDER");
     }
 
     @Test
