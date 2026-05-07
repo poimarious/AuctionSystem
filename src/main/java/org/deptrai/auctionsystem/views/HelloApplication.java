@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.deptrai.auctionsystem.utils.DatabaseConnection;
 import org.deptrai.auctionsystem.utils.SceneManager;
 
 import java.io.IOException;
@@ -18,6 +19,8 @@ public class HelloApplication extends Application {
 //        stage.setTitle("Hệ thống Đấu giá trực tuyến");
 //        stage.setScene(scene);
 //        stage.show();
+
+        DatabaseConnection.initializeDatabase();
 
         SceneManager.getInstance().setPrimaryStage(stage);
 

@@ -70,8 +70,8 @@ public class MainController {
             try {
                 // Tải file FXML của một thẻ sản phẩm
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org.deptrai.auctionsystem.views/item-card.fxml"));
-                VBox itemCard = loader.load();
-
+                //VBox itemCard = loader.load();
+                javafx.scene.Node  itemCard = loader.load();
                 // Lấy Controller của thẻ đó và truyền dữ liệu vào
                 ItemCardController cardController = loader.getController();
                 cardController.setData(auction);

@@ -4,7 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
 
-<StackPane prefHeight="650.0" prefWidth="850.0" style="-fx-background-color: #2c3e50;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane prefHeight="650.0" prefWidth="850.0" style="-fx-background-color: #2c3e50;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.controllers.RegisterController">
     <children>
         <VBox alignment="CENTER" maxWidth="450.0" spacing="25.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 20, 0, 0, 0);">
             <padding>
@@ -24,8 +24,8 @@
 
                         <Separator />
 
-                        <TextField fx:id="regUsernameField" prefHeight="40.0" promptText="Tên đăng nhập" styleClass="text-field" />
-                        <PasswordField fx:id="regPasswordField" prefHeight="40.0" promptText="Mật khẩu" styleClass="password-field" />
+                        <TextField fx:id="usernameField" prefHeight="40.0" promptText="Tên đăng nhập" styleClass="text-field" />
+                        <PasswordField fx:id="passwordField" prefHeight="40.0" promptText="Mật khẩu" styleClass="password-field" />
                         <PasswordField fx:id="confirmPasswordField" prefHeight="40.0" promptText="Xác nhận mật khẩu" styleClass="password-field" />
 
                         <VBox spacing="5.0">
@@ -38,7 +38,7 @@
                                                 <ToggleGroup fx:id="roleGroup" />
                                             </toggleGroup>
                                         </RadioButton>
-                                        <RadioButton mnemonicParsing="false" text="Người bán (Seller)" toggleGroup="$roleGroup" />
+                                        <RadioButton mnemonicParsing="false" text="Người bán (Seller)" toggleGroup="$roleGroup" userData="Seller" />
                                     </children>
                                 </HBox>
                             </children>
@@ -46,13 +46,13 @@
                     </children>
                 </VBox>
 
-                <Button maxWidth="Infinity" mnemonicParsing="false" prefHeight="45.0" styleClass="btn-register" text="HOÀN TẤT ĐĂNG KÝ" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" prefHeight="45.0" styleClass="btn-register" text="HOÀN TẤT ĐĂNG KÝ" onAction="#handleRegisterAction" />
 
                 <Hyperlink onAction="#handleBackToLogin" text="Đã có tài khoản? Đăng nhập ngay" textFill="#3498db" />
             </children>
         </VBox>
 
-        <Button mnemonicParsing="false" styleClass="btn-back" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-cursor: hand;" text="⬅ " StackPane.alignment="TOP_LEFT">
+        <Button mnemonicParsing="false" onAction="#handleBackToLogin" styleClass="btn-back" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-cursor: hand;" text="⬅ " StackPane.alignment="TOP_LEFT">
             <StackPane.margin>
                 <Insets left="20.0" top="20.0" />
             </StackPane.margin>
