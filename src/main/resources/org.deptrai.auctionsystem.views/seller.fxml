@@ -3,14 +3,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox prefHeight="720.0" prefWidth="1280.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<HBox prefHeight="720.0" prefWidth="1280.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.controllers.MainController">
     <children>
         <VBox prefWidth="260.0" spacing="15.0" style="-fx-background-color: white;" styleClass="sidebar">
             <padding>
                 <Insets bottom="20.0" left="15.0" right="15.0" top="15.0" /> </padding>
             <children>
 
-                <Button mnemonicParsing="false" styleClass="btn-back" text="⬅ ">
+                <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ ">
                     <padding>
                         <Insets bottom="8.0" right="15.0" top="8.0" />
                     </padding>
@@ -20,12 +20,18 @@
 
                 <Label style="-fx-font-size: 20; -fx-font-weight: bold;" text="SELLER CENTER" textFill="#2c3e50" />
                 <Separator />
+
                 <Button maxWidth="Infinity" style="-fx-text-fill: #2c3e50;" styleClass="btn-login" text="🏠 Tổng quan" />
                 <Button maxWidth="Infinity" style="-fx-text-fill: #2c3e50;" styleClass="btn-login" text="📦 Kho hàng của tôi" />
                 <Button maxWidth="Infinity" styleClass="btn-bid" text="➕ Đăng sản phẩm mới" />
                 <Button maxWidth="Infinity" style="-fx-text-fill: #2c3e50;" styleClass="btn-login" text="📈 Thống kê doanh thu" />
+
                 <Region VBox.vgrow="ALWAYS" />
+
                 <Button maxWidth="Infinity" style="-fx-background-color: #2c3e50;" styleClass="btn-bid" text="👤 Hồ sơ cá nhân" />
+
+                <Separator />
+                <Button maxWidth="Infinity" onAction="#handleLogout" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" styleClass="btn-bid" text="🚪 ĐĂNG XUẤT" />
             </children>
         </VBox>
 
