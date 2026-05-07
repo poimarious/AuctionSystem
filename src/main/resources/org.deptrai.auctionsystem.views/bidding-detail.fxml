@@ -17,6 +17,11 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
     <children>
+        <Button mnemonicParsing="false" styleClass="btn-back" text="⬅ ">
+            <padding>
+                <Insets bottom="8.0" left="12.0" right="15.0" top="8.0" />
+            </padding>
+        </Button>
         <!-- CỘT TRÁI: THÔNG TIN SẢN PHẨM -->
         <VBox prefWidth="450.0" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
             <children>

@@ -246,3 +246,28 @@
     -fx-text-fill: #2c3e50;
     -fx-font-family: "Segoe UI";
 }
+
+
+/* Trạng thái bình thường */
+.btn-back {
+    -fx-background-color: transparent;
+    -fx-text-fill: #7f8c8d;
+    -fx-font-size: 15px;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-background-radius: 8;
+}
+
+/* Hiệu ứng khi đưa chuột vào (Hover) */
+.btn-back:hover {
+    -fx-background-color: #e2e8f0;
+    -fx-text-fill: #2c3e50;
+    -fx-translate-x: -4;
+}
+
+/* Hiệu ứng khi click chuột xuống (Pressed) */
+.btn-back:pressed {
+    -fx-background-color: #cbd5e1;
+    -fx-translate-x: -2;
+}

@@ -5,10 +5,19 @@
 
 <HBox prefHeight="720.0" prefWidth="1280.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <!-- SIDEBAR SELLER -->
         <VBox prefWidth="260.0" spacing="15.0" style="-fx-background-color: white;" styleClass="sidebar">
-            <padding> <Insets bottom="20.0" left="15.0" right="15.0" top="30.0" /> </padding>
+            <padding>
+                <Insets bottom="20.0" left="15.0" right="15.0" top="15.0" /> </padding>
             <children>
+
+                <Button mnemonicParsing="false" styleClass="btn-back" text="⬅ ">
+                    <padding>
+                        <Insets bottom="8.0" right="15.0" top="8.0" />
+                    </padding>
+                    <VBox.margin>
+                        <Insets bottom="-5.0" /> </VBox.margin>
+                </Button>
+
                 <Label style="-fx-font-size: 20; -fx-font-weight: bold;" text="SELLER CENTER" textFill="#2c3e50" />
                 <Separator />
                 <Button maxWidth="Infinity" style="-fx-text-fill: #2c3e50;" styleClass="btn-login" text="🏠 Tổng quan" />
@@ -20,7 +29,6 @@
             </children>
         </VBox>
 
-        <!-- NỘI DUNG KHO HÀNG -->
         <VBox spacing="25.0" HBox.hgrow="ALWAYS" style="-fx-background-color: #f8f9fa;">
             <padding> <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /> </padding>
             <children>
@@ -32,11 +40,9 @@
                     </children>
                 </HBox>
 
-                <!-- Product Grid (Dùng FlowPane để hiển thị thẻ sản phẩm của riêng Seller) -->
                 <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
                     <content>
                         <FlowPane hgap="25.0" vgap="25.0">
-                            <!-- Các item-card.fxml của seller sẽ hiện ở đây -->
                         </FlowPane>
                     </content>
                 </ScrollPane>

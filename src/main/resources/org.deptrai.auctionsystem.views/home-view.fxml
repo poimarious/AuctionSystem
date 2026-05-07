@@ -10,6 +10,11 @@
     <content>
         <VBox spacing="0.0" style="-fx-background-color: #f0f2f5;">
             <children>
+                <Button mnemonicParsing="false" styleClass="btn-back" text="⬅ ">
+                    <padding>
+                        <Insets bottom="8.0" left="12.0" right="15.0" top="8.0" />
+                    </padding>
+                </Button>
 
                 <!-- 1. THANH NAVBAR CHUYÊN NGHIỆP -->
                 <HBox alignment="CENTER_LEFT" prefHeight="85.0" spacing="25.0" styleClass="header-bar">
