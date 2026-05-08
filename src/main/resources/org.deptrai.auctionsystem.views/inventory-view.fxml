@@ -9,21 +9,22 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="20.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:controller="org.deptrai.auctionsystem.controllers.InventoryController" spacing="20.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
         <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
     </padding>
     <children>
-        <Button mnemonicParsing="false" styleClass="btn-back" text="⬅ ">
+        <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ ">
             <padding>
                 <Insets bottom="8.0" left="12.0" right="15.0" top="8.0" />
             </padding>
         </Button>
+
         <HBox alignment="CENTER_LEFT" spacing="20.0">
             <children>
                 <Label style="-fx-font-size: 22; -fx-font-weight: bold;" text="KHO HÀNG CỦA TÔI" textFill="#2c3e50" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Button styleClass="btn-bid" text="+ ĐĂNG SẢN PHẨM MỚI" />
+                <Button onAction="#handleAddNewProduct" styleClass="btn-bid" text="+ ĐĂNG SẢN PHẨM MỚI" />
             </children>
         </HBox>
 
@@ -41,4 +42,3 @@
         </TableView>
     </children>
 </VBox>
-

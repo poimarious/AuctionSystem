@@ -14,14 +14,12 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-
-<VBox spacing="25.0" style="-fx-background-color: white; -fx-background-radius: 15;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:controller="org.deptrai.auctionsystem.controllers.AddProductController" spacing="25.0" style="-fx-background-color: white; -fx-background-radius: 15;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>
     <children>
-        <Button mnemonicParsing="false" styleClass="btn-back" text="⬅">
+        <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅">
             <padding>
                 <Insets bottom="8.0" left="12.0" right="15.0" top="8.0" />
             </padding>
@@ -35,7 +33,6 @@
 
         <HBox spacing="40.0" VBox.vgrow="ALWAYS">
             <children>
-                <!-- CỘT TRÁI: HÌNH ẢNH -->
                 <VBox alignment="TOP_CENTER" prefWidth="300.0" spacing="15.0">
                     <children>
                         <Label style="-fx-font-weight: bold;" text="Hình ảnh sản phẩm" />
@@ -45,11 +42,10 @@
                                 <Label fx:id="placeholderLabel" text="Chưa có ảnh" textFill="#bdc3c7" />
                             </children>
                         </StackPane>
-                        <Button maxWidth="Infinity" style="-fx-text-fill: #2c3e50; -fx-border-color: #2c3e50;" styleClass="btn-login" text="📁 CHỌN ẢNH TỪ MÁY TÍNH" />
+                        <Button onAction="#handleChooseImage" maxWidth="Infinity" style="-fx-text-fill: #2c3e50; -fx-border-color: #2c3e50;" styleClass="btn-login" text="📁 CHỌN ẢNH TỪ MÁY TÍNH" />
                     </children>
                 </VBox>
 
-                <!-- CỘT PHẢI: THÔNG TIN CHI TIẾT -->
                 <VBox spacing="15.0" HBox.hgrow="ALWAYS">
                     <children>
                         <VBox spacing="5.0">
@@ -98,8 +94,8 @@
 
         <HBox alignment="CENTER_RIGHT" spacing="15.0">
             <children>
-                <Button prefWidth="120.0" style="-fx-background-color: #7f8c8d;" styleClass="btn-bid" text="HỦY BỎ" />
-                <Button prefWidth="200.0" styleClass="btn-bid" text="ĐĂNG TẢI NGAY" />
+                <Button onAction="#handleGoBack" prefWidth="120.0" style="-fx-background-color: #7f8c8d;" styleClass="btn-bid" text="HỦY BỎ" />
+                <Button onAction="#handleUploadProduct" prefWidth="200.0" styleClass="btn-bid" text="ĐĂNG TẢI NGAY" />
             </children>
         </HBox>
     </children>

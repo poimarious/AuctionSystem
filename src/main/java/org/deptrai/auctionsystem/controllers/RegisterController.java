@@ -12,6 +12,9 @@ import org.deptrai.auctionsystem.utils.SceneManager;
 public class RegisterController {
 
     @FXML
+    private TextField fullNameField; // Đã thêm trường này để khớp với FXML
+
+    @FXML
     private TextField usernameField;
 
     @FXML
@@ -26,27 +29,18 @@ public class RegisterController {
     @FXML
     private ToggleGroup roleGroup;
 
-    @FXML
-    private ComboBox<String> roleComboBox; // Dùng nếu bạn cho phép user chọn làm Người mua hay Người bán
-
-    @FXML
-    public void initialize() {
-        // Khởi tạo các lựa chọn cho Role (Nếu giao diện của bạn có ComboBox này)
-        if (roleComboBox != null) {
-            roleComboBox.getItems().addAll("Người đấu giá (Bidder)", "Người bán (Seller)");
-            roleComboBox.getSelectionModel().selectFirst();
-        }
-    }
+    // Đã xóa roleComboBox và hàm initialize() đi vì giao diện mới dùng RadioButton
 
     @FXML
     public void handleRegisterAction(ActionEvent event) {
+        String fullName = fullNameField.getText(); // Lấy thêm fullName
         String username = usernameField.getText();
         String email = emailField.getText();
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        // 1. Kiểm tra không được để trống
-        if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+        // 1. Kiểm tra không được để trống (Cập nhật check thêm fullName)
+        if (fullName.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng điền đầy đủ tất cả các trường!");
             return;
         }
@@ -64,7 +58,9 @@ public class RegisterController {
         // Cấp phát một ID duy nhất cho User mới
         String newUserId = "USER_" + System.currentTimeMillis();
 
-        if (roleComboBox != null && roleComboBox.getValue().contains("Seller")) {
+        // Xử lý lấy Role từ ToggleGroup (RadioButton)
+        RadioButton selectedRole = (RadioButton) roleGroup.getSelectedToggle();
+        if (selectedRole != null && "Seller".equals(selectedRole.getUserData())) {
             newUser = new Seller(username, password, email);
             role = "SELLER";
         } else {

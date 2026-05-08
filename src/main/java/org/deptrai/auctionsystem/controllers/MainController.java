@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.layout.FlowPane;
@@ -34,6 +35,9 @@ public class MainController {
     private MenuButton userMenu;
 
     @FXML
+    private Button sellerCenterBtn; // Đã thêm khai báo nút
+
+    @FXML
     private FlowPane productsContainer;
 
     @FXML
@@ -61,6 +65,12 @@ public class MainController {
 
         userBox.setVisible(false);
         userBox.setManaged(false);
+
+        // Đảm bảo nút Seller Center bị ẩn
+        if (sellerCenterBtn != null) {
+            sellerCenterBtn.setVisible(false);
+            sellerCenterBtn.setManaged(false);
+        }
     }
 
     public void setUpUserView(String username, double balance) {
@@ -72,6 +82,16 @@ public class MainController {
 
         userNameLabel.setText(username);
         walletLabel.setText(String.format("Ví: $%,.2f", balance));
+
+        // KIỂM TRA NẾU LÀ SELLER THÌ HIỆN NÚT "KÊNH NGƯỜI BÁN"
+        org.deptrai.auctionsystem.models.users.User currentUser = org.deptrai.auctionsystem.utils.SessionManager.getInstance().getCurrentUser();
+        if (currentUser instanceof org.deptrai.auctionsystem.models.users.Seller) {
+            sellerCenterBtn.setVisible(true);
+            sellerCenterBtn.setManaged(true);
+        } else {
+            sellerCenterBtn.setVisible(false);
+            sellerCenterBtn.setManaged(false);
+        }
     }
 
     private void loadFeaturedAuctions() {
@@ -135,8 +155,12 @@ public class MainController {
     }
 
     @FXML
-    public void handleLearnMore(ActionEvent event) {
-        // Nút "Tìm hiểu thêm" sẽ dẫn người dùng thẳng vào Sàn Đấu Giá để xem toàn bộ sản phẩm
+    public void handleOpenAuctionFloor(ActionEvent event) {
         SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/auction-floor-view.fxml", "Sàn Đấu Giá - Auction.UET");
+    }
+
+    @FXML
+    public void handleGoToSellerCenter(ActionEvent event) {
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/seller.fxml", "Seller Center - Auction.UET");
     }
 }

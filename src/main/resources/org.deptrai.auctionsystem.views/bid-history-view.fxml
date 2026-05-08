@@ -4,12 +4,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox spacing="25.0" style="-fx-background-color: #f0f2f5;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:controller="org.deptrai.auctionsystem.controllers.BidHistoryController" spacing="25.0" style="-fx-background-color: #f0f2f5;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
         <Insets bottom="40.0" left="60.0" right="60.0" top="40.0" />
     </padding>
     <children>
-        <Button mnemonicParsing="false" styleClass="btn-back" text="⬅ ">
+        <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ ">
             <padding>
                 <Insets bottom="8.0" left="12.0" right="15.0" top="8.0" />
             </padding>
@@ -20,7 +20,6 @@
             </font>
         </Label>
 
-        <!-- Thanh lọc nhanh trạng thái -->
         <HBox spacing="15.0">
             <children>
                 <Button style="-fx-background-color: #2c3e50; -fx-text-fill: white;" text="Tất cả" />
@@ -30,7 +29,6 @@
             </children>
         </HBox>
 
-        <!-- Bảng lịch sử chi tiết -->
         <TableView VBox.vgrow="ALWAYS" styleClass="item-card">
             <columns>
                 <TableColumn prefWidth="150.0" text="Ảnh" />

@@ -54,13 +54,13 @@ public class LoginController {
 
             } else if (loggedInUser instanceof Bidder) {
                 showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chào mừng Bidder " + loggedInUser.getUsername());
-
                 // 3. Đưa Bidder về đúng home-view
                 SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/home-view.fxml", "Trang Chủ - Auction.UET");
 
             } else if (loggedInUser instanceof Seller) {
                 showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chào mừng Seller " + loggedInUser.getUsername());
-                SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/inventory-view.fxml", "Quản lý Kho Hàng");
+                // Đã sửa: Cho Seller vào trang chủ ngắm đồ trước
+                SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/home-view.fxml", "Trang Chủ - Auction.UET");
             }
         } else {
             // Báo lỗi nếu user không tồn tại hoặc sai mật khẩu
