@@ -6,7 +6,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.controllers.MainController">
+<ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.controllers.ProfileController">
     <content>
         <VBox spacing="30.0" style="-fx-padding: 40 60 40 60;">
             <children>
@@ -34,7 +34,7 @@
                                         <Circle fill="#3498db" radius="35.0" stroke="WHITE" strokeType="INSIDE" />
                                         <VBox spacing="5.0">
                                             <children>
-                                                <Label fx:id="profileNameLabel" style="-fx-font-weight: bold; -fx-font-size: 20;" text="Tên tk" />
+                                                <Label fx:id="profileNameLabel" style="-fx-font-weight: bold; -fx-font-size: 20;" text="Tên tài khoản" />
                                                 <Label fx:id="profileRoleLabel" text="Người dùng hệ thống" textFill="#7f8c8d" />
                                             </children>
                                         </VBox>
@@ -99,7 +99,7 @@
                                         <PasswordField fx:id="confirmNewPassField" />
                                     </children>
                                 </VBox>
-                                <Button style="-fx-text-fill: #2c3e50; -fx-border-color: #2c3e50;" styleClass="btn-login" text="CẬP NHẬT MẬT KHẨU" />
+                                <Button style="-fx-text-fill: #2c3e50; -fx-border-color: #2c3e50;" styleClass="btn-login" text="CẬP NHẬT MẬT KHẨU" onAction="#handleUpdatePassword" />
                             </children>
                         </VBox>
                     </children>

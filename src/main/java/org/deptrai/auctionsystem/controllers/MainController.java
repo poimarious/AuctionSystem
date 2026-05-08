@@ -1,107 +1,142 @@
 package org.deptrai.auctionsystem.controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import org.deptrai.auctionsystem.models.auction.Auction;
 import org.deptrai.auctionsystem.models.auction.AuctionManager;
-import org.deptrai.auctionsystem.models.items.ArtFactory;
-import org.deptrai.auctionsystem.models.items.ElectronicsFactory;
-import org.deptrai.auctionsystem.models.items.Item;
-import org.deptrai.auctionsystem.models.items.ItemFactory;
-import org.deptrai.auctionsystem.models.users.Seller;
+import org.deptrai.auctionsystem.utils.SceneManager;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class MainController {
+
+    // --- CÁC THÀNH PHẦN GIAO DIỆN ---
+    @FXML
+    private HBox guestBox;
+
+    @FXML
+    private HBox userBox;
+
+    @FXML
+    private Label userNameLabel;
+
+    @FXML
+    private Label walletLabel;
+
+    @FXML
+    private MenuButton userMenu;
 
     @FXML
     private FlowPane productsContainer;
 
     @FXML
     public void initialize() {
-        // 1. Tạo Mock Data (Dữ liệu giả)
-        createMockData();
+        // Kiểm tra xem có ai đang đăng nhập không
+        org.deptrai.auctionsystem.models.users.User currentUser = org.deptrai.auctionsystem.utils.SessionManager.getInstance().getCurrentUser();
 
-        // 2. Lấy dữ liệu từ Manager và in ra giao diện
-        loadAuctionsToGrid();
+        if (currentUser != null) {
+            // Nếu có người đăng nhập, hiển thị giao diện User
+            setUpUserView(currentUser.getUsername(), 0.0);
+        } else {
+            // Nếu không, hiển thị giao diện Khách
+            setUpGuestView();
+        }
+
+        // Load tối đa 6 sản phẩm nổi bật lên trang chủ
+        loadFeaturedAuctions();
     }
 
-    @FXML
-    public void handleAuctionFloor(javafx.event.ActionEvent event) {
-        System.out.println("Đã bấm nút chuyển sang Sàn Đấu Giá");
-        // Tương lai có thể dùng SceneManager đổi nội dung ở giữa tại đây
+    // --- LOGIC GIAO DIỆN NGƯỜI DÙNG ---
+
+    private void setUpGuestView() {
+        guestBox.setVisible(true);
+        guestBox.setManaged(true);
+
+        userBox.setVisible(false);
+        userBox.setManaged(false);
     }
 
-    @FXML
-    public void handleInventory(javafx.event.ActionEvent event) {
-        System.out.println("Đã bấm nút chuyển sang Quản lý Kho");
-        // Tương lai gọi SceneManager nạp inventory-view.fxml
+    public void setUpUserView(String username, double balance) {
+        guestBox.setVisible(false);
+        guestBox.setManaged(false);
+
+        userBox.setVisible(true);
+        userBox.setManaged(true);
+
+        userNameLabel.setText(username);
+        walletLabel.setText(String.format("Ví: $%,.2f", balance));
     }
 
-    // Các hàm cho Header (nếu main-view.fxml của bạn có chứa Header từ source 6)
-    @FXML
-    public void handleLogin(javafx.event.ActionEvent event) {
-        System.out.println("Đã bấm Đăng nhập");
-    }
+    private void loadFeaturedAuctions() {
+        productsContainer.getChildren().clear();
 
-    @FXML
-    public void handleLogout(javafx.event.ActionEvent event) {
-        System.out.println("Đã bấm Đăng xuất");
-    }
-
-    @FXML
-    public void handleShowProfile(javafx.event.ActionEvent event) {
-        System.out.println("Đã bấm Xem Hồ sơ");
-    }
-
-    @FXML
-    public void handleShowBidHistory(javafx.event.ActionEvent event) {
-        System.out.println("Đã bấm Xem Lịch sử đặt giá");
-    }
-
-    private void loadAuctionsToGrid() {
         List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
+        int limit = Math.min(allAuctions.size(), 6);
 
-        for (Auction auction : allAuctions) {
+        for (int i = 0; i < limit; i++) {
             try {
-                // Tải file FXML của một thẻ sản phẩm
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org.deptrai.auctionsystem.views/item-card.fxml"));
-                //VBox itemCard = loader.load();
-                javafx.scene.Node  itemCard = loader.load();
-                // Lấy Controller của thẻ đó và truyền dữ liệu vào
-                ItemCardController cardController = loader.getController();
-                cardController.setData(auction);
+                Node itemCard = loader.load();
 
-                // Thêm thẻ vào FlowPane
+                ItemCardController cardController = loader.getController();
+                if (cardController != null) {
+                    cardController.setData(allAuctions.get(i));
+                }
+
                 productsContainer.getChildren().add(itemCard);
 
             } catch (IOException e) {
-                System.err.println("Lỗi khi nạp item-card.fxml: " + e.getMessage());
+                System.err.println("Lỗi nạp item-card trên trang chủ: " + e.getMessage());
             }
         }
     }
 
-    // Giả lập tạo các phiên đấu giá mẫu để test giao diện
-    private void createMockData() {
-        // Chỉ tạo giả nếu danh sách đang trống để tránh bị lặp khi chuyển đi chuyển lại giữa các Scene
-        if (AuctionManager.getInstance().getAllAuctions().isEmpty()) {
-            Seller mockSeller = new Seller("seller1", "pass123", "seller@uet.edu.vn");
+    // --- CÁC HÀM ĐIỀU HƯỚNG ---
 
-            ItemFactory artFactory = new ArtFactory();
-            ItemFactory elecFactory = new ElectronicsFactory();
+    @FXML
+    public void handleLogin(ActionEvent event) {
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Hệ thống Đấu giá - Đăng nhập");
+    }
 
-            Item item1 = artFactory.createItem("Tranh Mona Lisa (Bản rep 1:1)", "Tranh sơn dầu tái bản chất lượng cao", 5000.0, mockSeller);
-            Item item2 = elecFactory.createItem("MacBook Pro M3 Max", "Máy tính xách tay cấu hình cao cấp nhất, bảo hành 12 tháng", 2500.0, mockSeller);
-            Item item3 = elecFactory.createItem("PlayStation 5 Pro", "Máy chơi game thế hệ mới nguyên seal", 800.0, mockSeller);
+    @FXML
+    public void handleRegister(ActionEvent event) {
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/register-view.fxml", "Hệ thống Đấu giá - Đăng ký");
+    }
 
-            // Thời gian kết thúc sau 2 giờ, 1 ngày, và thời gian ở quá khứ (để test hết hạn)
-            AuctionManager.getInstance().createAuction(item1, LocalDateTime.now().plusHours(2));
-            AuctionManager.getInstance().createAuction(item2, LocalDateTime.now().plusDays(1));
-            AuctionManager.getInstance().createAuction(item3, LocalDateTime.now().minusHours(1));
-        }
+    @FXML
+    public void handleLogout(ActionEvent event) {
+        System.out.println("Đăng xuất thành công!");
+
+        org.deptrai.auctionsystem.utils.SessionManager.getInstance().logout();
+
+        SceneManager.getInstance().clearHistory();
+        setUpGuestView();
+
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Đăng nhập - Auction.UET");
+    }
+
+    @FXML
+    public void handleShowProfile(ActionEvent event) {
+        // Dẫn đến trang cấu hình tài khoản cá nhân
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/profile-view.fxml", "Hồ sơ của tôi");
+    }
+
+    @FXML
+    public void handleShowBidHistory(ActionEvent event) {
+        // Dẫn đến trang xem các phiên đã từng đặt giá
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/bid-history-view.fxml", "Lịch sử đặt giá");
+    }
+
+    @FXML
+    public void handleLearnMore(ActionEvent event) {
+        // Nút "Tìm hiểu thêm" sẽ dẫn người dùng thẳng vào Sàn Đấu Giá để xem toàn bộ sản phẩm
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/auction-floor-view.fxml", "Sàn Đấu Giá - Auction.UET");
     }
 }

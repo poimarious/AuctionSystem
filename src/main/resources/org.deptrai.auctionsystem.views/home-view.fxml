@@ -15,7 +15,7 @@
                         <Insets left="40.0" right="40.0" />
                     </padding>
                     <children>
-                        <Label style="-fx-font-weight: bold; -fx-font-size: 26; -fx-letter-spacing: 1;" text="AUCTION.UET" textFill="WHITE" />
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 26; -fx-letter-spacing: 1;" text="AUCTION SYSTEM" textFill="WHITE" />
 
                         <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 5; -fx-padding: 0 10 0 10;">
                             <children>
@@ -33,7 +33,7 @@
                                 <HBox fx:id="guestBox" alignment="CENTER" spacing="15.0">
                                     <children>
                                         <Button mnemonicParsing="false" onAction="#handleLogin" styleClass="btn-login" text="ĐĂNG NHẬP" />
-                                        <Button mnemonicParsing="false" styleClass="btn-register" text="ĐĂNG KÝ" />
+                                        <Button mnemonicParsing="false" styleClass="btn-register" text="ĐĂNG KÝ" onAction="#handleRegister" />
                                     </children>
                                 </HBox>
 
@@ -86,7 +86,7 @@
                                 <Label lineSpacing="10.0" text="Khám phá những bộ sưu tập&#10;độc bản và giá trị nhất." textFill="WHITE">
                                     <font> <Font name="System Bold" size="44.0" /> </font>
                                 </Label>
-                                <Button prefHeight="55.0" prefWidth="220.0" styleClass="btn-register" text="TÌM HIỂU THÊM" />
+                                <Button prefHeight="55.0" prefWidth="220.0" styleClass="btn-register" text="TÌM HIỂU THÊM" onAction="#handleLearnMore" />
                             </children>
                         </VBox>
                     </children>

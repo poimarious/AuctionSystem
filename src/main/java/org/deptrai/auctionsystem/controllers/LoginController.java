@@ -21,6 +21,11 @@ public class LoginController {
     private PasswordField passwordField;
 
     @FXML
+    public void handleGoBack(ActionEvent event) {
+        SceneManager.getInstance().goBack();
+    }
+
+    @FXML
     public void handleLoginAction(ActionEvent event) {
         String inputUsername = usernameField.getText();
         String inputPassword = passwordField.getText();
@@ -36,13 +41,22 @@ public class LoginController {
 
         // KIỂM TRA MẬT KHẨU
         if (loggedInUser != null && loggedInUser.getPassword().equals(inputPassword)) {
+
+            // 1. DÒNG QUAN TRỌNG NHẤT: Lưu người dùng vào Session
+            org.deptrai.auctionsystem.utils.SessionManager.getInstance().setCurrentUser(loggedInUser);
+
+            // 2. Xóa lịch sử
+            SceneManager.getInstance().clearHistory();
+
             if (loggedInUser instanceof Admin) {
                 showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chào mừng Admin " + loggedInUser.getUsername());
                 SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/admin.fxml", "Admin Panel");
 
             } else if (loggedInUser instanceof Bidder) {
                 showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chào mừng Bidder " + loggedInUser.getUsername());
-                SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/main-view.fxml", "Sàn Đấu Giá");
+
+                // 3. Đưa Bidder về đúng home-view
+                SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/home-view.fxml", "Trang Chủ - Auction.UET");
 
             } else if (loggedInUser instanceof Seller) {
                 showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chào mừng Seller " + loggedInUser.getUsername());

@@ -24,7 +24,7 @@ public class HelloApplication extends Application {
 
         SceneManager.getInstance().setPrimaryStage(stage);
 
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Hệ thống Đấu giá - Đăng nhập");
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/home-view.fxml", "Hệ thống Đấu giá - Đăng nhập");
     }
 
     public static void main(String[] args) {
