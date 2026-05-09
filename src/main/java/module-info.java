@@ -10,10 +10,12 @@ module org.deptrai.auctionsystem {
 
     // 2. Mở package client (nơi chứa ClientApplication) để JavaFX khởi động ứng dụng
     opens org.deptrai.auctionsystem.client to javafx.graphics, javafx.fxml;
+    opens org.deptrai.auctionsystem.client.views to javafx.graphics, javafx.fxml;
 
     // 3. Xuất các package để trình biên dịch và JavaFX có thể nhìn thấy
     exports org.deptrai.auctionsystem.client;
     exports org.deptrai.auctionsystem.client.controllers;
+    exports org.deptrai.auctionsystem.client.views;
 
 
     // === CẤU HÌNH CHO PHÍA DỮ LIỆU CHUNG (SHARED) ===

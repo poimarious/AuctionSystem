@@ -41,12 +41,5 @@
                 <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
             </padding>
         </VBox>
-
-        <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅"
-                AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
-            <padding>
-                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-            </padding>
-        </Button>
     </children>
 </AnchorPane>

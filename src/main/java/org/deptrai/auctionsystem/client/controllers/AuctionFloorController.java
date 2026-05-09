@@ -51,40 +51,8 @@ public class AuctionFloorController {
             statusCombo.getSelectionModel().selectFirst();
         }
 
-        // 2. Tạo dữ liệu mẫu (Mock Data) để test giao diện
-        createMockData();
-
-        // 3. Load danh sách sản phẩm lên sàn
+        // 2. Load danh sách sản phẩm lên sàn
         loadAuctions();
-    }
-
-    private void createMockData() {
-        // Chỉ tạo dữ liệu nếu danh sách đang trống để tránh bị lặp (nhân bản) khi chuyển đi chuyển lại giữa các màn hình
-        if (AuctionManager.getInstance().getAllAuctions().isEmpty()) {
-
-            // Tạo một Seller ảo
-            Seller mockSeller = new Seller("SELLER_MOCK_01", "Nguyễn Văn Bán", "pass123", "seller@uet.edu.vn");
-
-            // Sử dụng Factory Pattern để tạo Item
-            ItemFactory artFactory = new ArtFactory();
-            ItemFactory elecFactory = new ElectronicsFactory();
-            ItemFactory vehicleFactory = new VehicleFactory();
-
-            // Tạo 3 sản phẩm mẫu
-            Item art = artFactory.createItem("Tranh Đêm Đầy Sao (Bản sao 1:1)", "Tranh sơn dầu chất lượng cao, phục chế hoàn hảo.", 1500.0, mockSeller);
-            Item laptop = elecFactory.createItem("MacBook Pro M3 Max", "Máy tính xách tay cấu hình cao cấp nhất, RAM 128GB.", 4200.0, mockSeller);
-            Item car = vehicleFactory.createItem("Porsche 911 GT3 RS", "Siêu xe thể thao đời 2024, mới đi được 5000 dặm.", 250000.0, mockSeller);
-
-            // Đưa sản phẩm lên sàn đấu giá với các mốc thời gian kết thúc khác nhau
-            AuctionManager.getInstance().createAuction(art, LocalDateTime.now().plusDays(2));
-            AuctionManager.getInstance().createAuction(laptop, LocalDateTime.now().plusHours(5));
-            AuctionManager.getInstance().createAuction(car, LocalDateTime.now().plusDays(7));
-
-            // Chuyển trạng thái của tất cả các phiên đấu giá mẫu sang RUNNING
-            for(Auction a : AuctionManager.getInstance().getAllAuctions()) {
-                a.startAuction();
-            }
-        }
     }
 
     private void loadAuctions() {
@@ -97,7 +65,7 @@ public class AuctionFloorController {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org.deptrai.auctionsystem.views/item-card.fxml"));
                 Node itemCard = loader.load();
 
-                // Lấy controller của card để truyền dữ liệu (ItemCardController đã được viết ở các bước trước)
+                // Lấy controller của card để truyền dữ liệu
                 ItemCardController cardController = loader.getController();
                 if (cardController != null) {
                     cardController.setData(auction);

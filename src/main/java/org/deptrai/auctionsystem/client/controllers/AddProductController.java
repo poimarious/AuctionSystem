@@ -3,8 +3,12 @@ package org.deptrai.auctionsystem.client.controllers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
+
+import java.io.File;
 
 public class AddProductController {
 
@@ -23,12 +27,14 @@ public class AddProductController {
   @FXML
   private Label placeholderLabel;
 
+  private String selectedImagePath = "";
+
   @FXML
   public void initialize() {
     System.out.println("Đã load trang Thêm sản phẩm!");
     // Nạp danh mục vào ComboBox khi trang vừa mở
     if (categoryCombo != null) {
-      categoryCombo.getItems().addAll("Điện tử", "Xe cộ", "Nghệ thuật", "Thời trang", "Khác");
+      categoryCombo.getItems().addAll("Điện tử", "Xe cộ", "Nghệ thuật");
     }
   }
 
@@ -58,8 +64,16 @@ public class AddProductController {
 
   @FXML
   public void handleChooseImage(ActionEvent event) {
-    // Sau này bạn có thể dùng FileChooser tại đây
-    System.out.println("Mở trình chọn ảnh...");
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Chọn hình ảnh sản phẩm");
+    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+
+    File selectedFile = fileChooser.showOpenDialog(null);
+    if (selectedFile != null) {
+      selectedImagePath = selectedFile.toURI().toString();
+      previewImage.setImage(new Image(selectedImagePath));
+      placeholderLabel.setVisible(false);
+    }
   }
 
   private void showAlert(Alert.AlertType type, String title, String content) {

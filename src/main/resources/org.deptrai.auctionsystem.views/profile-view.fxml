@@ -50,7 +50,7 @@
                                         <Label text="Email:" textFill="#7f8c8d" />
                                         <Label fx:id="profileEmailLabel" text="............" GridPane.columnIndex="1" />
                                         <Label text="Ngày tham gia:" textFill="#7f8c8d" GridPane.rowIndex="1" />
-                                        <Label text="07/05/2026" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                        <Label text="09/05/2026" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                     </children>
                                     <rowConstraints>
                                         <RowConstraints />
