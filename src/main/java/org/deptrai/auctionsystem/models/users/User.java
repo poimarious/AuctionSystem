@@ -60,4 +60,14 @@ public abstract class User {
         this.email = email;
     }
     //endregion
+
+    private double balance = 0.0;
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void addBalance(double amount) {
+        this.balance += amount;
+    }
 }

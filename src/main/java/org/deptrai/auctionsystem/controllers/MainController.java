@@ -18,46 +18,38 @@ import java.util.List;
 
 public class MainController {
 
-    // --- CÁC THÀNH PHẦN GIAO DIỆN ---
-    @FXML
-    private HBox guestBox;
-
-    @FXML
-    private HBox userBox;
-
-    @FXML
-    private Label userNameLabel;
-
-    @FXML
-    private Label walletLabel;
-
-    @FXML
-    private MenuButton userMenu;
-
-    @FXML
-    private Button sellerCenterBtn; // Đã thêm khai báo nút
-
-    @FXML
-    private FlowPane productsContainer;
+    @FXML private HBox guestBox;
+    @FXML private HBox userBox;
+    @FXML private Label userNameLabel;
+    @FXML private Label walletLabel;
+    @FXML private MenuButton userMenu;
+    @FXML private Button sellerCenterBtn;
+    @FXML private FlowPane productsContainer;
 
     @FXML
     public void initialize() {
-        // Kiểm tra xem có ai đang đăng nhập không
         org.deptrai.auctionsystem.models.users.User currentUser = org.deptrai.auctionsystem.utils.SessionManager.getInstance().getCurrentUser();
 
         if (currentUser != null) {
-            // Nếu có người đăng nhập, hiển thị giao diện User
-            setUpUserView(currentUser.getUsername(), 0.0);
+            // Hiển thị số tiền thực tế của user thay vì 0.0
+            setUpUserView(currentUser.getUsername(), currentUser.getBalance());
         } else {
-            // Nếu không, hiển thị giao diện Khách
             setUpGuestView();
         }
 
-        // Load tối đa 6 sản phẩm nổi bật lên trang chủ
         loadFeaturedAuctions();
-    }
 
-    // --- LOGIC GIAO DIỆN NGƯỜI DÙNG ---
+        // ĐĂNG KÝ NHẬN THÔNG BÁO KHI SỐ DƯ VÍ THAY ĐỔI
+        org.deptrai.auctionsystem.utils.SessionManager.getInstance().setBalanceListener(() -> {
+            // Phải dùng Platform.runLater vì UI chỉ được cập nhật trên luồng chính (Main Thread)
+            javafx.application.Platform.runLater(() -> {
+                org.deptrai.auctionsystem.models.users.User user = org.deptrai.auctionsystem.utils.SessionManager.getInstance().getCurrentUser();
+                if (user != null) {
+                    walletLabel.setText(String.format("Ví: $%,.2f", user.getBalance()));
+                }
+            });
+        });
+    }
 
     private void setUpGuestView() {
         guestBox.setVisible(true);
@@ -66,7 +58,6 @@ public class MainController {
         userBox.setVisible(false);
         userBox.setManaged(false);
 
-        // Đảm bảo nút Seller Center bị ẩn
         if (sellerCenterBtn != null) {
             sellerCenterBtn.setVisible(false);
             sellerCenterBtn.setManaged(false);
@@ -83,7 +74,6 @@ public class MainController {
         userNameLabel.setText(username);
         walletLabel.setText(String.format("Ví: $%,.2f", balance));
 
-        // KIỂM TRA NẾU LÀ SELLER THÌ HIỆN NÚT "KÊNH NGƯỜI BÁN"
         org.deptrai.auctionsystem.models.users.User currentUser = org.deptrai.auctionsystem.utils.SessionManager.getInstance().getCurrentUser();
         if (currentUser instanceof org.deptrai.auctionsystem.models.users.Seller) {
             sellerCenterBtn.setVisible(true);
@@ -113,54 +103,46 @@ public class MainController {
                 productsContainer.getChildren().add(itemCard);
 
             } catch (IOException e) {
-                System.err.println("Lỗi nạp item-card trên trang chủ: " + e.getMessage());
+                System.err.println("Lỗi nạp item-card: " + e.getMessage());
             }
         }
     }
 
-    // --- CÁC HÀM ĐIỀU HƯỚNG ---
-
     @FXML
     public void handleLogin(ActionEvent event) {
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Hệ thống Đấu giá - Đăng nhập");
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Đăng nhập");
     }
 
     @FXML
     public void handleRegister(ActionEvent event) {
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/register-view.fxml", "Hệ thống Đấu giá - Đăng ký");
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/register-view.fxml", "Đăng ký");
     }
 
     @FXML
     public void handleLogout(ActionEvent event) {
-        System.out.println("Đăng xuất thành công!");
-
         org.deptrai.auctionsystem.utils.SessionManager.getInstance().logout();
-
         SceneManager.getInstance().clearHistory();
         setUpGuestView();
-
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Đăng nhập - Auction.UET");
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Đăng nhập");
     }
 
     @FXML
     public void handleShowProfile(ActionEvent event) {
-        // Dẫn đến trang cấu hình tài khoản cá nhân
         SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/profile-view.fxml", "Hồ sơ của tôi");
     }
 
     @FXML
     public void handleShowBidHistory(ActionEvent event) {
-        // Dẫn đến trang xem các phiên đã từng đặt giá
         SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/bid-history-view.fxml", "Lịch sử đặt giá");
     }
 
     @FXML
     public void handleOpenAuctionFloor(ActionEvent event) {
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/auction-floor-view.fxml", "Sàn Đấu Giá - Auction.UET");
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/auction-floor-view.fxml", "Sàn Đấu Giá");
     }
 
     @FXML
     public void handleGoToSellerCenter(ActionEvent event) {
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/seller.fxml", "Seller Center - Auction.UET");
+        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/seller.fxml", "Kênh Người Bán");
     }
 }

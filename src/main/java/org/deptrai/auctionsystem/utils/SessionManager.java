@@ -12,6 +12,9 @@ public class SessionManager {
     // Lưu trữ phiên đấu giá được chọn khi người dùng bấm "Đặt giá ngay"
     private Auction selectedAuction;
 
+    // Biến lắng nghe sự thay đổi số dư ví
+    private Runnable balanceListener;
+
     private SessionManager() {}
 
     public static SessionManager getInstance() {
@@ -32,10 +35,11 @@ public class SessionManager {
 
     public void logout() {
         this.currentUser = null;
-        this.selectedAuction = null; // Xóa luôn phiên đang chọn khi đăng xuất
+        this.selectedAuction = null;
+        this.balanceListener = null; // Xóa chuông khi đăng xuất
     }
 
-    // --- QUẢN LÝ PHIÊN ĐẤU GIÁ ĐƯỢC CHỌN (MỚI THÊM) ---
+    // --- QUẢN LÝ PHIÊN ĐẤU GIÁ ĐƯỢC CHỌN ---
     public void setSelectedAuction(Auction auction) {
         this.selectedAuction = auction;
     }
@@ -46,5 +50,16 @@ public class SessionManager {
 
     public void clearSelectedAuction() {
         this.selectedAuction = null;
+    }
+
+    // --- HỆ THỐNG LẮNG NGHE SỐ DƯ (MỚI THÊM) ---
+    public void setBalanceListener(Runnable listener) {
+        this.balanceListener = listener;
+    }
+
+    public void notifyBalanceChanged() {
+        if (balanceListener != null) {
+            balanceListener.run();
+        }
     }
 }

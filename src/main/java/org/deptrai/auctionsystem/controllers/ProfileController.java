@@ -5,39 +5,28 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextInputDialog;
 import org.deptrai.auctionsystem.models.users.Admin;
 import org.deptrai.auctionsystem.models.users.Seller;
 import org.deptrai.auctionsystem.models.users.User;
 import org.deptrai.auctionsystem.utils.SceneManager;
 import org.deptrai.auctionsystem.utils.SessionManager;
 
+import java.util.Optional;
+
 public class ProfileController {
 
-    // --- CÁC THÀNH PHẦN GIAO DIỆN ---
-    @FXML
-    private Label profileNameLabel;
+    @FXML private Label profileNameLabel;
+    @FXML private Label profileRoleLabel;
+    @FXML private Label profileEmailLabel;
+    @FXML private Label balanceLabel;
 
-    @FXML
-    private Label profileRoleLabel;
-
-    @FXML
-    private Label profileEmailLabel;
-
-    @FXML
-    private Label balanceLabel;
-
-    @FXML
-    private PasswordField currentPassField;
-
-    @FXML
-    private PasswordField newPassField;
-
-    @FXML
-    private PasswordField confirmNewPassField;
+    @FXML private PasswordField currentPassField;
+    @FXML private PasswordField newPassField;
+    @FXML private PasswordField confirmNewPassField;
 
     @FXML
     public void initialize() {
-        // Nạp thông tin người dùng đang đăng nhập
         loadUserData();
     }
 
@@ -48,7 +37,6 @@ public class ProfileController {
             profileNameLabel.setText(currentUser.getUsername());
             profileEmailLabel.setText(currentUser.getEmail() != null ? currentUser.getEmail() : "Chưa cập nhật");
 
-            // Xác định chức vụ
             if (currentUser instanceof Admin) {
                 profileRoleLabel.setText("Quản trị viên hệ thống (Admin)");
             } else if (currentUser instanceof Seller) {
@@ -57,15 +45,55 @@ public class ProfileController {
                 profileRoleLabel.setText("Người mua hàng (Bidder)");
             }
 
-            // Tạm thời gán số dư ví là 0 (Sau này bạn có thể cập nhật lấy từ Database)
-            balanceLabel.setText("$0.00");
+            balanceLabel.setText(String.format("$%.2f", currentUser.getBalance()));
         } else {
             profileNameLabel.setText("Khách");
             profileRoleLabel.setText("Chưa đăng nhập");
+            balanceLabel.setText("$0.00");
         }
     }
 
-    // --- CÁC HÀM XỬ LÝ SỰ KIỆN ---
+    @FXML
+    public void handleTopUpWallet(ActionEvent event) {
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+
+        if (currentUser == null) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi xác thực", "Bạn cần đăng nhập để nạp tiền!");
+            return;
+        }
+
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Nạp tiền vào ví");
+        dialog.setHeaderText("Số dư hiện tại: " + String.format("$%.2f", currentUser.getBalance()));
+        dialog.setContentText("Vui lòng nhập số tiền muốn nạp ($):");
+
+        Optional<String> result = dialog.showAndWait();
+
+        result.ifPresent(amountStr -> {
+            try {
+                double amount = Double.parseDouble(amountStr);
+
+                if (amount <= 0) {
+                    showAlert(Alert.AlertType.WARNING, "Lỗi nhập liệu", "Số tiền nạp phải lớn hơn 0!");
+                    return;
+                }
+
+                // Cộng tiền vào user
+                currentUser.addBalance(amount);
+
+                // GỬI THÔNG BÁO CHO TRANG CHỦ CẬP NHẬT LẠI TIỀN
+                SessionManager.getInstance().notifyBalanceChanged();
+
+                // Cập nhật nhãn tại trang Profile
+                balanceLabel.setText(String.format("$%.2f", currentUser.getBalance()));
+
+                showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã nạp thành công $" + amount + " vào ví!");
+
+            } catch (NumberFormatException e) {
+                showAlert(Alert.AlertType.ERROR, "Lỗi nhập liệu", "Vui lòng chỉ nhập số (Ví dụ: 100 hoặc 50.5)");
+            }
+        });
+    }
 
     @FXML
     public void handleUpdatePassword(ActionEvent event) {
@@ -80,24 +108,18 @@ public class ProfileController {
 
         User currentUser = SessionManager.getInstance().getCurrentUser();
 
-        // Kiểm tra mật khẩu cũ có đúng không
         if (!currentUser.getPassword().equals(currentPass)) {
             showAlert(Alert.AlertType.ERROR, "Lỗi", "Mật khẩu hiện tại không chính xác!");
             return;
         }
 
-        // Kiểm tra mật khẩu mới có khớp không
         if (!newPass.equals(confirmPass)) {
             showAlert(Alert.AlertType.ERROR, "Lỗi", "Xác nhận mật khẩu mới không khớp!");
             return;
         }
 
-        // CHÚ Ý: Ở đây bạn sẽ gọi UserDAO để lưu mật khẩu mới vào Database
-
-        // Tạm thời hiển thị thông báo thành công
         showAlert(Alert.AlertType.INFORMATION, "Thành công", "Mật khẩu của bạn đã được cập nhật!");
 
-        // Xóa trắng các ô nhập liệu
         currentPassField.clear();
         newPassField.clear();
         confirmNewPassField.clear();
@@ -110,7 +132,6 @@ public class ProfileController {
 
     @FXML
     public void handleLogout(ActionEvent event) {
-        System.out.println("Đăng xuất từ trang Profile!");
         SessionManager.getInstance().logout();
         SceneManager.getInstance().clearHistory();
         SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Đăng nhập - Auction.UET");
