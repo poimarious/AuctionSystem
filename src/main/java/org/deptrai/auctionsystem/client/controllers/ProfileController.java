@@ -6,6 +6,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextInputDialog;
+import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.users.Admin;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
@@ -13,6 +14,7 @@ import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 
 import java.util.Optional;
+import org.deptrai.auctionsystem.shared.network.Message;
 
 public class ProfileController {
 
@@ -78,17 +80,24 @@ public class ProfileController {
                     return;
                 }
 
-                // Cộng tiền vào user
-                currentUser.addBalance(amount);
+                Object[] topUpData = {currentUser.getUserId(), amount};
+                Message request = new Message("TOP_UP", topUpData);
 
-                // GỬI THÔNG BÁO CHO TRANG CHỦ CẬP NHẬT LẠI TIỀN
-                SessionManager.getInstance().notifyBalanceChanged();
+                // Awaiting response from Server after sending a request
+                Message response = SocketClient.sendRequest(request);
 
-                // Cập nhật nhãn tại trang Profile
-                balanceLabel.setText(String.format("$%.2f", currentUser.getBalance()));
+                if (response.getStatus().equals("SUCCESS")) {
+                    double newBalance = (Double) response.getData(); // Server trả về số dư mới
 
-                showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã nạp thành công $" + amount + " vào ví!");
+                    // Cập nhật lại Session trên RAM của Client
+                    currentUser.setBalance(newBalance);
+                    SessionManager.getInstance().notifyBalanceChanged(); // Báo cho các giao diện tự update số
+                    balanceLabel.setText(String.format("$%.2f", newBalance));
 
+                    showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã nạp thành công $" + amount + " vào ví!");
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Lỗi Server", (String) response.getData());
+                }
             } catch (NumberFormatException e) {
                 showAlert(Alert.AlertType.ERROR, "Lỗi nhập liệu", "Vui lòng chỉ nhập số (Ví dụ: 100 hoặc 50.5)");
             }
@@ -134,7 +143,8 @@ public class ProfileController {
     public void handleLogout(ActionEvent event) {
         SessionManager.getInstance().logout();
         SceneManager.getInstance().clearHistory();
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Đăng nhập - Auction.UET");
+        SceneManager.getInstance().switchScene(
+            "/org/deptrai/auctionsystem/views/views/login-view.fxml", "Đăng nhập - Auction.UET");
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {

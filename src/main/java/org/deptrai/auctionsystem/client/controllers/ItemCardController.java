@@ -70,7 +70,8 @@ public class ItemCardController {
         if (timeline != null) timeline.stop();
         // LOGIC CỦA BẠN: Lưu session và chuyển cảnh
         SessionManager.getInstance().setSelectedAuction(this.auction);
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/bidding-detail.fxml", "Đấu giá - " + auction.getItem().getName());
+        SceneManager.getInstance().switchScene(
+            "/org/deptrai/auctionsystem/client/views/bidding-detail.fxml", "Đấu giá - " + auction.getItem().getName());
     }
 
     @FXML

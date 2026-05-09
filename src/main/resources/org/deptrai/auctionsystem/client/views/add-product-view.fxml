@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:controller="org.deptrai.auctionsystem.client.controllers.AddProductController" spacing="25.0" style="-fx-background-color: white; -fx-background-radius: 15;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:controller="org.deptrai.auctionsystem.client.controllers.AddProductController" spacing="25.0" style="-fx-background-color: white; -fx-background-radius: 15;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>

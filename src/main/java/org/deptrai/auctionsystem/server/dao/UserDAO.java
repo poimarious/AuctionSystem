@@ -17,7 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class UserDAO {
 
     public boolean insertUser(User user, String role) {
-        String sql = "INSERT INTO Users (userId, username, password, email, role, adminLevel) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (userId, username, password, email, role, adminLevel, balance) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -37,6 +37,7 @@ public class UserDAO {
             } else {
                 pstmt.setObject(6, null); // Setting non-admin users to null adminLevel
             }
+            pstmt.setDouble(7, user.getBalance()); // Everyone has a balance
 
             pstmt.executeUpdate();
             return true;
@@ -60,20 +61,26 @@ public class UserDAO {
                 String username = rs.getString("username");
                 String pass = rs.getString("password");
                 String email = rs.getString("email");
+                double balance = rs.getDouble("balance");
 
                 int adminLevel = rs.getInt("adminLevel"); // Currently null if not Admin
 
                 switch (role) {
                     case "BIDDER":
-                        return new Bidder(userId, username, pass, email, new CopyOnWriteArrayList<>());
+                        Bidder bidder = new Bidder(userId, username, pass, email, new CopyOnWriteArrayList<>());
+                        bidder.setBalance(balance);
+                        return bidder;
 
                     case "SELLER":
                         Seller seller = new Seller(userId, username, pass, email);
                         seller.setListedItems(new ArrayList<>());
+                        seller.setBalance(balance);
                         return seller;
 
                     case "ADMIN":
-                        return new Admin(userId, username, pass, email, adminLevel);
+                        Admin admin = new Admin(userId, username, pass, email, adminLevel);
+                        admin.setBalance(balance);
+                        return admin;
 
                     default:
                         return null;
@@ -100,18 +107,27 @@ public class UserDAO {
                 String userId = rs.getString("userId");
                 String pass = rs.getString("password");
                 String email = rs.getString("email");
+                double balance = rs.getDouble("balance");
 
                 int adminLevel = rs.getInt("adminLevel"); // Currently null if not Admin
 
                 switch (role) {
                     case "BIDDER":
-                        return new Bidder(userId, username, pass, email, new CopyOnWriteArrayList<>());
+                        Bidder bidder = new Bidder(userId, username, pass, email, new CopyOnWriteArrayList<>());
+                        bidder.setBalance(balance);
+                        return bidder;
+
                     case "SELLER":
                         Seller seller = new Seller(userId, username, pass, email);
                         seller.setListedItems(new ArrayList<>());
+                        seller.setBalance(balance);
                         return seller;
+
                     case "ADMIN":
-                        return new Admin(userId, username, pass, email, adminLevel);
+                        Admin admin = new Admin(userId, username, pass, email, adminLevel);
+                        admin.setBalance(balance);
+                        return admin;
+
                     default:
                         return null;
                 }
@@ -138,6 +154,19 @@ public class UserDAO {
             System.out.println("Lỗi kiểm tra trùng lặp Username: " + e.getMessage());
             // Trả về true (coi như đã tồn tại) để an toàn, chặn không cho tạo mới nếu DB đang lỗi
             return true;
+        }
+    }
+
+    public boolean updateBalance(String userId, double newBalance) {
+        String sql = "UPDATE Users SET balance = ? WHERE userId = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDouble(1, newBalance);
+            pstmt.setString(2, userId);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            return false;
         }
     }
 }

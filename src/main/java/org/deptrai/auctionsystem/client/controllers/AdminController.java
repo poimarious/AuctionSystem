@@ -11,7 +11,7 @@ public class AdminController {
   public void handleLogout(ActionEvent event) {
     SessionManager.getInstance().logout();
     SceneManager.getInstance().clearHistory();
-    SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Đăng nhập - Auction.UET");
+    SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập - Auction.UET");
   }
 
   @FXML

@@ -1,10 +1,13 @@
 package org.deptrai.auctionsystem.shared.models.users;
 
-public abstract class User {
+import java.io.Serializable;
+
+public abstract class User implements Serializable {
     private String userId; // Database automatically assigns this.
     private String username;
     private String password;
     private String email;
+    private double balance = 0.0;
 
     public User(String username, String password, String email) {
         this.username = username;
@@ -41,6 +44,10 @@ public abstract class User {
     public String getEmail() {
         return email;
     }
+
+    public double getBalance() {
+        return balance;
+    }
     //endregion
 
     //region Setters
@@ -59,15 +66,7 @@ public abstract class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public void setBalance(double balance) { this.balance = balance; }
     //endregion
-
-    private double balance = 0.0;
-
-    public double getBalance() {
-        return balance;
-    }
-
-    public void addBalance(double amount) {
-        this.balance += amount;
-    }
 }

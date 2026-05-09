@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:controller="org.deptrai.auctionsystem.client.controllers.BidHistoryController" spacing="25.0" style="-fx-background-color: #f0f2f5;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:controller="org.deptrai.auctionsystem.client.controllers.BidHistoryController" spacing="25.0" style="-fx-background-color: #f0f2f5;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
         <Insets bottom="40.0" left="60.0" right="60.0" top="40.0" />
     </padding>

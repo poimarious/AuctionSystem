@@ -9,15 +9,8 @@ import javafx.scene.layout.FlowPane;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
-import org.deptrai.auctionsystem.shared.models.items.ArtFactory;
-import org.deptrai.auctionsystem.shared.models.items.ElectronicsFactory;
-import org.deptrai.auctionsystem.shared.models.items.Item;
-import org.deptrai.auctionsystem.shared.models.items.ItemFactory;
-import org.deptrai.auctionsystem.shared.models.items.VehicleFactory;
-import org.deptrai.auctionsystem.shared.models.users.Seller;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class AuctionFloorController {
@@ -62,7 +55,8 @@ public class AuctionFloorController {
         for (Auction auction : allAuctions) {
             try {
                 // Nạp file giao diện của thẻ sản phẩm
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org.deptrai.auctionsystem.views/item-card.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/org/deptrai/auctionsystem/client/views/item-card.fxml"));
                 Node itemCard = loader.load();
 
                 // Lấy controller của card để truyền dữ liệu

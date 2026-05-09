@@ -6,7 +6,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.client.controllers.ProfileController">
+<ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.client.controllers.ProfileController">
     <content>
         <VBox spacing="30.0" style="-fx-padding: 40 60 40 60;">
             <children>

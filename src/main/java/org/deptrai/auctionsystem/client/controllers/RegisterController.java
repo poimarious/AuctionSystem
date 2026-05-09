@@ -3,11 +3,9 @@ package org.deptrai.auctionsystem.client.controllers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import org.deptrai.auctionsystem.server.dao.UserDAO;
-import org.deptrai.auctionsystem.shared.models.users.Bidder;
-import org.deptrai.auctionsystem.shared.models.users.Seller;
-import org.deptrai.auctionsystem.shared.models.users.User;
+import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
+import org.deptrai.auctionsystem.shared.network.Message;
 
 public class RegisterController {
 
@@ -52,39 +50,36 @@ public class RegisterController {
         }
 
         // 3. Khởi tạo đối tượng User phù hợp
-        User newUser;
         String role = "BIDDER";
-
-        // Cấp phát một ID duy nhất cho User mới
-        String newUserId = "USER_" + System.currentTimeMillis();
 
         // Xử lý lấy Role từ ToggleGroup (RadioButton)
         RadioButton selectedRole = (RadioButton) roleGroup.getSelectedToggle();
         if (selectedRole != null && "Seller".equals(selectedRole.getUserData())) {
-            newUser = new Seller(username, password, email);
             role = "SELLER";
-        } else {
-            newUser = new Bidder(username, password, email);
         }
-        newUser.setUserId(newUserId);
 
-        // 4. Lưu User vào Database bằng UserDAO
-        UserDAO userDAO = new UserDAO();
-        boolean isSuccess = userDAO.insertUser(newUser, role);
+        String[] registerData = {username, password, email, role};
+        Message request = new Message("REGISTER", registerData);
 
-        if (isSuccess) {
+        // Await response from Server after sending a request
+        Message response = SocketClient.sendRequest(request);
+
+        if (response.getStatus().equals("SUCCESS")) {
             showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đăng ký tài khoản thành công! Vui lòng đăng nhập.");
             // Chuyển hướng về trang Đăng nhập
-            SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Hệ thống Đấu giá - Đăng nhập");
+            SceneManager.getInstance().switchScene(
+                "/org/deptrai/auctionsystem/client/views/login-view.fxml", "Hệ thống Đấu giá - Đăng nhập");
         } else {
-            showAlert(Alert.AlertType.ERROR, "Lỗi hệ thống", "Không thể tạo tài khoản. Có thể tên đăng nhập đã tồn tại.");
+            String errorMsg = (String) response.getData();
+            showAlert(Alert.AlertType.ERROR, "Lỗi hệ thống", errorMsg);
         }
     }
 
     @FXML
     public void handleBackToLogin(ActionEvent event) {
         // Dùng cho nút ⬅ quay lại trang đăng nhập
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Hệ thống Đấu giá - Đăng nhập");
+        SceneManager.getInstance().switchScene(
+            "/org/deptrai/auctionsystem/client/views/login-view.fxml", "Hệ thống Đấu giá - Đăng nhập");
     }
 
     // Hàm tiện ích hiển thị thông báo

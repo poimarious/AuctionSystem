@@ -6,12 +6,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
-import org.deptrai.auctionsystem.server.dao.UserDAO;
+import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.users.Admin;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
+import org.deptrai.auctionsystem.shared.network.Message;
 
 public class LoginController {
 
@@ -36,12 +37,15 @@ public class LoginController {
             return;
         }
 
-        // TÌM USER TỪ DATABASE THẬT THÔNG QUA UserDAO
-        UserDAO userDAO = new UserDAO();
-        User loggedInUser = userDAO.getUserByUsername(inputUsername);
+        String[] credentials = {inputUsername, inputPassword};
+        Message request = new Message("LOGIN", credentials);
+
+        // Await response from Server after sending a request
+        Message response = SocketClient.sendRequest(request);
 
         // KIỂM TRA MẬT KHẨU
-        if (loggedInUser != null && loggedInUser.getPassword().equals(inputPassword)) {
+        if (response.getStatus().equals("SUCCESS")) {
+            User loggedInUser = (User) response.getData();
 
             // 1. DÒNG QUAN TRỌNG NHẤT: Lưu người dùng vào Session
             SessionManager.getInstance().setCurrentUser(loggedInUser);
@@ -51,28 +55,33 @@ public class LoginController {
 
             if (loggedInUser instanceof Admin) {
                 showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chào mừng Admin " + loggedInUser.getUsername());
-                SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/admin.fxml", "Admin Panel");
+                SceneManager.getInstance().switchScene(
+                    "/org/deptrai/auctionsystem/client/views/admin.fxml", "Admin Panel");
 
             } else if (loggedInUser instanceof Bidder) {
                 showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chào mừng Bidder " + loggedInUser.getUsername());
                 // 3. Đưa Bidder về đúng home-view
-                SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/home-view.fxml", "Trang Chủ - Auction.UET");
+                SceneManager.getInstance().switchScene(
+                    "/org/deptrai/auctionsystem/client/views/home-view.fxml", "Trang Chủ - Auction.UET");
 
             } else if (loggedInUser instanceof Seller) {
                 showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chào mừng Seller " + loggedInUser.getUsername());
                 // Đã sửa: Cho Seller vào trang chủ ngắm đồ trước
-                SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/home-view.fxml", "Trang Chủ - Auction.UET");
+                SceneManager.getInstance().switchScene(
+                    "/org/deptrai/auctionsystem/client/views/home-view.fxml", "Trang Chủ - Auction.UET");
             }
         } else {
             // Báo lỗi nếu user không tồn tại hoặc sai mật khẩu
-            showAlert(Alert.AlertType.ERROR, "Thất bại", "Sai tên đăng nhập hoặc mật khẩu.");
+            String errorMsg = (String) response.getData();
+            showAlert(Alert.AlertType.ERROR, "Thất bại", errorMsg);
         }
     }
 
     @FXML
     public void handleGoToRegister(ActionEvent event) {
         // Chuyển sang trang Register
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/register-view.fxml", "Hệ thống Đấu giá - Đăng ký");
+        SceneManager.getInstance().switchScene(
+            "/org/deptrai/auctionsystem/client/views/register-view.fxml", "Hệ thống Đấu giá - Đăng ký");
     }
 
     // Tiện ích hiển thị thông báo popup

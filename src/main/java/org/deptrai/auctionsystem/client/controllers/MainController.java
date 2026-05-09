@@ -95,7 +95,8 @@ public class MainController {
 
         for (int i = 0; i < limit; i++) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org.deptrai.auctionsystem.views/item-card.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/org/deptrai/auctionsystem/client/views/item-card.fxml"));
                 Node itemCard = loader.load();
 
                 ItemCardController cardController = loader.getController();
@@ -113,12 +114,14 @@ public class MainController {
 
     @FXML
     public void handleLogin(ActionEvent event) {
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Đăng nhập");
+        SceneManager.getInstance().switchScene(
+            "/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
     }
 
     @FXML
     public void handleRegister(ActionEvent event) {
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/register-view.fxml", "Đăng ký");
+        SceneManager.getInstance().switchScene(
+            "/org/deptrai/auctionsystem/client/views/register-view.fxml", "Đăng ký");
     }
 
     @FXML
@@ -126,26 +129,30 @@ public class MainController {
         SessionManager.getInstance().logout();
         SceneManager.getInstance().clearHistory();
         setUpGuestView();
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Đăng nhập");
+        SceneManager.getInstance().switchScene(
+            "/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
     }
 
     @FXML
     public void handleShowProfile(ActionEvent event) {
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/profile-view.fxml", "Hồ sơ của tôi");
+        SceneManager.getInstance().switchScene(
+            "/org/deptrai/auctionsystem/client/views/profile-view.fxml", "Hồ sơ của tôi");
     }
 
     @FXML
     public void handleShowBidHistory(ActionEvent event) {
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/bid-history-view.fxml", "Lịch sử đặt giá");
+        SceneManager.getInstance().switchScene(
+            "/org/deptrai/auctionsystem/client/views/bid-history-view.fxml", "Lịch sử đặt giá");
     }
 
     @FXML
     public void handleOpenAuctionFloor(ActionEvent event) {
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/auction-floor-view.fxml", "Sàn Đấu Giá");
+        SceneManager.getInstance().switchScene(
+            "/org/deptrai/auctionsystem/client/views/auction-floor-view.fxml", "Sàn Đấu Giá");
     }
 
     @FXML
     public void handleGoToSellerCenter(ActionEvent event) {
-        SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/seller.fxml", "Kênh Người Bán");
+        SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/seller.fxml", "Kênh Người Bán");
     }
 }

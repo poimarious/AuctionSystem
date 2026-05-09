@@ -10,7 +10,7 @@
 <AnchorPane fx:controller="org.deptrai.auctionsystem.client.controllers.ItemCardController"
             maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="339.0" prefWidth="408.0" styleClass="item-card"
-            stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21"
+            stylesheets="@style.css" xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <VBox alignment="TOP_CENTER" spacing="12.0" AnchorPane.bottomAnchor="0.0"

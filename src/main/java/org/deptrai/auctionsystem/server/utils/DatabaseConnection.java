@@ -20,7 +20,8 @@ public class DatabaseConnection {
                 + "password TEXT NOT NULL, "
                 + "email TEXT, "
                 + "role TEXT NOT NULL,"
-                + "adminLevel INTEGER "
+                + "adminLevel INTEGER, "
+                + "balance REAL DEFAULT 0.0"
                 + ");";
 
         String sqlCreateItems = "CREATE TABLE IF NOT EXISTS Items ("

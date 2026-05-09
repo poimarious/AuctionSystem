@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.client.controllers.MainController">
+<ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.client.controllers.MainController">
     <content>
         <VBox spacing="0.0" style="-fx-background-color: #f0f2f5;">
             <children>

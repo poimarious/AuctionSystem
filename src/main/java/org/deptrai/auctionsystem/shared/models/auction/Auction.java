@@ -1,5 +1,6 @@
 package org.deptrai.auctionsystem.shared.models.auction;
 
+import java.io.Serializable;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.items.Item;
 import org.deptrai.auctionsystem.shared.observer.AuctionObserver;
@@ -12,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Auction implements AuctionSubject {
+public class Auction implements AuctionSubject, Serializable {
     private String auctionId; // Database automatically assign this
     private Item item;
     private double currentPrice;

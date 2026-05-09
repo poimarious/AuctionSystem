@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Button?>
 
-<VBox prefHeight="600.0" prefWidth="800.0" spacing="20.0" style="-fx-background-color: transparent;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.client.controllers.AuctionFloorController">
+<VBox prefHeight="600.0" prefWidth="800.0" spacing="20.0" style="-fx-background-color: transparent;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.client.controllers.AuctionFloorController">
     <children>
         <Button mnemonicParsing="false" styleClass="btn-back" onAction="#handleGoBack" text="⬅ ">
             <padding>
@@ -36,7 +36,7 @@
         <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
             <content>
                 <!-- FlowPane sẽ tự động đẩy các item-card xuống hàng tiếp theo nếu hết chỗ -->
-                <FlowPane fx:id="productsContainer" hgap="25.0" stylesheets="@../style.css" vgap="25.0">
+                <FlowPane fx:id="productsContainer" hgap="25.0" stylesheets="@style.css" vgap="25.0">
                     <padding>
                         <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
                     </padding>

@@ -1,5 +1,6 @@
 package org.deptrai.auctionsystem.shared.models.bid;
 
+import java.io.Serializable;
 import org.deptrai.auctionsystem.shared.exceptions.AuctionClosedException;
 import org.deptrai.auctionsystem.shared.exceptions.AuthenticationException;
 import org.deptrai.auctionsystem.shared.exceptions.InvalidBidException;
@@ -9,7 +10,7 @@ import org.deptrai.auctionsystem.shared.models.users.Bidder;
 
 import java.time.LocalDateTime;
 
-public class Bid {
+public class Bid implements Serializable {
     private String bidId; // Database automatically assign this
     private Bidder bidder;
     private Auction auction;
