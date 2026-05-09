@@ -18,12 +18,14 @@
             <children>
                 <ImageView fx:id="productImageView" fitHeight="300.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" />
                 <Label fx:id="nameLabel" styleClass="product-title" text="Tên sản phẩm" />
-                <HBox alignment="CENTER_LEFT" spacing="15.0">
+
+                <VBox alignment="CENTER_LEFT" spacing="10.0">
                     <children>
                         <Label fx:id="currentPriceLabel" styleClass="price-label" text="GIÁ" />
-                        <Label styleClass="timer-label" text="HẾT HẠN TRONG: ....." />
+                        <Label fx:id="expiryTimerLabel" styleClass="timer-label" text="HẾT HẠN TRONG: 00:00:00" />
                     </children>
-                </HBox>
+                </VBox>
+
                 <Separator />
                 <Label style="-fx-font-weight: bold;" text="Mô tả chi tiết:" />
                 <Label fx:id="descriptionLabel" styleClass="product-description" text="..." wrapText="true" />

@@ -29,14 +29,14 @@
             </children>
         </HBox>
 
-        <TableView VBox.vgrow="ALWAYS" styleClass="item-card">
+        <TableView fx:id="bidHistoryTable" VBox.vgrow="ALWAYS" styleClass="item-card">
             <columns>
-                <TableColumn prefWidth="150.0" text="Ảnh" />
-                <TableColumn prefWidth="250.0" text="Tên sản phẩm" />
-                <TableColumn prefWidth="150.0" text="Giá bạn đặt" />
-                <TableColumn prefWidth="150.0" text="Giá hiện tại" />
-                <TableColumn prefWidth="150.0" text="Thời gian còn lại" />
-                <TableColumn prefWidth="120.0" text="Trạng thái" />
+                <TableColumn fx:id="imageColumn" prefWidth="150.0" text="Ảnh" />
+                <TableColumn fx:id="productNameColumn" prefWidth="250.0" text="Tên sản phẩm" />
+                <TableColumn fx:id="myBidPriceColumn" prefWidth="150.0" text="Giá bạn đặt" />
+                <TableColumn fx:id="currentPriceColumn" prefWidth="150.0" text="Giá hiện tại" />
+                <TableColumn fx:id="timeRemainingColumn" prefWidth="150.0" text="Thời gian còn lại" />
+                <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Trạng thái" />
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
