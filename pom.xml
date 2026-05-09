@@ -79,7 +79,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>org.deptrai.auctionsystem.Main</mainClass>
+                            <mainClass>org.deptrai.auctionsystem.server.ServerMain</mainClass>
                         </configuration>
                     </execution>
                 </executions>

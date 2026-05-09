@@ -1,16 +1,15 @@
 package org.deptrai.auctionsystem.models.auction;
 
-import org.deptrai.auctionsystem.exceptions.AuctionClosedException;
-import org.deptrai.auctionsystem.exceptions.AuthenticationException;
-import org.deptrai.auctionsystem.exceptions.InvalidBidException;
-import org.deptrai.auctionsystem.models.auction.Auction;
-import org.deptrai.auctionsystem.models.bid.Bid;
-import org.deptrai.auctionsystem.models.items.ArtFactory;
-import org.deptrai.auctionsystem.models.items.Item;
-import org.deptrai.auctionsystem.models.items.ItemFactory;
-import org.deptrai.auctionsystem.models.users.Bidder;
-import org.deptrai.auctionsystem.models.users.Seller;
-import org.deptrai.auctionsystem.models.users.User;
+import org.deptrai.auctionsystem.shared.exceptions.AuctionClosedException;
+import org.deptrai.auctionsystem.shared.exceptions.AuthenticationException;
+import org.deptrai.auctionsystem.shared.exceptions.InvalidBidException;
+import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.bid.Bid;
+import org.deptrai.auctionsystem.shared.models.items.ArtFactory;
+import org.deptrai.auctionsystem.shared.models.items.Item;
+import org.deptrai.auctionsystem.shared.models.items.ItemFactory;
+import org.deptrai.auctionsystem.shared.models.users.Bidder;
+import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

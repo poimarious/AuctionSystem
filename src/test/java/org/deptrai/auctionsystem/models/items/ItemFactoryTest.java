@@ -1,6 +1,11 @@
 package org.deptrai.auctionsystem.models.items;
 
-import org.deptrai.auctionsystem.models.users.Seller;
+import org.deptrai.auctionsystem.shared.models.items.ArtFactory;
+import org.deptrai.auctionsystem.shared.models.items.ElectronicsFactory;
+import org.deptrai.auctionsystem.shared.models.items.Item;
+import org.deptrai.auctionsystem.shared.models.items.ItemFactory;
+import org.deptrai.auctionsystem.shared.models.items.VehicleFactory;
+import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.junit.jupiter.api.Test;
 
 public class ItemFactoryTest {

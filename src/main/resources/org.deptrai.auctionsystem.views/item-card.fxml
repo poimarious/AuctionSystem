@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:controller="org.deptrai.auctionsystem.controllers.ItemCardController"
+<AnchorPane fx:controller="org.deptrai.auctionsystem.client.controllers.ItemCardController"
             maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="339.0" prefWidth="408.0" styleClass="item-card"
             stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21"
