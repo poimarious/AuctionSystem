@@ -9,8 +9,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
-import org.deptrai.auctionsystem.server.utils.SceneManager;
-import org.deptrai.auctionsystem.server.utils.SessionManager;
+import org.deptrai.auctionsystem.client.utils.SceneManager;
+import org.deptrai.auctionsystem.client.utils.SessionManager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

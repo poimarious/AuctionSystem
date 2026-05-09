@@ -1,4 +1,4 @@
-package org.deptrai.auctionsystem.server.utils;
+package org.deptrai.auctionsystem.client.utils;
 
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;

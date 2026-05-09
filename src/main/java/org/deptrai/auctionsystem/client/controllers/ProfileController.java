@@ -9,8 +9,8 @@ import javafx.scene.control.TextInputDialog;
 import org.deptrai.auctionsystem.shared.models.users.Admin;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
-import org.deptrai.auctionsystem.server.utils.SceneManager;
-import org.deptrai.auctionsystem.server.utils.SessionManager;
+import org.deptrai.auctionsystem.client.utils.SceneManager;
+import org.deptrai.auctionsystem.client.utils.SessionManager;
 
 import java.util.Optional;
 

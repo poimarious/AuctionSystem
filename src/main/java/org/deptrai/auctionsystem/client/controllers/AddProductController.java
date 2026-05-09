@@ -4,7 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import org.deptrai.auctionsystem.server.utils.SceneManager;
+import org.deptrai.auctionsystem.client.utils.SceneManager;
 
 public class AddProductController {
 

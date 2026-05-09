@@ -2,8 +2,8 @@ package org.deptrai.auctionsystem.client.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import org.deptrai.auctionsystem.server.utils.SceneManager;
-import org.deptrai.auctionsystem.server.utils.SessionManager;
+import org.deptrai.auctionsystem.client.utils.SceneManager;
+import org.deptrai.auctionsystem.client.utils.SessionManager;
 
 public class SellerController {
 

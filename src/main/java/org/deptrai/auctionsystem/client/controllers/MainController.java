@@ -9,9 +9,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
-import org.deptrai.auctionsystem.server.utils.SceneManager;
+import org.deptrai.auctionsystem.client.utils.SceneManager;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,7 +31,7 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        User currentUser = org.deptrai.auctionsystem.server.utils.SessionManager.getInstance().getCurrentUser();
+        User currentUser = SessionManager.getInstance().getCurrentUser();
 
         if (currentUser != null) {
             // Hiển thị số tiền thực tế của user thay vì 0.0
@@ -42,10 +43,10 @@ public class MainController {
         loadFeaturedAuctions();
 
         // ĐĂNG KÝ NHẬN THÔNG BÁO KHI SỐ DƯ VÍ THAY ĐỔI
-        org.deptrai.auctionsystem.server.utils.SessionManager.getInstance().setBalanceListener(() -> {
+        SessionManager.getInstance().setBalanceListener(() -> {
             // Phải dùng Platform.runLater vì UI chỉ được cập nhật trên luồng chính (Main Thread)
             javafx.application.Platform.runLater(() -> {
-                User user = org.deptrai.auctionsystem.server.utils.SessionManager.getInstance().getCurrentUser();
+                User user = SessionManager.getInstance().getCurrentUser();
                 if (user != null) {
                     walletLabel.setText(String.format("Ví: $%,.2f", user.getBalance()));
                 }
@@ -76,7 +77,7 @@ public class MainController {
         userNameLabel.setText(username);
         walletLabel.setText(String.format("Ví: $%,.2f", balance));
 
-        User currentUser = org.deptrai.auctionsystem.server.utils.SessionManager.getInstance().getCurrentUser();
+        User currentUser = SessionManager.getInstance().getCurrentUser();
         if (currentUser instanceof Seller) {
             sellerCenterBtn.setVisible(true);
             sellerCenterBtn.setManaged(true);
@@ -122,7 +123,7 @@ public class MainController {
 
     @FXML
     public void handleLogout(ActionEvent event) {
-        org.deptrai.auctionsystem.server.utils.SessionManager.getInstance().logout();
+        SessionManager.getInstance().logout();
         SceneManager.getInstance().clearHistory();
         setUpGuestView();
         SceneManager.getInstance().switchScene("/org.deptrai.auctionsystem.views/login-view.fxml", "Đăng nhập");

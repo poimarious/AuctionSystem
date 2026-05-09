@@ -5,12 +5,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.server.dao.UserDAO;
 import org.deptrai.auctionsystem.shared.models.users.Admin;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
-import org.deptrai.auctionsystem.server.utils.SceneManager;
+import org.deptrai.auctionsystem.client.utils.SceneManager;
 
 public class LoginController {
 
@@ -43,7 +44,7 @@ public class LoginController {
         if (loggedInUser != null && loggedInUser.getPassword().equals(inputPassword)) {
 
             // 1. DÒNG QUAN TRỌNG NHẤT: Lưu người dùng vào Session
-            org.deptrai.auctionsystem.server.utils.SessionManager.getInstance().setCurrentUser(loggedInUser);
+            SessionManager.getInstance().setCurrentUser(loggedInUser);
 
             // 2. Xóa lịch sử
             SceneManager.getInstance().clearHistory();

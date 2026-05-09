@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
+import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.shared.models.items.ArtFactory;
@@ -35,7 +36,7 @@ public class AuctionFloorController {
 
     @FXML
     public void handleGoBack(javafx.event.ActionEvent event) {
-        org.deptrai.auctionsystem.server.utils.SceneManager.getInstance().goBack();
+        SceneManager.getInstance().goBack();
     }
 
     @FXML

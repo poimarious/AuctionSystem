@@ -7,7 +7,7 @@ import org.deptrai.auctionsystem.server.dao.UserDAO;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
-import org.deptrai.auctionsystem.server.utils.SceneManager;
+import org.deptrai.auctionsystem.client.utils.SceneManager;
 
 public class RegisterController {
 

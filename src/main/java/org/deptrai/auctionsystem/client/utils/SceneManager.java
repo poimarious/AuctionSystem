@@ -1,4 +1,4 @@
-package org.deptrai.auctionsystem.server.utils;
+package org.deptrai.auctionsystem.client.utils;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

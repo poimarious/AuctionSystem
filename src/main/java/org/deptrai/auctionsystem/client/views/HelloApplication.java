@@ -3,7 +3,7 @@ package org.deptrai.auctionsystem.client.views;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
-import org.deptrai.auctionsystem.server.utils.SceneManager;
+import org.deptrai.auctionsystem.client.utils.SceneManager;
 
 import java.io.IOException;
 
