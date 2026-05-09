@@ -121,4 +121,23 @@ public class UserDAO {
         }
         return null;
     }
+
+    public boolean isUsernameTaken(String username) {
+        String sql = "SELECT 1 FROM Users WHERE username = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            // Nếu rs.next() là true tức là đã có dòng dữ liệu tồn tại
+            return rs.next();
+
+        } catch (SQLException e) {
+            System.out.println("Lỗi kiểm tra trùng lặp Username: " + e.getMessage());
+            // Trả về true (coi như đã tồn tại) để an toàn, chặn không cho tạo mới nếu DB đang lỗi
+            return true;
+        }
+    }
 }
