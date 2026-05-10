@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 
 public class DatabaseConnection {
   // Database file name (sẽ tự động tạo trong thư mục project)
@@ -64,18 +66,43 @@ public class DatabaseConnection {
             + ");";
 
     try (Connection conn = getConnection();
-        Statement stmt = conn.createStatement()) {
+         Statement stmt = conn.createStatement()) {
 
       stmt.execute("PRAGMA foreign_keys = ON;"); // Turning on foreign keys in Sqlite
 
+      // 1. Tạo bảng (Nếu chưa có)
       stmt.execute(sqlCreateUsers);
       stmt.execute(sqlCreateItems);
       stmt.execute(sqlCreateAuctions);
       stmt.execute(sqlCreateBids);
+
+      // 2. Kiểm tra và nâng cấp Schema (Migration)
+      updateSchema(conn);
+
       System.out.println("Cơ sở dữ liệu đã sẵn sàng");
 
     } catch (SQLException e) {
       System.out.println("Lỗi khởi tạo DB: " + e.getMessage());
+    }
+  }
+
+  // Hàm tự động Update Schema - Giữ nguyên dữ liệu cũ
+  private static void updateSchema(Connection conn) {
+    try {
+      DatabaseMetaData metaData = conn.getMetaData();
+
+      // Kiểm tra xem bảng Users đã có cột balance chưa
+      ResultSet rs = metaData.getColumns(null, null, "Users", "balance");
+
+      if (!rs.next()) {
+        // Nếu ResultSet rỗng (nghĩa là chưa có cột balance), tiến hành ALTER TABLE
+        try (Statement stmt = conn.createStatement()) {
+          stmt.execute("ALTER TABLE Users ADD COLUMN balance REAL DEFAULT 0.0;");
+          System.out.println("[SCHEMA UPDATE] Đã tự động thêm cột 'balance' vào bảng Users.");
+        }
+      }
+    } catch (SQLException e) {
+      System.out.println("[LỖI SCHEMA] Không thể cập nhật cấu trúc DB: " + e.getMessage());
     }
   }
 }
