@@ -1,5 +1,6 @@
 package org.deptrai.auctionsystem.server.managers;
 
+import org.deptrai.auctionsystem.server.dao.AuctionDAO;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.items.Item;
 
@@ -38,4 +39,14 @@ public class AuctionManager {
         return new ArrayList<>(auctions.values());
     }
     // MAYBE NEED ONE MORE METHOD THAT CONNECT TO DATABASE
+    public void loadAuctionsFromDatabase() {
+        AuctionDAO auctionDAO = new AuctionDAO();
+        List<Auction> dbAuctions = auctionDAO.getAllAuctions();
+
+        // Đưa từng phiên đấu giá từ DB lên RAM (ConcurrentSkipListMap)
+        for (Auction auction : dbAuctions) {
+            auctions.put(auction.getAuctionId(), auction);
+        }
+        System.out.println("Đã đồng bộ " + dbAuctions.size() + " phiên đấu giá từ Database lên AuctionManager.");
+    }
 }

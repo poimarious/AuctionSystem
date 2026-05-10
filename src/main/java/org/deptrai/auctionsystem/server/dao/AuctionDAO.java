@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -97,4 +98,48 @@ public class AuctionDAO {
         }
         return null;
     }
+    // Thêm hàm này vào dưới cùng của class AuctionDAO để đồng bộ với auction manager
+    public List<Auction> getAllAuctions() {
+        List<Auction> auctionList = new ArrayList<>();
+        String sql = "SELECT * FROM Auctions"; // Lấy tất cả, hoặc bạn có thể thêm: WHERE status = 'OPEN'
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            ItemDAO itemDAO = new ItemDAO();
+            BidDAO bidDAO = new BidDAO();
+
+            while (rs.next()) {
+                String auctionId = rs.getString("auctionId");
+                String itemId = rs.getString("itemId");
+                double currentPrice = rs.getDouble("currentPrice");
+                String statusStr = rs.getString("status");
+                String endTimeStr = rs.getString("endTime");
+
+                Item item = itemDAO.getItemById(itemId);
+                AuctionStatus status = AuctionStatus.valueOf(statusStr);
+                LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
+
+                Auction auction = new Auction(
+                        auctionId,
+                        item,
+                        currentPrice,
+                        status,
+                        endTime,
+                        new CopyOnWriteArrayList<>()
+                );
+
+                // Nạp luôn danh sách lịch sử Bid của phiên đấu giá này
+                List<Bid> auctionBids = bidDAO.getBidsByAuctionId(auctionId, auction);
+                auction.setBids(auctionBids);
+
+                auctionList.add(auction);
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi lấy danh sách tất cả Auction từ DB: " + e.getMessage());
+        }
+        return auctionList;
+    }
+
 }

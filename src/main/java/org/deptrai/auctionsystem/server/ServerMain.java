@@ -1,5 +1,6 @@
 package org.deptrai.auctionsystem.server;
 
+import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -17,7 +18,7 @@ public class ServerMain {
         System.out.println("=== HỆ THỐNG ĐẤU GIÁ SERVER ===");
 
         DatabaseConnection.initializeDatabase();
-
+        AuctionManager.getInstance().loadAuctionsFromDatabase();
         /*
          * Thread pool thay cho new Thread().start():
          *   - Tái sử dụng thread thay vì tạo mới mỗi lần → tiết kiệm tài nguyên
