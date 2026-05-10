@@ -1,46 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+  style="-fx-background-color: #f0f2f5;" spacing="25.0" stylesheets="@style.css"
+  xmlns="http://javafx.com/javafx/21"
+  fx:controller="org.deptrai.auctionsystem.client.controllers.BidHistoryController">
+  <children>
+    <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ ">
+      <padding>
+        <Insets bottom="8.0" left="12.0" right="15.0" top="8.0"/>
+      </padding>
+    </Button>
+    <HBox spacing="15.0">
+      <children>
+        <Button style="-fx-background-color: #2c3e50; -fx-text-fill: white;" text="Tất cả"/>
+        <Button text="Đang diễn ra"/>
+        <Button text="Đã thắng"/>
+        <Button text="Đã kết thúc"/>
+      </children>
+    </HBox>
 
-<VBox fx:controller="org.deptrai.auctionsystem.client.controllers.BidHistoryController" spacing="25.0" style="-fx-background-color: #f0f2f5;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
-    <padding>
-        <Insets bottom="40.0" left="60.0" right="60.0" top="40.0" />
-    </padding>
-    <children>
-        <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ ">
-            <padding>
-                <Insets bottom="8.0" left="12.0" right="15.0" top="8.0" />
-            </padding>
-        </Button>
-        <Label text="LỊCH SỬ ĐẶT GIÁ CỦA BẠN" textFill="#2c3e50">
-            <font>
-                <Font name="System Bold" size="28.0" />
-            </font>
-        </Label>
+    <Label text="LỊCH SỬ ĐẶT GIÁ CỦA BẠN" textFill="#2c3e50">
+      <font>
+        <Font name="System Bold" size="28.0"/>
+      </font>
+    </Label>
 
-        <HBox spacing="15.0">
-            <children>
-                <Button style="-fx-background-color: #2c3e50; -fx-text-fill: white;" text="Tất cả" />
-                <Button text="Đang diễn ra" />
-                <Button text="Đã thắng" />
-                <Button text="Đã kết thúc" />
-            </children>
-        </HBox>
-
-        <TableView fx:id="bidHistoryTable" VBox.vgrow="ALWAYS" styleClass="item-card">
-            <columns>
-                <TableColumn fx:id="imageColumn" prefWidth="150.0" text="Ảnh" />
-                <TableColumn fx:id="productNameColumn" prefWidth="250.0" text="Tên sản phẩm" />
-                <TableColumn fx:id="myBidPriceColumn" prefWidth="150.0" text="Giá bạn đặt" />
-                <TableColumn fx:id="currentPriceColumn" prefWidth="150.0" text="Giá hiện tại" />
-                <TableColumn fx:id="timeRemainingColumn" prefWidth="150.0" text="Thời gian còn lại" />
-                <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Trạng thái" />
-            </columns>
-            <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-            </columnResizePolicy>
-        </TableView>
-    </children>
+    <TableView VBox.vgrow="ALWAYS" styleClass="item-card" fx:id="bidHistoryTable">
+      <columnResizePolicy>
+        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+      </columnResizePolicy>
+      <columns>
+        <TableColumn prefWidth="150.0" text="Ảnh" fx:id="imageColumn"/>
+        <TableColumn prefWidth="250.0" text="Tên sản phẩm" fx:id="productNameColumn"/>
+        <TableColumn prefWidth="150.0" text="Giá bạn đặt" fx:id="myBidPriceColumn"/>
+        <TableColumn prefWidth="150.0" text="Giá hiện tại" fx:id="currentPriceColumn"/>
+        <TableColumn prefWidth="150.0" text="Thời gian còn lại" fx:id="timeRemainingColumn"/>
+        <TableColumn prefWidth="120.0" text="Trạng thái" fx:id="statusColumn"/>
+      </columns>
+    </TableView>
+  </children>
+  <padding>
+    <Insets bottom="40.0" left="60.0" right="60.0" top="40.0"/>
+  </padding>
 </VBox>

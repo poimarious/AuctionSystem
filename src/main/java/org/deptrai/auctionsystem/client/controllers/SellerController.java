@@ -17,25 +17,29 @@ public class SellerController {
     System.out.println("Đăng xuất từ Seller Center!");
     SessionManager.getInstance().logout();
     SceneManager.getInstance().clearHistory();
-    SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập - Auction.UET");
+    SceneManager.getInstance()
+        .switchScene(
+            "/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập - Auction.UET");
   }
 
   @FXML
   public void handleAddNewProduct(ActionEvent event) {
-    SceneManager.getInstance().switchScene(
-        "/org/deptrai/auctionsystem/client/views/add-product-view.fxml", "Đăng sản phẩm mới");
+    SceneManager.getInstance()
+        .switchScene(
+            "/org/deptrai/auctionsystem/client/views/add-product-view.fxml", "Đăng sản phẩm mới");
   }
 
   @FXML
   public void handleOpenInventory(ActionEvent event) {
-    SceneManager.getInstance().switchScene(
-        "/org/deptrai/auctionsystem/client/views/inventory-view.fxml", "Kho hàng của tôi");
+    SceneManager.getInstance()
+        .switchScene(
+            "/org/deptrai/auctionsystem/client/views/inventory-view.fxml", "Kho hàng của tôi");
   }
 
   @FXML
   public void handleShowProfile(ActionEvent event) {
-    SceneManager.getInstance().switchScene(
-        "/org/deptrai/auctionsystem/client/views/profile-view.fxml", "Hồ sơ cá nhân");
+    SceneManager.getInstance()
+        .switchScene("/org/deptrai/auctionsystem/client/views/profile-view.fxml", "Hồ sơ cá nhân");
   }
 
   @FXML

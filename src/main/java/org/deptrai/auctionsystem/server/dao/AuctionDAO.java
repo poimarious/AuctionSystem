@@ -1,11 +1,5 @@
 package org.deptrai.auctionsystem.server.dao;
 
-import org.deptrai.auctionsystem.shared.models.auction.Auction;
-import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
-import org.deptrai.auctionsystem.shared.models.bid.Bid;
-import org.deptrai.auctionsystem.shared.models.items.Item;
-import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,131 +9,130 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
+import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
+import org.deptrai.auctionsystem.shared.models.bid.Bid;
+import org.deptrai.auctionsystem.shared.models.items.Item;
 
 public class AuctionDAO {
-    public boolean insertAuction(Auction auction) {
-        String sql = "INSERT INTO Auctions (auctionId, itemId, currentPrice, status, endTime) VALUES (?, ?, ?, ?, ?)";
+  public boolean insertAuction(Auction auction) {
+    String sql =
+        "INSERT INTO Auctions (auctionId, itemId, currentPrice, status, endTime) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            String id = (auction.getAuctionId() != null) ? auction.getAuctionId() : UUID.randomUUID().toString();
-            auction.setAuctionId(id);
+    try (Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+      String id =
+          (auction.getAuctionId() != null) ? auction.getAuctionId() : UUID.randomUUID().toString();
+      auction.setAuctionId(id);
 
-            pstmt.setString(1, auction.getAuctionId()); // Always has id if it is handled in AuctionManager
-            pstmt.setString(2, auction.getItem().getItemId());
-            pstmt.setDouble(3, auction.getCurrentPrice());
-            pstmt.setString(4, auction.getStatus().name());
-            pstmt.setString(5, auction.getEndTime().toString());
+      pstmt.setString(
+          1, auction.getAuctionId()); // Always has id if it is handled in AuctionManager
+      pstmt.setString(2, auction.getItem().getItemId());
+      pstmt.setDouble(3, auction.getCurrentPrice());
+      pstmt.setString(4, auction.getStatus().name());
+      pstmt.setString(5, auction.getEndTime().toString());
 
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.out.println("Lỗi lưu Auction: " + e.getMessage());
-            return false;
-        }
+      pstmt.executeUpdate();
+      return true;
+    } catch (SQLException e) {
+      System.out.println("Lỗi lưu Auction: " + e.getMessage());
+      return false;
     }
+  }
 
-    // Use when there's a new bid/closing auction
-    public boolean updateAuctionState(Auction auction) {
-        String sql = "UPDATE Auctions SET currentPrice = ?, status = ? WHERE auctionId = ?";
+  // Use when there's a new bid/closing auction
+  public boolean updateAuctionState(Auction auction) {
+    String sql = "UPDATE Auctions SET currentPrice = ?, status = ? WHERE auctionId = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    try (Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setDouble(1, auction.getCurrentPrice());
-            pstmt.setString(2, auction.getStatus().name());
-            pstmt.setString(3, auction.getAuctionId());
+      pstmt.setDouble(1, auction.getCurrentPrice());
+      pstmt.setString(2, auction.getStatus().name());
+      pstmt.setString(3, auction.getAuctionId());
 
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.out.println("Lỗi cập nhật Auction: " + e.getMessage());
-            return false;
-        }
+      pstmt.executeUpdate();
+      return true;
+    } catch (SQLException e) {
+      System.out.println("Lỗi cập nhật Auction: " + e.getMessage());
+      return false;
     }
+  }
 
-    public Auction getAuctionById(String auctionId) {
-        String sql = "SELECT * FROM Auctions WHERE auctionId = ?";
+  public Auction getAuctionById(String auctionId) {
+    String sql = "SELECT * FROM Auctions WHERE auctionId = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    try (Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, auctionId);
-            ResultSet rs = pstmt.executeQuery();
+      pstmt.setString(1, auctionId);
+      ResultSet rs = pstmt.executeQuery();
 
-            if (rs.next()) {
-                String itemId = rs.getString("itemId");
-                double currentPrice = rs.getDouble("currentPrice");
-                String statusStr = rs.getString("status");
-                String endTimeStr = rs.getString("endTime");
+      if (rs.next()) {
+        String itemId = rs.getString("itemId");
+        double currentPrice = rs.getDouble("currentPrice");
+        String statusStr = rs.getString("status");
+        String endTimeStr = rs.getString("endTime");
 
-                ItemDAO itemDAO = new ItemDAO();
-                Item item = itemDAO.getItemById(itemId);
+        ItemDAO itemDAO = new ItemDAO();
+        Item item = itemDAO.getItemById(itemId);
 
-                AuctionStatus status = AuctionStatus.valueOf(statusStr);
-                LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
+        AuctionStatus status = AuctionStatus.valueOf(statusStr);
+        LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
 
-                Auction auction = new Auction(
-                        auctionId,
-                        item,
-                        currentPrice,
-                        status,
-                        endTime,
-                        new CopyOnWriteArrayList<>()
-                );
-                BidDAO bidDAO = new BidDAO();
-                List<Bid> auctionBids = bidDAO.getBidsByAuctionId(auctionId, auction);
-                auction.setBids(auctionBids);
+        Auction auction =
+            new Auction(
+                auctionId, item, currentPrice, status, endTime, new CopyOnWriteArrayList<>());
+        BidDAO bidDAO = new BidDAO();
+        List<Bid> auctionBids = bidDAO.getBidsByAuctionId(auctionId, auction);
+        auction.setBids(auctionBids);
 
-                return auction;
-            }
-        } catch (SQLException e) {
-            System.out.println("Lỗi tìm Auction theo ID: " + e.getMessage());
-        }
-        return null;
+        return auction;
+      }
+    } catch (SQLException e) {
+      System.out.println("Lỗi tìm Auction theo ID: " + e.getMessage());
     }
-    // Thêm hàm này vào dưới cùng của class AuctionDAO để đồng bộ với auction manager
-    public List<Auction> getAllAuctions() {
-        List<Auction> auctionList = new ArrayList<>();
-        String sql = "SELECT * FROM Auctions"; // Lấy tất cả, hoặc bạn có thể thêm: WHERE status = 'OPEN'
+    return null;
+  }
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+  // Thêm hàm này vào dưới cùng của class AuctionDAO để đồng bộ với auction manager
+  public List<Auction> getAllAuctions() {
+    List<Auction> auctionList = new ArrayList<>();
+    String sql =
+        "SELECT * FROM Auctions"; // Lấy tất cả, hoặc bạn có thể thêm: WHERE status = 'OPEN'
 
-            ItemDAO itemDAO = new ItemDAO();
-            BidDAO bidDAO = new BidDAO();
+    try (Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery()) {
 
-            while (rs.next()) {
-                String auctionId = rs.getString("auctionId");
-                String itemId = rs.getString("itemId");
-                double currentPrice = rs.getDouble("currentPrice");
-                String statusStr = rs.getString("status");
-                String endTimeStr = rs.getString("endTime");
+      ItemDAO itemDAO = new ItemDAO();
+      BidDAO bidDAO = new BidDAO();
 
-                Item item = itemDAO.getItemById(itemId);
-                AuctionStatus status = AuctionStatus.valueOf(statusStr);
-                LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
+      while (rs.next()) {
+        String auctionId = rs.getString("auctionId");
+        String itemId = rs.getString("itemId");
+        double currentPrice = rs.getDouble("currentPrice");
+        String statusStr = rs.getString("status");
+        String endTimeStr = rs.getString("endTime");
 
-                Auction auction = new Auction(
-                        auctionId,
-                        item,
-                        currentPrice,
-                        status,
-                        endTime,
-                        new CopyOnWriteArrayList<>()
-                );
+        Item item = itemDAO.getItemById(itemId);
+        AuctionStatus status = AuctionStatus.valueOf(statusStr);
+        LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
 
-                // Nạp luôn danh sách lịch sử Bid của phiên đấu giá này
-                List<Bid> auctionBids = bidDAO.getBidsByAuctionId(auctionId, auction);
-                auction.setBids(auctionBids);
+        Auction auction =
+            new Auction(
+                auctionId, item, currentPrice, status, endTime, new CopyOnWriteArrayList<>());
 
-                auctionList.add(auction);
-            }
-        } catch (SQLException e) {
-            System.out.println("Lỗi khi lấy danh sách tất cả Auction từ DB: " + e.getMessage());
-        }
-        return auctionList;
+        // Nạp luôn danh sách lịch sử Bid của phiên đấu giá này
+        List<Bid> auctionBids = bidDAO.getBidsByAuctionId(auctionId, auction);
+        auction.setBids(auctionBids);
+
+        auctionList.add(auction);
+      }
+    } catch (SQLException e) {
+      System.out.println("Lỗi khi lấy danh sách tất cả Auction từ DB: " + e.getMessage());
     }
-
+    return auctionList;
+  }
 }

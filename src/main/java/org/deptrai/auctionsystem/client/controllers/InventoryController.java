@@ -9,8 +9,10 @@ public class InventoryController {
   @FXML
   public void handleAddNewProduct(ActionEvent event) {
     // Chuyển sang trang Đăng sản phẩm mới
-    SceneManager.getInstance().switchScene(
-        "/org/deptrai/auctionsystem/client/views/add-product-view.fxml", "Đăng sản phẩm đấu giá mới");
+    SceneManager.getInstance()
+        .switchScene(
+            "/org/deptrai/auctionsystem/client/views/add-product-view.fxml",
+            "Đăng sản phẩm đấu giá mới");
   }
 
   @FXML

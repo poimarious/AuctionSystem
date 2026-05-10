@@ -1,33 +1,27 @@
 package org.deptrai.auctionsystem.server;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import org.deptrai.auctionsystem.server.dao.UserDAO;
-import org.deptrai.auctionsystem.shared.models.users.Admin;
-import org.deptrai.auctionsystem.shared.models.users.Bidder;
-import org.deptrai.auctionsystem.shared.models.users.Seller;
-import org.deptrai.auctionsystem.shared.models.users.User;
+import java.net.Socket;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.deptrai.auctionsystem.server.dao.AuctionDAO;
 import org.deptrai.auctionsystem.server.dao.ItemDAO;
+import org.deptrai.auctionsystem.server.dao.UserDAO;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus; // Giả định bạn có enum này
 import org.deptrai.auctionsystem.shared.models.items.Item;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.deptrai.auctionsystem.shared.models.users.Bidder;
+import org.deptrai.auctionsystem.shared.models.users.Seller;
+import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 import org.deptrai.auctionsystem.utils.ValidationUtils;
 
 public class ClientHandler implements Runnable {
-  private Socket socket;
-  private UserDAO userDAO;
+  private final Socket socket;
+  private final UserDAO userDAO;
   private ObjectOutputStream out;
   private ObjectInputStream in;
 
@@ -67,7 +61,8 @@ public class ClientHandler implements Runnable {
             handleCloseAuction(request);
             break;
           default:
-            out.writeObject(new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
+            out.writeObject(
+                new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
             out.flush();
             break;
         }
@@ -82,8 +77,6 @@ public class ClientHandler implements Runnable {
       }
     }
   }
-
-
 
   private void handleLogin(Message request) {
     // Data ta quy ước Client gửi sang là mảng String[] {username, password}
@@ -113,18 +106,21 @@ public class ClientHandler implements Runnable {
     String role = data[3];
 
     try {
-      if(!ValidationUtils.isValidPassword(password)) {
-        out.writeObject(new Message("FAIL", "REGISTER", "Mật khẩu bao gồm chữ cái thường, chữ cái in hoa, số và kí tự đặc biệt!"));
+      if (!ValidationUtils.isValidPassword(password)) {
+        out.writeObject(
+            new Message(
+                "FAIL",
+                "REGISTER",
+                "Mật khẩu bao gồm chữ cái thường, chữ cái in hoa, số và kí tự đặc biệt!"));
         out.flush();
         return;
-      }
-      else if (userDAO.isUsernameTaken(username)) {
+      } else if (userDAO.isUsernameTaken(username)) {
         out.writeObject(new Message("FAIL", "REGISTER", "Tên đăng nhập đã tồn tại!"));
         out.flush();
         return;
-      }
-      else if (userDAO.isEmailTaken(email)) {
-        out.writeObject(new Message("FAIL", "REGISTER", "Email này đã được sử dụng cho một tài khoản khác!"));
+      } else if (userDAO.isEmailTaken(email)) {
+        out.writeObject(
+            new Message("FAIL", "REGISTER", "Email này đã được sử dụng cho một tài khoản khác!"));
         out.flush();
         return;
       }
@@ -133,7 +129,9 @@ public class ClientHandler implements Runnable {
       if (role.equals("SELLER")) {
         newUser = new Seller(null, username, password, email);
       } else { // role.equals("BIDDER")
-        newUser = new Bidder(null, username, password, email, new java.util.concurrent.CopyOnWriteArrayList<>());
+        newUser =
+            new Bidder(
+                null, username, password, email, new java.util.concurrent.CopyOnWriteArrayList<>());
       }
 
       boolean success = userDAO.insertUser(newUser, role);
@@ -185,10 +183,9 @@ public class ClientHandler implements Runnable {
       out.writeObject(new Message("SUCCESS", "GET_ALL_AUCTIONS", auctions));
       out.flush();
     } catch (IOException e) {
-        System.out.println("Lỗi khi gửi danh sách Auction cho Client.");
-        e.printStackTrace();
+      System.out.println("Lỗi khi gửi danh sách Auction cho Client.");
+      e.printStackTrace();
     }
-
   }
 
   private void handleGetAuctionById(Message request) {
@@ -207,7 +204,8 @@ public class ClientHandler implements Runnable {
       if (auction != null) {
         out.writeObject(new Message("SUCCESS", "GET_AUCTION_BY_ID", auction));
       } else {
-        out.writeObject(new Message("FAIL", "GET_AUCTION_BY_ID", "Không tìm thấy phiên đấu giá này!"));
+        out.writeObject(
+            new Message("FAIL", "GET_AUCTION_BY_ID", "Không tìm thấy phiên đấu giá này!"));
       }
       out.flush();
     } catch (IOException e) {
@@ -243,7 +241,8 @@ public class ClientHandler implements Runnable {
         // Gửi trả về đối tượng Auction đã hoàn chỉnh (kèm ID) để Client cập nhật UI
         out.writeObject(new Message("SUCCESS", "CREATE_AUCTION", newAuction));
       } else {
-        out.writeObject(new Message("FAIL", "CREATE_AUCTION", "Lỗi Database khi tạo Phiên đấu giá."));
+        out.writeObject(
+            new Message("FAIL", "CREATE_AUCTION", "Lỗi Database khi tạo Phiên đấu giá."));
       }
       out.flush();
 

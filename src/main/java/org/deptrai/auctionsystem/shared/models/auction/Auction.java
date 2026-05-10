@@ -1,215 +1,223 @@
 package org.deptrai.auctionsystem.shared.models.auction;
 
 import java.io.Serializable;
-import org.deptrai.auctionsystem.shared.models.bid.Bid;
-import org.deptrai.auctionsystem.shared.models.items.Item;
-import org.deptrai.auctionsystem.shared.observer.AuctionObserver;
-import org.deptrai.auctionsystem.shared.models.users.Bidder;
-import org.deptrai.auctionsystem.shared.observer.AuctionSubject;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
+import org.deptrai.auctionsystem.shared.models.bid.Bid;
+import org.deptrai.auctionsystem.shared.models.items.Item;
+import org.deptrai.auctionsystem.shared.models.users.Bidder;
+import org.deptrai.auctionsystem.shared.observer.AuctionObserver;
+import org.deptrai.auctionsystem.shared.observer.AuctionSubject;
 
 public class Auction implements AuctionSubject, Serializable {
-    private String auctionId; // Database automatically assign this
-    private Item item;
-    private double currentPrice;
-    private AuctionStatus status;
-    private LocalDateTime endTime;
-    private List<Bid> bids;
-    private List<AuctionObserver> observers;
+  private final ReentrantLock lock = new ReentrantLock();
+  private String auctionId; // Database automatically assign this
+  private Item item;
+  private double currentPrice;
+  private AuctionStatus status;
+  private LocalDateTime endTime;
+  private List<Bid> bids;
+  private List<AuctionObserver> observers;
 
-    private final ReentrantLock lock = new ReentrantLock();
+  public Auction(Item item, LocalDateTime endTime) {
+    this.item = item;
+    this.currentPrice = item.getStartingPrice();
+    this.status = AuctionStatus.OPEN;
+    this.endTime = endTime;
+    this.bids = new CopyOnWriteArrayList<>();
+    this.observers = new CopyOnWriteArrayList<>();
+  } // For creating a new object
 
-    public Auction(Item item, LocalDateTime endTime) {
-        this.item = item;
-        this.currentPrice = item.getStartingPrice();
-        this.status = AuctionStatus.OPEN;
-        this.endTime = endTime;
-        this.bids = new CopyOnWriteArrayList<>();
-        this.observers = new CopyOnWriteArrayList<>();
-    }// For creating a new object
+  public Auction(
+      String auctionId,
+      Item item,
+      double currentPrice,
+      AuctionStatus status,
+      LocalDateTime endTime,
+      List<Bid> bids) {
+    this.auctionId = auctionId;
+    this.item = item;
+    this.currentPrice = currentPrice;
+    this.status = status;
+    this.endTime = endTime;
+    this.bids = bids;
+    observers = new CopyOnWriteArrayList<>(); // use CopyOnWriteArrayList to avoid
+    // ConcurrentModificationException
+  } // For loading from database
 
-    public Auction(String auctionId, Item item, double currentPrice, AuctionStatus status, LocalDateTime endTime, List<Bid> bids) {
-        this.auctionId = auctionId;
-        this.item = item;
-        this.currentPrice = currentPrice;
-        this.status = status;
-        this.endTime = endTime;
-        this.bids = bids;
-        observers = new CopyOnWriteArrayList<>(); // use CopyOnWriteArrayList to avoid ConcurrentModificationException
-    }// For loading from database
+  public void startAuction() {
+    lock.lock();
+    try {
+      if (this.status == AuctionStatus.OPEN) {
+        this.status = AuctionStatus.RUNNING;
+        System.out.println("Auction for " + item.getName() + " is now RUNNING.");
+        notifyStatusChanged();
+      }
+    } finally {
+      lock.unlock();
+    }
+  }
 
-    public void startAuction() {
-        lock.lock();
-        try {
-            if (this.status == AuctionStatus.OPEN) {
-                this.status = AuctionStatus.RUNNING;
-                System.out.println("Auction for " + item.getName() + " is now RUNNING.");
-                notifyStatusChanged();
+  public void closeAuction() {
+    lock.lock();
+    try {
+      if (this.status == AuctionStatus.RUNNING) {
+        this.status = AuctionStatus.FINISHED;
+        System.out.println("Auction for " + item.getName() + " has FINISHED.");
+        notifyStatusChanged();
+
+        Bidder winner = getWinner();
+        if (winner != null) {
+          System.out.println("Winner is: " + winner.getUsername() + " with $" + currentPrice);
+          // Next step could be transitioning to PAID
+        } else {
+          System.out.println("No bids placed. Auction CANCELED.");
+          this.status = AuctionStatus.CANCELED;
+          notifyStatusChanged();
+        }
+      }
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  // Place bid logic (We add 'synchronized' in Week 7 Task 4/5)
+  public boolean placeBid(Bid bid) {
+    lock.lock();
+    try {
+      if (bid.validate()) {
+        this.currentPrice = bid.getAmount();
+        this.bids.add(bid);
+
+        // Notify all observers when a new valid bid is placed
+        notifyBidPlaced(bid);
+        return true;
+      }
+    } finally {
+      lock.unlock();
+    }
+    return false; // Invalid bid
+  }
+
+  public Bidder getWinner() {
+    lock.lock();
+    try {
+      if (bids.isEmpty()) return null;
+      // The last valid bid in the list is the winner
+      return bids.get(bids.size() - 1).getBidder();
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
+  public void attach(AuctionObserver observer) {
+    if (!observers.contains(observer)) {
+      observers.add(observer);
+      System.out.println("Someone just subscribed to the session: " + item.getName());
+    }
+  }
+
+  @Override
+  public void detach(AuctionObserver observer) {
+    if (observers.contains(observer)) {
+      observers.remove(observer);
+      System.out.println("Someone just unsubscribed to the session: " + item.getName());
+    }
+  }
+
+  @Override
+  public void notifyBidPlaced(Bid bid) {
+    for (AuctionObserver obs : observers) {
+      // obs.onBidPlaced(this, bid);
+      CompletableFuture.runAsync(
+          () -> {
+            try {
+              obs.onBidPlaced(this, bid);
+            } catch (Exception e) {
+              System.err.println("Failed when notify bid placed to observer: " + e.getMessage());
             }
-        } finally {
-            lock.unlock();
-        }
+          });
     }
+  }
 
-    public void closeAuction() {
-        lock.lock();
-        try {
-            if (this.status == AuctionStatus.RUNNING) {
-                this.status = AuctionStatus.FINISHED;
-                System.out.println("Auction for " + item.getName() + " has FINISHED.");
-                notifyStatusChanged();
+  @Override
+  public void notifyStatusChanged() {
+    for (AuctionObserver obs : observers) {
+      // obs.onAuctionStatusChanged(this);
 
-                Bidder winner = getWinner();
-                if (winner != null) {
-                    System.out.println("Winner is: " + winner.getUsername() + " with $" + currentPrice);
-                    // Next step could be transitioning to PAID
-                } else {
-                    System.out.println("No bids placed. Auction CANCELED.");
-                    this.status = AuctionStatus.CANCELED;
-                    notifyStatusChanged();
-                }
+      CompletableFuture.runAsync(
+          () -> {
+            try {
+              obs.onAuctionStatusChanged(this);
+            } catch (Exception e) {
+              System.err.println("Failed when notify status change to observer: " + e.getMessage());
             }
-        } finally {
-            lock.unlock();
-        }
+          });
     }
+  }
 
-    // Place bid logic (We add 'synchronized' in Week 7 Task 4/5)
-    public boolean placeBid(Bid bid) {
-        lock.lock();
-        try {
-            if (bid.validate()) {
-                this.currentPrice = bid.getAmount();
-                this.bids.add(bid);
+  // region Getters
+  public String getAuctionId() {
+    return auctionId;
+  }
 
-                // Notify all observers when a new valid bid is placed
-                notifyBidPlaced(bid);
-                return true;
-            }
-        } finally {
-            lock.unlock();
-        }
-        return false; // Invalid bid
-    }
+  // region Setters
+  public void setAuctionId(String auctionId) {
+    this.auctionId = auctionId;
+  }
 
-    public Bidder getWinner() {
-        lock.lock();
-        try {
-            if (bids.isEmpty()) return null;
-            // The last valid bid in the list is the winner
-            return bids.get(bids.size() - 1).getBidder();
-        } finally {
-            lock.unlock();
-        }
-    }
+  public Item getItem() {
+    return item;
+  }
 
-    @Override
-    public void attach(AuctionObserver observer) {
-        if (!observers.contains(observer)) {
-            observers.add(observer);
-            System.out.println("Someone just subscribed to the session: " + item.getName());
-        }
-    }
+  public void setItem(Item item) {
+    this.item = item;
+  }
 
-    @Override
-    public void detach(AuctionObserver observer) {
-        if (observers.contains(observer)) {
-            observers.remove(observer);
-            System.out.println("Someone just unsubscribed to the session: " + item.getName());
-        }
-    }
+  public double getCurrentPrice() {
+    return currentPrice;
+  }
 
-    @Override
-    public void notifyBidPlaced(Bid bid) {
-        for (AuctionObserver obs : observers) {
-            //obs.onBidPlaced(this, bid);
-            CompletableFuture.runAsync(() -> {
-                try {
-                    obs.onBidPlaced(this, bid);
-                } catch(Exception e) {
-                    System.err.println("Failed when notify bid placed to observer: " + e.getMessage());
-                }
-            });
-        }
-    }
+  public void setCurrentPrice(double currentPrice) {
+    this.currentPrice = currentPrice;
+  }
 
-    @Override
-    public void notifyStatusChanged() {
-        for (AuctionObserver obs : observers) {
-            //obs.onAuctionStatusChanged(this);
+  public AuctionStatus getStatus() {
+    return status;
+  }
 
-            CompletableFuture.runAsync(() -> {
-                try {
-                    obs.onAuctionStatusChanged(this);
-                } catch(Exception e) {
-                    System.err.println("Failed when notify status change to observer: " + e.getMessage());
-                }
-            });
-        }
-    }
+  // endregion
 
-    //region Getters
-    public String getAuctionId() {
-        return auctionId;
-    }
+  public void setStatus(AuctionStatus status) {
+    this.status = status;
+  }
 
-    public Item getItem() {
-        return item;
-    }
+  public LocalDateTime getEndTime() {
+    return endTime;
+  }
 
-    public double getCurrentPrice() {
-        return currentPrice;
-    }
+  public void setEndTime(LocalDateTime endTime) {
+    this.endTime = endTime;
+  }
 
-    public AuctionStatus getStatus() {
-        return status;
-    }
+  public List<Bid> getBids() {
+    return bids;
+  }
 
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
+  public void setBids(List<Bid> bids) {
+    this.bids = bids;
+  }
 
-    public List<Bid> getBids() {
-        return bids;
-    }
+  public List<AuctionObserver> getObservers() {
+    return observers;
+  }
 
-    public List<AuctionObserver> getObservers() {
-        return observers;
-    }
-    //endregion
-
-    //region Setters
-    public void setAuctionId(String auctionId) {
-        this.auctionId = auctionId;
-    }
-
-    public void setItem(Item item) {
-        this.item = item;
-    }
-
-    public void setCurrentPrice(double currentPrice) {
-        this.currentPrice = currentPrice;
-    }
-
-    public void setStatus(AuctionStatus status) {
-        this.status = status;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public void setBids(List<Bid> bids) {
-        this.bids = bids;
-    }
-
-    public void setObservers(List<AuctionObserver> observers) {
-        this.observers = observers;
-    }
-    //endregion
+  public void setObservers(List<AuctionObserver> observers) {
+    this.observers = observers;
+  }
+  // endregion
 }

@@ -1,12 +1,9 @@
 package org.deptrai.auctionsystem.client.utils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 import org.deptrai.auctionsystem.shared.network.Message;
 
 public class SocketClient {
@@ -17,7 +14,9 @@ public class SocketClient {
   public static void connect(String serverAddress, int port) {
     try {
       socket = new Socket(serverAddress, port);
-      out = new ObjectOutputStream(socket.getOutputStream()); // Output is always first to avoid deadlock
+      out =
+          new ObjectOutputStream(
+              socket.getOutputStream()); // Output is always first to avoid deadlock
       in = new ObjectInputStream(socket.getInputStream());
       System.out.println("Đã kết nối tới Server thành công!");
     } catch (IOException e) {

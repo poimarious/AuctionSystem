@@ -3,70 +3,73 @@ package org.deptrai.auctionsystem.shared.models.users;
 import java.io.Serializable;
 
 public abstract class User implements Serializable {
-    private String userId; // Database automatically assigns this.
-    private String username;
-    private String password;
-    private String email;
-    private double balance = 0.0;
+  private String userId; // Database automatically assigns this.
+  private String username;
+  private String password;
+  private String email;
+  private double balance = 0.0;
 
-    public User(String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-    }// For creating a new object
+  public User(String username, String password, String email) {
+    this.username = username;
+    this.password = password;
+    this.email = email;
+  } // For creating a new object
 
-    public User(String userId, String username, String password, String email) {
-        this.userId = userId;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-    }// For loading an object
+  public User(String userId, String username, String password, String email) {
+    this.userId = userId;
+    this.username = username;
+    this.password = password;
+    this.email = email;
+  } // For loading an object
 
-    public abstract boolean login();
+  public abstract boolean login();
 
-    public abstract void logout();
+  public abstract void logout();
 
-    public abstract String getInfo();
+  public abstract String getInfo();
 
-    //region Getters
-    public String getUserId() {
-        return userId;
-    }
+  // region Getters
+  public String getUserId() {
+    return userId;
+  }
 
-    public String getUsername() {
-        return username;
-    }
+  // region Setters
+  public void setUserId(String userId) {
+    this.userId = userId;
+  }
 
-    public String getPassword() {
-        return password;
-    }
+  public String getUsername() {
+    return username;
+  }
 
-    public String getEmail() {
-        return email;
-    }
+  public void setUsername(String username) {
+    this.username = username;
+  }
 
-    public double getBalance() {
-        return balance;
-    }
-    //endregion
+  public String getPassword() {
+    return password;
+  }
 
-    //region Setters
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+  // endregion
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public String getEmail() {
+    return email;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-    public void setBalance(double balance) { this.balance = balance; }
-    //endregion
+  public double getBalance() {
+    return balance;
+  }
+
+  public void setBalance(double balance) {
+    this.balance = balance;
+  }
+  // endregion
 }

@@ -3,9 +3,9 @@ package org.deptrai.auctionsystem.shared.network;
 import java.io.Serializable;
 
 public class Message implements Serializable {
-  private String command; // "LOGIN", "REGISTER", "GET_AUCTIONS"
-  private Object data;    // Chứa bất kỳ thứ gì: String[], User, List<Auction>...
-  private String status;  // "SUCCESS", "FAIL"
+  private final String command; // "LOGIN", "REGISTER", "GET_AUCTIONS"
+  private final Object data; // Chứa bất kỳ thứ gì: String[], User, List<Auction>...
+  private String status; // "SUCCESS", "FAIL"
 
   // Constructor gửi yêu cầu (Client -> Server)
   public Message(String command, Object data) {
@@ -21,7 +21,15 @@ public class Message implements Serializable {
   }
 
   // Getters
-  public String getCommand() { return command; }
-  public Object getData() { return data; }
-  public String getStatus() { return status; }
+  public String getCommand() {
+    return command;
+  }
+
+  public Object getData() {
+    return data;
+  }
+
+  public String getStatus() {
+    return status;
+  }
 }
