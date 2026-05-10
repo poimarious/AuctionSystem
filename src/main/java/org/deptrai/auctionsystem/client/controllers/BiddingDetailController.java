@@ -127,8 +127,23 @@ public class BiddingDetailController implements AuctionObserver {
         Platform.runLater(() -> {
           if (res != null && "SUCCESS".equals(res.getStatus())) {
             bidAmountField.clear();
+            Bid newBid = (Bid) res.getData();
+            currentAuction.setCurrentPrice(newBid.getAmount());
+            onBidPlaced(currentAuction, newBid);
           } else {
-            showError("Lỗi từ Server.");
+            String realErrorMessage = "Không nhận được phản hồi từ Server (Mất kết nối).";
+
+            if (res != null) {
+              if (res.getData() instanceof String) {
+                // Nếu Server trả về lỗi dạng chuỗi String
+                realErrorMessage = (String) res.getData();
+              } else {
+                // Nếu Server trả về object khác hoặc null
+                realErrorMessage = "Server từ chối yêu cầu nhưng không rõ lý do. Trạng thái: " + res.getStatus();
+              }
+            }
+
+            showError(realErrorMessage);
           }
         });
       }).start();

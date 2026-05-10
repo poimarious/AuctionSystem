@@ -32,7 +32,7 @@ public class Bid implements Serializable {
   } // For loading from database
 
   public boolean validate() {
-    if (auction.getStatus() != AuctionStatus.RUNNING) {
+    if (auction.getStatus() != AuctionStatus.RUNNING && auction.getStatus() != AuctionStatus.OPEN) {
       throw new AuctionClosedException("Failed when place bid: Auction is closed.");
     } else if (amount < 0) {
       throw new InvalidBidException("Failed when place bid: amount is lower then zero.");

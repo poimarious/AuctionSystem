@@ -45,6 +45,14 @@
 
         <VBox spacing="15.0">
           <children>
+
+            <TextField prefHeight="40.0" promptText="Tên đăng nhập" styleClass="text-field"
+                       fx:id="usernameField"/>
+            <TextField prefHeight="40.0" promptText="Địa chỉ Email" styleClass="text-field"
+                       fx:id="emailField"/>
+            <TextField prefHeight="40.0" promptText="Họ và tên đầy đủ" styleClass="text-field"
+                       fx:id="fullNameField"/>
+
             <PasswordField prefHeight="40.0" promptText="Mật khẩu" styleClass="password-field"
               fx:id="passwordField"/>
             <PasswordField prefHeight="40.0" promptText="Xác nhận mật khẩu"
@@ -52,12 +60,7 @@
 
             <Separator/>
 
-            <TextField prefHeight="40.0" promptText="Tên đăng nhập" styleClass="text-field"
-              fx:id="usernameField"/>
-            <TextField prefHeight="40.0" promptText="Địa chỉ Email" styleClass="text-field"
-              fx:id="emailField"/>
-            <TextField prefHeight="40.0" promptText="Họ và tên đầy đủ" styleClass="text-field"
-              fx:id="fullNameField"/>
+
 
             <VBox spacing="5.0">
               <children>

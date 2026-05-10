@@ -63,6 +63,8 @@ public class ClientHandler implements Runnable {
           case "GET_SELLER_AUCTIONS":
             handleGetSellerAuctions(request);
             break;
+          case "PLACE_BID":
+            handlePlaceBid(request);
           default:
             out.writeObject(
                 new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
@@ -349,4 +351,77 @@ public class ClientHandler implements Runnable {
       }
     }
   }
+
+    private void handlePlaceBid(Message request) {
+        try {
+            // 1. Tách dữ liệu từ Client gửi lên (Quy ước: {auctionId, User, amount})
+            Object[] data = (Object[]) request.getData();
+            String auctionId = (String) data[0];
+            User currentUser = (User) data[1];
+            double bidAmount = (Double) data[2];
+
+            // 2. Ép kiểu User sang Bidder (Đề phòng có ai đó cố tình dùng tài khoản Admin gọi lệnh này)
+            if (!(currentUser instanceof Bidder)) {
+                out.writeObject(new Message("FAIL", "PLACE_BID", "Chỉ tài khoản Người mua (Bidder) mới có quyền đặt giá!"));
+                out.flush();
+                return;
+            }
+            Bidder bidder = (Bidder) currentUser;
+
+            // 3. Lấy phiên đấu giá từ RAM (AuctionManager)
+            Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
+            if (auction == null) {
+                out.writeObject(new Message("FAIL", "PLACE_BID", "Phiên đấu giá không tồn tại trên Server!"));
+                out.flush();
+                return;
+            }
+
+            // 4. Tạo đối tượng Bid mới (Truyền đúng 4 tham số theo thiết kế của bạn)
+            org.deptrai.auctionsystem.shared.models.bid.Bid newBid =
+                    new org.deptrai.auctionsystem.shared.models.bid.Bid(bidder, auction, bidAmount, LocalDateTime.now());
+
+            // 5. KIỂM TRA BẢO MẬT BẰNG HÀM CỦA BẠN
+            try {
+                // Hàm này sẽ ném Exception nếu có lỗi (Ví dụ: InvalidBidException)
+                newBid.validate();
+            } catch (Exception validationException) {
+                // Bắt thông báo lỗi từ Exception và gửi thẳng về cho Client hiển thị
+                out.writeObject(new Message("FAIL", "PLACE_BID", validationException.getMessage()));
+                out.flush();
+                return;
+            }
+
+            // 6. LƯU XUỐNG DATABASE
+            org.deptrai.auctionsystem.server.dao.BidDAO bidDAO = new org.deptrai.auctionsystem.server.dao.BidDAO();
+            boolean isBidSaved = bidDAO.insertBid(newBid); // Gọi đúng 1 tham số
+
+            if (!isBidSaved) {
+                out.writeObject(new Message("FAIL", "PLACE_BID", "Lỗi Database khi lưu lịch sử đặt giá."));
+                out.flush();
+                return;
+            }
+
+            // Cập nhật giá hiện tại mới nhất vào bảng Auctions
+            auction.setCurrentPrice(bidAmount);
+            AuctionDAO auctionDAO = new AuctionDAO();
+            boolean isAuctionUpdated = auctionDAO.updateAuctionState(auction); // Lưu lại mức giá mới xuống SQLite
+
+            // 7. CẬP NHẬT ĐỒNG BỘ TRÊN RAM
+            auction.getBids().add(newBid);
+
+            // 8. Báo thành công
+            out.writeObject(new Message("SUCCESS", "PLACE_BID", newBid));
+            out.flush();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                out.writeObject(new Message("ERROR", "PLACE_BID", "Lỗi xử lý dữ liệu đặt giá tại Server."));
+                out.flush();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        }
+    }
+
 }
