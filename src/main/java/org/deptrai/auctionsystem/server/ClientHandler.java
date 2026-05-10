@@ -215,11 +215,27 @@ public class ClientHandler implements Runnable {
 
   private void handleCreateAuction(Message request) {
     try {
-      // Quy ước dữ liệu gửi sang: Object[] { Item item, LocalDateTime endTime }
+      // Quy ước dữ liệu gửi sang: Object[] { Item item, LocalDateTime endTime, imagebytes, filename }
       Object[] data = (Object[]) request.getData();
       Item item = (Item) data[0];
       LocalDateTime endTime = (LocalDateTime) data[1];
+      byte[] imageBytes = (byte[]) data[2];
+      String fileName = (String) data[3];
+      // --- XỬ LÝ LƯU FILE ẢNH VÀO SERVER ---
+      if (imageBytes != null && imageBytes.length > 0) {
+        // Tạo thư mục "uploads" trên Server nếu chưa có
+        java.io.File uploadDir = new java.io.File("server_uploads");
+        if (!uploadDir.exists()) {
+          uploadDir.mkdir();
+        }
 
+        // Tạo đường dẫn lưu file (Thêm timestamp để không bị trùng tên)
+        String savePath = "server_uploads/" + System.currentTimeMillis() + "_" + fileName;
+        java.nio.file.Files.write(java.nio.file.Paths.get(savePath), imageBytes);
+
+        System.out.println("Đã lưu ảnh sản phẩm tại Server: " + savePath);
+        // (Tùy chọn: Bạn có thể thêm thuộc tính 'imagePath' vào class Item và set nó ở đây)
+      }
       // Bước 1: Lưu Item xuống DB trước
       ItemDAO itemDAO = new ItemDAO();
       boolean isItemSaved = itemDAO.insertItem(item);
@@ -239,6 +255,8 @@ public class ClientHandler implements Runnable {
 
       if (isAuctionSaved) {
         // Gửi trả về đối tượng Auction đã hoàn chỉnh (kèm ID) để Client cập nhật UI
+        // 3. ĐỒNG BỘ: Chỉ khi DB thành công mới đưa vào RAM
+        AuctionManager.getInstance().addAuctionToMemory(newAuction);
         out.writeObject(new Message("SUCCESS", "CREATE_AUCTION", newAuction));
       } else {
         out.writeObject(

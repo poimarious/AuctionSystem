@@ -24,7 +24,7 @@ public class AuctionManager {
     String tempId = UUID.randomUUID().toString();
     newAuction.setAuctionId(tempId);
 
-    auctions.put(newAuction.getAuctionId(), newAuction);
+    //auctions.put(newAuction.getAuctionId(), newAuction);
     return newAuction;
   }
 
@@ -48,7 +48,12 @@ public class AuctionManager {
     System.out.println(
         "Đã đồng bộ " + dbAuctions.size() + " phiên đấu giá từ Database lên AuctionManager.");
   }
-
+  // Thêm method này để đồng bộ 1 phiên đấu giá lẻ từ DB lên RAM,do nếu lệnh lưu vào db thất bại thì phiên đấu giá vẫn tồn tại trên ram
+  public void addAuctionToMemory(Auction auction) {
+    if (auction != null && auction.getAuctionId() != null) {
+      auctions.put(auction.getAuctionId(), auction);
+    }
+  }
   private static
   class SingletonHelper { // Helper class to generate instance,because this class only loads once so
                           // it ensures thread-safe
