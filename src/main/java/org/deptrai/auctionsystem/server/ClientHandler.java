@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.deptrai.auctionsystem.shared.network.Message;
+import org.deptrai.auctionsystem.utils.ValidationUtils;
 
 public class ClientHandler implements Runnable {
   private Socket socket;
@@ -112,7 +113,12 @@ public class ClientHandler implements Runnable {
     String role = data[3];
 
     try {
-      if (userDAO.isUsernameTaken(username)) {
+      if(!ValidationUtils.isValidPassword(password)) {
+        out.writeObject(new Message("FAIL", "REGISTER", "Mật khẩu bao gồm chữ cái thường, chữ cái in hoa, số và kí tự đặc biệt!"));
+        out.flush();
+        return;
+      }
+      else if (userDAO.isUsernameTaken(username)) {
         out.writeObject(new Message("FAIL", "REGISTER", "Tên đăng nhập đã tồn tại!"));
         out.flush();
         return;
