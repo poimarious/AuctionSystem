@@ -60,6 +60,9 @@ public class ClientHandler implements Runnable {
           case "CLOSE_AUCTION":
             handleCloseAuction(request);
             break;
+          case "GET_SELLER_AUCTIONS":
+            handleGetSellerAuctions(request);
+            break;
           default:
             out.writeObject(
                 new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
@@ -310,6 +313,40 @@ public class ClientHandler implements Runnable {
 
     } catch (Exception e) {
       e.printStackTrace();
+    }
+  }
+  private void handleGetSellerAuctions(Message request) {
+    try {
+      // Quy ước dữ liệu gửi sang: String clientID
+      // 1. Nhận sellerId từ Client gửi lên
+      String sellerId = (String) request.getData();
+
+      // 2. Lấy toàn bộ danh sách từ RAM
+      List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
+      List<Auction> sellerAuctions = new java.util.ArrayList<>();
+
+      // 3. Lọc ra những phiên đấu giá có chứa Item do Seller này đăng bán
+      for (Auction auction : allAuctions) {
+        if (auction.getItem() != null &&
+                auction.getItem().getSeller() != null &&
+                auction.getItem().getSeller().getUserId().equals(sellerId)) {
+
+          sellerAuctions.add(auction);
+        }
+      }
+
+      // 4. Đóng gói và gửi trả về cho Client
+      out.writeObject(new Message("SUCCESS", "GET_SELLER_AUCTIONS", sellerAuctions));
+      out.flush();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      try {
+        out.writeObject(new Message("FAIL", "GET_SELLER_AUCTIONS", "Lỗi khi tải danh sách kho hàng."));
+        out.flush();
+      } catch (IOException ioException) {
+        ioException.printStackTrace();
+      }
     }
   }
 }
