@@ -123,11 +123,16 @@ public class ClientHandler implements Runnable {
         out.flush();
         return;
       }
+      else if (userDAO.isEmailTaken(email)) {
+        out.writeObject(new Message("FAIL", "REGISTER", "Email này đã được sử dụng cho một tài khoản khác!"));
+        out.flush();
+        return;
+      }
 
       User newUser; // Admin account cannot be registered
       if (role.equals("SELLER")) {
         newUser = new Seller(null, username, password, email);
-      } else {
+      } else { // role.equals("BIDDER")
         newUser = new Bidder(null, username, password, email, new java.util.concurrent.CopyOnWriteArrayList<>());
       }
 

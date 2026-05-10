@@ -157,6 +157,25 @@ public class UserDAO {
         }
     }
 
+    public boolean isEmailTaken(String email) {
+        String sql = "SELECT 1 FROM Users WHERE email = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
+
+            // Nếu tìm thấy bất kỳ dòng nào khớp email, trả về true
+            return rs.next();
+
+        } catch (SQLException e) {
+            System.out.println("Lỗi kiểm tra trùng lặp Email: " + e.getMessage());
+            // Trả về true để an toàn (ngăn chặn tạo tài khoản nếu DB đang gặp sự cố)
+            return true;
+        }
+    }
+
     public boolean updateBalance(String userId, double newBalance) {
         String sql = "UPDATE Users SET balance = ? WHERE userId = ?";
         try (Connection conn = DatabaseConnection.getConnection();
