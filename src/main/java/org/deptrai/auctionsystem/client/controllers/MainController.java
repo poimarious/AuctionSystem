@@ -10,14 +10,15 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
+import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
-import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 
 import java.io.IOException;
 import java.util.List;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
+import org.deptrai.auctionsystem.shared.network.Message;
 
 public class MainController {
 
@@ -34,7 +35,6 @@ public class MainController {
         User currentUser = SessionManager.getInstance().getCurrentUser();
 
         if (currentUser != null) {
-            // Hiển thị số tiền thực tế của user thay vì 0.0
             setUpUserView(currentUser.getUsername(), currentUser.getBalance());
         } else {
             setUpGuestView();
@@ -89,26 +89,34 @@ public class MainController {
 
     private void loadFeaturedAuctions() {
         productsContainer.getChildren().clear();
+        Message request = new Message("REQUEST", "GET_ALL_AUCTIONS", null);
+        Message response = SocketClient.sendRequest(request);
 
-        List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
-        int limit = Math.min(allAuctions.size(), 6);
+        if(response != null && response.getStatus().equals("SUCCESS")) {
+            List<Auction> allAuctions = (List<Auction>) response.getData();
+            System.out.println(allAuctions.size());
 
-        for (int i = 0; i < limit; i++) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "/org/deptrai/auctionsystem/client/views/item-card.fxml"));
-                Node itemCard = loader.load();
+            int limit = Math.min(allAuctions.size(), 6);
 
-                ItemCardController cardController = loader.getController();
-                if (cardController != null) {
-                    cardController.setData(allAuctions.get(i));
+            for (int i = 0; i < limit; i++) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                            "/org/deptrai/auctionsystem/client/views/item-card.fxml"));
+                    Node itemCard = loader.load();
+
+                    ItemCardController cardController = loader.getController();
+                    if (cardController != null) {
+                        cardController.setData(allAuctions.get(i));
+                    }
+
+                    productsContainer.getChildren().add(itemCard);
+
+                } catch (IOException e) {
+                    System.err.println("Lỗi nạp item-card: " + e.getMessage());
                 }
-
-                productsContainer.getChildren().add(itemCard);
-
-            } catch (IOException e) {
-                System.err.println("Lỗi nạp item-card: " + e.getMessage());
             }
+        } else {
+            System.err.println("Không thể lấy danh sách đấu giá từ server");
         }
     }
 

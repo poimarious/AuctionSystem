@@ -24,7 +24,7 @@ public class LoginController {
 
     @FXML
     public void handleGoBack(ActionEvent event) {
-        SceneManager.getInstance().goBack();
+        SceneManager.getInstance().navigateToHome();
     }
 
     @FXML
