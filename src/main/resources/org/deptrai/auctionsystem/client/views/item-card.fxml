@@ -16,9 +16,6 @@
     <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
       AnchorPane.topAnchor="0.0" alignment="TOP_CENTER" spacing="12.0">
       <children>
-        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-          onAction="#handleBidAction"
-          styleClass="btn-bid" text="ĐẶT GIÁ NGAY" fx:id="bidButton"/>
 
         <ImageView fitHeight="160.0" fitWidth="210.0" pickOnBounds="true"
           preserveRatio="true" fx:id="itemImageView"/>
@@ -37,6 +34,10 @@
             <Insets left="5.0" right="5.0"/>
           </padding>
         </VBox>
+
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                onAction="#handleBidAction"
+                styleClass="btn-bid" text="ĐẶT GIÁ NGAY" fx:id="bidButton"/>
       </children>
       <padding>
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
