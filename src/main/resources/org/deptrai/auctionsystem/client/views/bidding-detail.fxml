@@ -1,92 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<HBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
-  minHeight="-Infinity"
-  minWidth="-Infinity"
-  prefHeight="512.0" prefWidth="789.0" spacing="30.0" stylesheets="@style.css"
-  xmlns="http://javafx.com/javafx/21"
-  fx:controller="org.deptrai.auctionsystem.client.controllers.BiddingDetailController">
-  <children>
-    <VBox prefHeight="200.0" prefWidth="100.0" spacing="15.0">
-      <children>
-        <ImageView fitHeight="240.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true"
-          fx:id="productImageView"/>
-        <Label styleClass="product-title" text="Tên sản phẩm" textFill="#2c3e50" fx:id="nameLabel">
-          <font>
-            <Font name="System Bold" size="24.0"/>
-          </font>
-        </Label>
-        <Label text="\$0.00" textFill="#e74c3c" fx:id="currentPriceLabel">
-          <font>
-            <Font name="System Bold" size="20.0"/>
-          </font>
-        </Label>
-        <Label styleClass="product-description" text="Mô tả sản phẩm sẽ hiển thị ở đây..."
-          wrapText="true" fx:id="descriptionLabel"/>
-      </children>
-      <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-      </padding>
-    </VBox>
-    <VBox HBox.hgrow="ALWAYS" prefHeight="200.0" prefWidth="400.0" spacing="10.0">
-      <children>
-        <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="200.0" spacing="10.0">
-          <children>
-            <Button mnemonicParsing="false" onAction="#handlePlaceBid" styleClass="btn-bid"
-              text="ĐẶT GIÁ"/>
-            <TextField HBox.hgrow="ALWAYS" promptText="Nhập số tiền..." fx:id="bidAmountField"/>
-          </children>
-        </HBox>
-        <Label text="LỊCH SỬ ĐẤU GIÁ">
-          <font>
-            <Font name="System Bold" size="14.0"/>
-          </font>
-        </Label>
-        <TableView prefHeight="250.0" prefWidth="134.0" fx:id="bidHistoryTable">
-          <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-          </columnResizePolicy>
-          <columns>
-            <TableColumn prefWidth="75.0" text="Thời gian" fx:id="timeColumn"/>
-            <TableColumn prefWidth="75.0" text="Người đặt" fx:id="bidderColumn"/>
-            <TableColumn prefWidth="75.0" text="Số tiền" fx:id="amountColumn"/>
-          </columns>
-        </TableView>
-        <TitledPane animated="false" text="CÀI ĐẶT TỰ ĐỘNG ĐẤU GIÁ (AUTO-BID)">
-          <content>
-            <VBox prefHeight="100.0" prefWidth="100.0" spacing="10.0">
-              <children>
-                <HBox alignment="CENTER_LEFT" spacing="10.0">
-                  <children>
-                    <Label text="Giá tối đa:"/>
-                    <Label text="Bước giá:"/>
-                    <TextField prefWidth="100.0" fx:id="maxBidField"/>
-                    <TextField prefWidth="100.0" fx:id="incrementField"/>
-                  </children>
-                </HBox>
-              </children>
-              <padding>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
-              </padding>
-            </VBox>
-          </content>
-        </TitledPane>
-      </children>
-    </VBox>
-  </children>
+<?import javafx.scene.layout.*?>
+
+<HBox fx:controller="org.deptrai.auctionsystem.client.controllers.BiddingDetailController"
+      spacing="25.0" style="-fx-background-color: transparent;"
+      stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+
   <padding>
-    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
   </padding>
 
+  <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ ">
+    <padding>
+      <Insets bottom="8.0" left="12.0" right="15.0" top="8.0" />
+    </padding>
+  </Button>
+
+  <VBox prefWidth="450.0" spacing="20.0"
+        style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+
+    <ImageView fx:id="productImageView" fitHeight="300.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" />
+
+    <Label fx:id="nameLabel" styleClass="product-title" text="Tên sản phẩm" />
+
+    <VBox alignment="CENTER_LEFT" spacing="10.0">
+      <Label fx:id="currentPriceLabel" styleClass="price-label" text="GIÁ" />
+      <Label fx:id="expiryTimerLabel" styleClass="timer-label" text="HẾT HẠN TRONG: 00:00:00" />
+    </VBox>
+
+    <Separator />
+
+    <Label style="-fx-font-weight: bold;" text="Mô tả chi tiết:" />
+    <Label fx:id="descriptionLabel" styleClass="product-description" text="..." wrapText="true" />
+  </VBox>
+
+  <VBox spacing="20.0" HBox.hgrow="ALWAYS">
+    <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+      <Label style="-fx-font-weight: bold; -fx-font-size: 16;" text="LỊCH SỬ ĐẶT THẦU" />
+      <TableView fx:id="bidHistoryTable" VBox.vgrow="ALWAYS">
+        <columns>
+          <TableColumn fx:id="timeColumn" prefWidth="150.0" text="Thời gian" />
+          <TableColumn fx:id="bidderColumn" prefWidth="120.0" text="Người đặt" />
+          <TableColumn fx:id="amountColumn" prefWidth="100.0" text="Mức giá" />
+        </columns>
+        <columnResizePolicy>
+          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+      </TableView>
+    </VBox>
+
+    <HBox spacing="10.0">
+      <TextField fx:id="bidAmountField" promptText="Nhập mức giá của bạn..." styleClass="text-field" HBox.hgrow="ALWAYS" />
+      <Button onAction="#handlePlaceBid" styleClass="btn-bid" text="XÁC NHẬN ĐẶT GIÁ" />
+    </HBox>
+
+    <TitledPane animated="false" text="CÀI ĐẶT TỰ ĐỘNG ĐẤU GIÁ (AUTO-BID)">
+      <content>
+        <HBox spacing="20.0">
+          <VBox spacing="5.0">
+            <Label text="Giới hạn tối đa ($)" />
+            <TextField fx:id="maxBidField" prefWidth="150.0" />
+          </VBox>
+          <VBox spacing="5.0">
+            <Label text="Bước nhảy giá ($)" />
+            <TextField fx:id="incrementField" prefWidth="150.0" />
+          </VBox>
+        </HBox>
+      </content>
+    </TitledPane>
+  </VBox>
 </HBox>
