@@ -1,25 +1,34 @@
 package org.deptrai.auctionsystem.client.controllers;
 
 import java.time.LocalDateTime;
+import java.time.Duration;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import org.deptrai.auctionsystem.client.utils.SceneManager;
+import org.deptrai.auctionsystem.client.utils.SessionManager;
+import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
-import org.deptrai.auctionsystem.shared.models.users.Bidder;
+import org.deptrai.auctionsystem.shared.models.users.User;
+import org.deptrai.auctionsystem.shared.network.Message;
 import org.deptrai.auctionsystem.shared.observer.AuctionObserver;
 
 public class BiddingDetailController implements AuctionObserver {
 
-  // --- 1. KẾT NỐI LINH KIỆN FXML ---
   @FXML private ImageView productImageView;
   @FXML private Label nameLabel;
   @FXML private Label descriptionLabel;
   @FXML private Label currentPriceLabel;
+  @FXML private Label expiryTimerLabel;
 
   @FXML private TableView<Bid> bidHistoryTable;
   @FXML private TableColumn<Bid, String> timeColumn;
@@ -27,115 +36,124 @@ public class BiddingDetailController implements AuctionObserver {
   @FXML private TableColumn<Bid, Double> amountColumn;
 
   @FXML private TextField bidAmountField;
-  @FXML private TextField maxBidField;
-  @FXML private TextField incrementField;
 
-  // Đối tượng phiên đấu giá hiện tại đang quản lý
   private Auction currentAuction;
+  private Timeline countdownTimeline;
 
-  // --- 2. HÀM KHỞI TẠO (CHẠY TỰ ĐỘNG) ---
   @FXML
   public void initialize() {
-    // Cấu hình kết nối dữ liệu cho các cột của bảng
-    // "amount" và "timestamp" phải khớp với tên thuộc tính trong lớp Bid.java
+    // Cấu hình bảng
     amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
-    timeColumn.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
+    timeColumn.setCellValueFactory(cellData ->
+        new SimpleStringProperty(cellData.getValue().getTimestamp().toString().substring(11, 19)));
 
-    // Cấu hình cột người đặt (Lấy username từ đối tượng Bidder bên trong Bid)
-    bidderColumn.setCellValueFactory(
-        cellData -> {
-          if (cellData.getValue().getBidder() != null) {
-            return new SimpleStringProperty(cellData.getValue().getBidder().getUsername());
-          }
-          return new SimpleStringProperty("N/A");
-        });
+    bidderColumn.setCellValueFactory(cellData -> {
+      if (cellData.getValue().getBidder() != null) {
+        return new SimpleStringProperty(cellData.getValue().getBidder().getUsername());
+      }
+      return new SimpleStringProperty("N/A");
+    });
 
-    System.out.println("GUI: Đã khởi tạo cấu hình bảng lịch sử đấu giá.");
+    // Tự động load dữ liệu từ Session khi vừa vào trang
+    Auction selected = SessionManager.getInstance().getSelectedAuction();
+    if (selected != null) {
+      setAuctionData(selected);
+    }
   }
 
-  // --- 3. THIẾT LẬP DỮ LIỆU BAN ĐẦU ---
   public void setAuctionData(Auction auction) {
     this.currentAuction = auction;
-
-    // Hiển thị thông tin sản phẩm
-    if (auction.getItem() != null) {
-      nameLabel.setText(auction.getItem().getName());
-      descriptionLabel.setText(auction.getItem().getDescription());
-    }
-
-    // Hiển thị giá hiện tại ban đầu
+    nameLabel.setText(auction.getItem().getName());
+    descriptionLabel.setText(auction.getItem().getDescription());
     currentPriceLabel.setText(String.format("$%.2f", auction.getCurrentPrice()));
 
-    // Đổ dữ liệu lịch sử giá đã có vào bảng
-    bidHistoryTable.getItems().setAll(auction.getBids());
+    // SỬA LỖI ĐỎ: Dùng placeholder nếu chưa có getImagePath trong lớp Item
+    try {
+      productImageView.setImage(new Image(getClass().getResourceAsStream("/org/deptrai/auctionsystem/client/images/placeholder.png")));
+    } catch (Exception e) {
+      System.err.println("Lỗi load ảnh: " + e.getMessage());
+    }
 
-    // QUAN TRỌNG: Đăng ký Controller này làm "Người theo dõi" phiên đấu giá
+    bidHistoryTable.getItems().setAll(auction.getBids());
     this.currentAuction.attach(this);
-    System.out.println("GUI: Đã kết nối và đăng ký theo dõi phiên: " + auction.getItem().getName());
+    startTimer();
   }
 
-  // --- 4. XỬ LÝ SỰ KIỆN ĐẶT GIÁ ---
+  private void startTimer() {
+    if (countdownTimeline != null) countdownTimeline.stop();
+    countdownTimeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(1), e -> updateCountdown()));
+    countdownTimeline.setCycleCount(Timeline.INDEFINITE);
+    countdownTimeline.play();
+  }
+
+  private void updateCountdown() {
+    if (currentAuction == null) return;
+    Duration res = Duration.between(LocalDateTime.now(), currentAuction.getEndTime());
+    if (res.isNegative() || res.isZero()) {
+      expiryTimerLabel.setText("00:00:00");
+      bidAmountField.setDisable(true);
+      countdownTimeline.stop();
+    } else {
+      expiryTimerLabel.setText(String.format("%02d:%02d:%02d",
+          res.toHours(), res.toMinutesPart(), res.toSecondsPart()));
+    }
+  }
+
+  // SỬA NÚT QUAY LẠI: Kiểm tra kỹ đường dẫn này!
+  @FXML
+  public void handleGoBack(ActionEvent event) {
+    if (countdownTimeline != null) countdownTimeline.stop();
+    // Kiểm tra xem file của bạn là home-view.fxml hay auction-floor.fxml
+    SceneManager.getInstance().switchScene(
+        "/org/deptrai/auctionsystem/client/views/home-view.fxml",
+        "Trang chủ - Auction.UET"
+    );
+  }
+
   @FXML
   private void handlePlaceBid() {
     try {
       double amount = Double.parseDouble(bidAmountField.getText());
+      User currentUser = SessionManager.getInstance().getCurrentUser();
 
-      // Ở phiên bản hoàn thiện, bạn nên lấy Bidder từ Session đăng nhập
-      Bidder currentBidder = null;
+      if (amount <= currentAuction.getCurrentPrice()) {
+        showError("Giá phải cao hơn giá hiện tại!");
+        return;
+      }
 
-      Bid newBid = new Bid(currentBidder, currentAuction, amount, LocalDateTime.now());
-      currentAuction.placeBid(newBid);
+      Message bidReq = new Message("REQUEST", "PLACE_BID", new Object[]{currentAuction.getAuctionId(), currentUser, amount});
+      new Thread(() -> {
+        Message res = SocketClient.sendRequest(bidReq);
+        Platform.runLater(() -> {
+          if (res != null && "SUCCESS".equals(res.getStatus())) {
+            bidAmountField.clear();
+          } else {
+            showError("Lỗi từ Server.");
+          }
+        });
+      }).start();
 
-      // Xóa nội dung ô nhập sau khi đặt thành công
-      bidAmountField.clear();
-
-    } catch (NumberFormatException e) {
-      showErrorAlert("Vui lòng nhập số tiền hợp lệ!");
     } catch (Exception e) {
-      showErrorAlert(e.getMessage());
+      showError("Vui lòng nhập giá hợp lệ.");
     }
   }
 
-  // --- 5. CẬP NHẬT GIAO DIỆN THỜI GIAN THỰC (OBSERVER METHODS) ---
-  @Override
-  public void onBidPlaced(Auction a, Bid b) {
-    // Sử dụng Platform.runLater để cập nhật giao diện từ luồng phụ an toàn
-    Platform.runLater(
-        () -> {
-          // Cập nhật nhãn giá tiền
-          currentPriceLabel.setText(String.format("$%.2f", a.getCurrentPrice()));
-
-          // Thêm dòng mới vào bảng và tự động cuộn xuống
-          bidHistoryTable.getItems().add(b);
-          bidHistoryTable.scrollTo(b);
-
-          System.out.println("GUI: Đã nhận thông báo và cập nhật giá mới: $" + b.getAmount());
-        });
+  @Override public void onBidPlaced(Auction a, Bid b) {
+    Platform.runLater(() -> {
+      currentPriceLabel.setText(String.format("$%.2f", a.getCurrentPrice()));
+      bidHistoryTable.getItems().add(b);
+      bidHistoryTable.scrollTo(b);
+    });
   }
 
-  @Override
-  public void onAuctionStatusChanged(Auction a) {
-    Platform.runLater(
-        () -> {
-          // Khóa nút đặt giá nếu phiên đã kết thúc hoặc bị hủy
-          if (a.getStatus() == AuctionStatus.FINISHED || a.getStatus() == AuctionStatus.CANCELED) {
-            bidAmountField.setDisable(true);
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Thông báo");
-            alert.setHeaderText(null);
-            alert.setContentText("Phiên đấu giá '" + a.getItem().getName() + "' đã kết thúc!");
-            alert.showAndWait();
-          }
-        });
+  @Override public void onAuctionStatusChanged(Auction a) {
+    Platform.runLater(() -> {
+      if (a.getStatus() == AuctionStatus.FINISHED) bidAmountField.setDisable(true);
+    });
   }
 
-  // --- HÀM TIỆN ÍCH ---
-  private void showErrorAlert(String message) {
-    Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle("Lỗi");
-    alert.setHeaderText(null);
-    alert.setContentText(message);
-    alert.showAndWait();
+  private void showError(String msg) {
+    Alert alert = new Alert(Alert.AlertType.ERROR, msg);
+    alert.show();
   }
 }
