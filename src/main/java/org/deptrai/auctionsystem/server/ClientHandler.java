@@ -7,7 +7,15 @@ import org.deptrai.auctionsystem.shared.models.users.Admin;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
+import org.deptrai.auctionsystem.server.dao.AuctionDAO;
+import org.deptrai.auctionsystem.server.dao.ItemDAO;
+import org.deptrai.auctionsystem.server.managers.AuctionManager;
+import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus; // Giả định bạn có enum này
+import org.deptrai.auctionsystem.shared.models.items.Item;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -45,6 +53,18 @@ public class ClientHandler implements Runnable {
           case "TOP_UP":
             handleTopUp(request);
             break;
+          case "GET_ALL_AUCTIONS":
+            handleGetAllAuctions(request);
+            break;
+          case "GET_AUCTION_BY_ID":
+            handleGetAuctionById(request);
+            break;
+          case "CREATE_AUCTION":
+            handleCreateAuction(request);
+            break;
+          case "CLOSE_AUCTION":
+            handleCloseAuction(request);
+            break;
           default:
             out.writeObject(new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
             out.flush();
@@ -61,6 +81,8 @@ public class ClientHandler implements Runnable {
       }
     }
   }
+
+
 
   private void handleLogin(Message request) {
     // Data ta quy ước Client gửi sang là mảng String[] {username, password}
@@ -140,6 +162,126 @@ public class ClientHandler implements Runnable {
       out.writeObject(new Message("FAIL", "TOP_UP", "Lỗi cập nhật số dư."));
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  private void handleGetAllAuctions(Message request) {
+
+    try {
+      // Lấy toàn bộ danh sách từ AuctionManager
+      List<Auction> auctions = AuctionManager.getInstance().getAllAuctions();
+
+      out.writeObject(new Message("SUCCESS", "GET_ALL_AUCTIONS", auctions));
+      out.flush();
+    } catch (IOException e) {
+        System.out.println("Lỗi khi gửi danh sách Auction cho Client.");
+        e.printStackTrace();
+    }
+
+  }
+
+  private void handleGetAuctionById(Message request) {
+    try {
+      String auctionId = (String) request.getData();
+
+      // 1. Tìm trong RAM (Manager) trước
+      Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
+
+      // 2. Nếu RAM không có (có thể server vừa khởi động lại), tìm trong DB
+      if (auction == null) {
+        AuctionDAO auctionDAO = new AuctionDAO();
+        auction = auctionDAO.getAuctionById(auctionId);
+      }
+
+      if (auction != null) {
+        out.writeObject(new Message("SUCCESS", "GET_AUCTION_BY_ID", auction));
+      } else {
+        out.writeObject(new Message("FAIL", "GET_AUCTION_BY_ID", "Không tìm thấy phiên đấu giá này!"));
+      }
+      out.flush();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void handleCreateAuction(Message request) {
+    try {
+      // Quy ước dữ liệu gửi sang: Object[] { Item item, LocalDateTime endTime }
+      Object[] data = (Object[]) request.getData();
+      Item item = (Item) data[0];
+      LocalDateTime endTime = (LocalDateTime) data[1];
+
+      // Bước 1: Lưu Item xuống DB trước
+      ItemDAO itemDAO = new ItemDAO();
+      boolean isItemSaved = itemDAO.insertItem(item);
+
+      if (!isItemSaved) {
+        out.writeObject(new Message("FAIL", "CREATE_AUCTION", "Lỗi Database khi lưu Vật phẩm."));
+        out.flush();
+        return;
+      }
+
+      // Bước 2: Tạo Auction trong RAM qua Manager (Tự động sinh AuctionID)
+      Auction newAuction = AuctionManager.getInstance().createAuction(item, endTime);
+
+      // Bước 3: Lưu Auction mới này xuống DB
+      AuctionDAO auctionDAO = new AuctionDAO();
+      boolean isAuctionSaved = auctionDAO.insertAuction(newAuction);
+
+      if (isAuctionSaved) {
+        // Gửi trả về đối tượng Auction đã hoàn chỉnh (kèm ID) để Client cập nhật UI
+        out.writeObject(new Message("SUCCESS", "CREATE_AUCTION", newAuction));
+      } else {
+        out.writeObject(new Message("FAIL", "CREATE_AUCTION", "Lỗi Database khi tạo Phiên đấu giá."));
+      }
+      out.flush();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      try {
+        out.writeObject(new Message("ERROR", "CREATE_AUCTION", "Lỗi dữ liệu đầu vào."));
+        out.flush();
+      } catch (IOException ioException) {
+        ioException.printStackTrace();
+      }
+    }
+  }
+
+  private void handleCloseAuction(Message request) {
+    try {
+      // Nhận ID phiên đấu giá cần đóng
+      String auctionId = (String) request.getData();
+
+      AuctionDAO auctionDAO = new AuctionDAO();
+      Auction auction = auctionDAO.getAuctionById(auctionId);
+
+      if (auction == null) {
+        out.writeObject(new Message("FAIL", "CLOSE_AUCTION", "Không tìm thấy phiên đấu giá."));
+        out.flush();
+        return;
+      }
+
+      // Đổi trạng thái thành Đóng (Giả sử bạn có Enum AuctionStatus.CLOSED)
+      auction.setStatus(AuctionStatus.CANCELED);
+
+      // Cập nhật xuống Database
+      boolean isUpdated = auctionDAO.updateAuctionState(auction);
+
+      if (isUpdated) {
+        // Cập nhật đồng bộ lại trên RAM (AuctionManager)
+        Auction inMemoryAuction = AuctionManager.getInstance().getAuctionById(auctionId);
+        if (inMemoryAuction != null) {
+          inMemoryAuction.setStatus(AuctionStatus.CANCELED);
+        }
+
+        out.writeObject(new Message("SUCCESS", "CLOSE_AUCTION", auction));
+      } else {
+        out.writeObject(new Message("FAIL", "CLOSE_AUCTION", "Lỗi DB khi cập nhật trạng thái."));
+      }
+      out.flush();
+
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }

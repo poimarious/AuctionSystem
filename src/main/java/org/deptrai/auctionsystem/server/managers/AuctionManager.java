@@ -31,7 +31,7 @@ public class AuctionManager {
         return newAuction;
     }
 
-    public Auction getAuction(String id) {
+    public Auction getAuctionById(String id) {
         return auctions.get(id);
     }
     public List<Auction> getAllAuctions() {
