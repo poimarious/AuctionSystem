@@ -30,14 +30,14 @@ public class ItemCardController {
     nameLabel.setText(auction.getItem().getName());
     priceLabel.setText(String.format("$%.2f", auction.getCurrentPrice()));
 
+    // Quay lại dùng ảnh mặc định như cũ để không bị lỗi đỏ
     try {
-      Image placeholder = new Image(getClass().getResourceAsStream("/images/placeholder.png"));
+      Image placeholder = new Image(getClass().getResourceAsStream("/org/deptrai/auctionsystem/client/images/placeholder.png"));
       itemImageView.setImage(placeholder);
     } catch (Exception e) {
-      System.err.println("Không tìm thấy ảnh.");
+      System.err.println("Không tìm thấy ảnh placeholder.");
     }
 
-    // Chạy đồng hồ
     startCountdown();
   }
 
@@ -67,20 +67,31 @@ public class ItemCardController {
     }
   }
 
+  /**
+   * HÀM QUAN TRỌNG: Chuyển sang trang bidding-detail
+   */
   @FXML
   public void handleBidAction() {
+    if (this.auction == null) return;
+
     if (timeline != null) timeline.stop();
-    // LOGIC CỦA BẠN: Lưu session và chuyển cảnh
+
+    // 1. Lưu auction vào Session để trang sau có cái mà hiển thị
     SessionManager.getInstance().setSelectedAuction(this.auction);
-    SceneManager.getInstance()
-        .switchScene(
-            "/org/deptrai/auctionsystem/client/views/bidding-detail.fxml",
-            "Đấu giá - " + auction.getItem().getName());
+
+    // 2. Chuyển sang đúng file FXML bạn vừa gửi
+    SceneManager.getInstance().switchScene(
+        "/org/deptrai/auctionsystem/client/views/bidding-detail.fxml",
+        "Chi tiết đấu giá - " + auction.getItem().getName());
   }
 
   @FXML
   public void handleGoBack(ActionEvent event) {
     if (timeline != null) timeline.stop();
-    SceneManager.getInstance().goBack();
+    // Quay về trang chủ
+    SceneManager.getInstance().switchScene(
+        "/org/deptrai/auctionsystem/client/views/home-view.fxml",
+        "Trang chủ - Auction.UET"
+    );
   }
 }
