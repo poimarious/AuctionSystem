@@ -1,5 +1,6 @@
 package org.deptrai.auctionsystem.client.controllers;
 
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -13,6 +14,8 @@ import javafx.util.Duration;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
+
+import java.io.File;
 
 public class ItemCardController {
 
@@ -30,13 +33,18 @@ public class ItemCardController {
     nameLabel.setText(auction.getItem().getName());
     priceLabel.setText(String.format("$%.2f", auction.getCurrentPrice()));
 
+    String imagePath = auction.getItem().getImageUrl();
 
-    // Quay lại dùng ảnh mặc định như cũ để không bị lỗi đỏ
-    try {
-      Image placeholder = new Image(getClass().getResourceAsStream("/org/deptrai/auctionsystem/client/images/placeholder.png"));
-      itemImageView.setImage(placeholder);
-    } catch (Exception e) {
-      System.err.println("Không tìm thấy ảnh placeholder.");
+    if(imagePath != null && !imagePath.isEmpty()) {
+      try {
+        File imgFile = new File(imagePath);
+        if(imgFile.exists()) {
+          Image realImage = new Image(imgFile.toURI().toString());
+          itemImageView.setImage(realImage);
+        }
+      } catch (Exception e) {
+        System.err.println("Không thể load ảnh thật từ đường dẫn: " + imagePath);
+      }
     }
 
     startCountdown();

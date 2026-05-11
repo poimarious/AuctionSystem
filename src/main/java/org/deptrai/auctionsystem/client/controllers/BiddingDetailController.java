@@ -1,5 +1,6 @@
 package org.deptrai.auctionsystem.client.controllers;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.Duration;
 import javafx.animation.KeyFrame;
@@ -67,11 +68,17 @@ public class BiddingDetailController implements AuctionObserver {
     descriptionLabel.setText(auction.getItem().getDescription());
     currentPriceLabel.setText(String.format("$%.2f", auction.getCurrentPrice()));
 
-    // SỬA LỖI ĐỎ: Dùng placeholder nếu chưa có getImagePath trong lớp Item
-    try {
-      productImageView.setImage(new Image(getClass().getResourceAsStream("/org/deptrai/auctionsystem/client/images/placeholder.png")));
-    } catch (Exception e) {
-      System.err.println("Lỗi load ảnh: " + e.getMessage());
+    String imagePath = auction.getItem().getImageUrl();
+    if(imagePath != null && !imagePath.isEmpty()) {
+      try {
+        File imgfile = new File(imagePath);
+        if(imgfile.exists()) {
+          Image image = new Image(imgfile.toURI().toString());
+          productImageView.setImage(image);
+        }
+      } catch (Exception e) {
+        System.err.println("Không thể load ảnh thật từ đường dẫn: " + imagePath);
+      }
     }
 
     bidHistoryTable.getItems().setAll(auction.getBids());

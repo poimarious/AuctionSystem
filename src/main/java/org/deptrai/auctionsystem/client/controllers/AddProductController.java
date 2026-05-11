@@ -156,9 +156,6 @@ public class AddProductController {
         showAlert(Alert.AlertType.ERROR, "Đăng tải thất bại", errorMsg);
       }
     }
-
-    // Sau khi đăng xong thì quay lại trang quản lý
-    SceneManager.getInstance().goBack();
   }
 
   @FXML

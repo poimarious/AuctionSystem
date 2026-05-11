@@ -41,6 +41,7 @@ public class DatabaseConnection {
             + "yearCreated INTEGER, "
             + "make TEXT, "
             + "mileage INTEGER, "
+            + "imageUrl TEXT, "
             + "FOREIGN KEY(sellerId) REFERENCES Users(userId)"
             + ");";
 
@@ -100,6 +101,13 @@ public class DatabaseConnection {
           stmt.execute("ALTER TABLE Users ADD COLUMN balance REAL DEFAULT 0.0;");
           System.out.println("[SCHEMA UPDATE] Đã tự động thêm cột 'balance' vào bảng Users.");
         }
+      }
+      ResultSet rsImageUrl = metaData.getColumns(null, null, "Items", "imageUrl");
+      if (!rsImageUrl.next()) {
+          try (Statement stmt = conn.createStatement()) {
+              stmt.execute("ALTER TABLE Items ADD COLUMN imageUrl TEXT;");
+              System.out.println("[SCHEMA UPDATE] Đã tự động thêm cột 'imageUrl' vào bảng Items.");
+          }
       }
     } catch (SQLException e) {
       System.out.println("[LỖI SCHEMA] Không thể cập nhật cấu trúc DB: " + e.getMessage());

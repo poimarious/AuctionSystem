@@ -21,8 +21,8 @@ public class ItemDAO {
   public boolean insertItem(Item item) {
     String sql =
         "INSERT INTO Items (itemId, name, description, startingPrice, category, sellerId, "
-            + "brand, warrantyMonths, artist, yearCreated, make, mileage) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + "brand, warrantyMonths, artist, yearCreated, make, mileage, imageUrl) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     try (Connection conn = DatabaseConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -63,6 +63,7 @@ public class ItemDAO {
       pstmt.setInt(10, yearCreated);
       pstmt.setString(11, make);
       pstmt.setInt(12, mileage);
+      pstmt.setString(13, item.getImageUrl());
 
       pstmt.executeUpdate();
       return true;
@@ -88,6 +89,7 @@ public class ItemDAO {
         double startingPrice = rs.getDouble("startingPrice");
         String category = rs.getString("category");
         String sellerId = rs.getString("sellerId");
+        String imageUrl = rs.getString("imageUrl");
 
         UserDAO userDAO = new UserDAO();
         Seller seller = (Seller) userDAO.getUserById(sellerId);
@@ -109,6 +111,7 @@ public class ItemDAO {
         if (factory != null) {
           Item item = factory.createItem(name, description, startingPrice, seller);
           item.setItemId(itemId);
+          item.setImageUrl(imageUrl);
 
           if (item instanceof Electronics) {
             ((Electronics) item)
