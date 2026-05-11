@@ -67,6 +67,8 @@ public class ClientHandler implements Runnable {
             break;
           case "PLACE_BID":
             handlePlaceBid(request);
+          case "UPDATE_PASSWORD":
+            handleUpdatePassword(request);
           default:
             out.writeObject(
                 new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
@@ -237,7 +239,7 @@ public class ClientHandler implements Runnable {
         }
 
         // Tạo đường dẫn lưu file (Thêm timestamp để không bị trùng tên)
-        String savePath = "server_uploads/" + System.currentTimeMillis() + "_" + fileName;
+        String savePath = "server_uploads/" + item.getItemId() + "_" + fileName;
         java.nio.file.Files.write(java.nio.file.Paths.get(savePath), imageBytes);
 
         System.out.println("Đã lưu ảnh sản phẩm tại Server: " + savePath);
@@ -433,5 +435,7 @@ public class ClientHandler implements Runnable {
             }
         }
     }
+    private void handleUpdatePassword(Message request) {
 
+    }
 }
