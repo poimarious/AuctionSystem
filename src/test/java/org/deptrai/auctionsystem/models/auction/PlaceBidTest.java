@@ -13,6 +13,7 @@ import org.deptrai.auctionsystem.shared.exceptions.AuctionClosedException;
 import org.deptrai.auctionsystem.shared.exceptions.AuthenticationException;
 import org.deptrai.auctionsystem.shared.exceptions.InvalidBidException;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.items.ArtFactory;
 import org.deptrai.auctionsystem.shared.models.items.Item;
@@ -51,7 +52,7 @@ public class PlaceBidTest {
   void testPlaceBidWhenAuctionIsClosed() {
     // Test if place bid when auction is closed
     double validAmount = 65.0;
-
+    auction.setStatus(AuctionStatus.PAID);
     Exception exception =
         assertThrows(
             AuctionClosedException.class,
