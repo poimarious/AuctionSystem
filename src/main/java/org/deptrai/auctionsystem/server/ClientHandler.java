@@ -242,6 +242,7 @@ public class ClientHandler implements Runnable {
 
         System.out.println("Đã lưu ảnh sản phẩm tại Server: " + savePath);
         // (Tùy chọn: Bạn có thể thêm thuộc tính 'imagePath' vào class Item và set nó ở đây)
+        item.setImageUrl(savePath);
       }
       // Bước 1: Lưu Item xuống DB trước
       ItemDAO itemDAO = new ItemDAO();

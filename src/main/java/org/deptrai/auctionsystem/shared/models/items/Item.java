@@ -9,7 +9,7 @@ public abstract class Item implements Serializable {
   private String description;
   private double startingPrice;
   private Seller seller;
-
+  private String imageUrl;
   public Item() {}
 
   public Item(String name, String description, double startingPrice, Seller seller) {
@@ -86,6 +86,14 @@ public abstract class Item implements Serializable {
     this.seller = seller;
     return this;
   }
-  // endregion
+
+  public String getImageUrl() {
+    return imageUrl;
+  }
+
+  public void setImageUrl(String imageUrl) {
+    this.imageUrl = imageUrl;
+  }
+  // endregion\
 
 }
