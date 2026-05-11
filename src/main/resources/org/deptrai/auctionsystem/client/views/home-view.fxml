@@ -123,18 +123,19 @@
         </StackPane>
 
         <VBox spacing="30.0">
+
+          <HBox alignment="BOTTOM_LEFT" spacing="15.0">
+            <children>
+              <Label style="-fx-font-size: 30; -fx-font-weight: bold;"
+                     text="Sản phẩm đang đấu giá" textFill="#2c3e50"/>
+              <Label style="-fx-font-size: 18;" text="(sản phẩm mới hôm nay)"
+                     textFill="#7f8c8d"/>
+            </children>
+          </HBox>
+
           <children>
             <FlowPane alignment="TOP_LEFT" hgap="40.0" vgap="40.0" fx:id="productsContainer">
             </FlowPane>
-
-            <HBox alignment="BOTTOM_LEFT" spacing="15.0">
-              <children>
-                <Label style="-fx-font-size: 30; -fx-font-weight: bold;"
-                  text="Sản phẩm đang đấu giá" textFill="#2c3e50"/>
-                <Label style="-fx-font-size: 18;" text="(15 sản phẩm mới hôm nay)"
-                  textFill="#7f8c8d"/>
-              </children>
-            </HBox>
           </children>
           <padding>
             <Insets bottom="60.0" left="60.0" right="60.0" top="40.0"/>
