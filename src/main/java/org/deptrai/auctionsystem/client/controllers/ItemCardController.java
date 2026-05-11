@@ -30,6 +30,7 @@ public class ItemCardController {
     nameLabel.setText(auction.getItem().getName());
     priceLabel.setText(String.format("$%.2f", auction.getCurrentPrice()));
 
+
     // Quay lại dùng ảnh mặc định như cũ để không bị lỗi đỏ
     try {
       Image placeholder = new Image(getClass().getResourceAsStream("/org/deptrai/auctionsystem/client/images/placeholder.png"));

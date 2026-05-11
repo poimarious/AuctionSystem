@@ -34,11 +34,11 @@
         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
       </columnResizePolicy>
       <columns>
-        <TableColumn prefWidth="100.0" text="ID"/>
-        <TableColumn prefWidth="250.0" text="Tên sản phẩm"/>
-        <TableColumn prefWidth="150.0" text="Giá khởi điểm"/>
-        <TableColumn prefWidth="120.0" text="Trạng thái"/>
-        <TableColumn prefWidth="100.0" text="Thao tác"/>
+        <TableColumn fx:id="idColumn" prefWidth="100.0" text="ID"/>
+        <TableColumn fx:id="nameColumn" prefWidth="250.0" text="Tên sản phẩm"/>
+        <TableColumn fx:id="priceColumn" prefWidth="150.0" text="Giá khởi điểm"/>
+        <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Trạng thái"/>
+        <TableColumn fx:id="actionColumn" prefWidth="100.0" text="Thao tác"/>
       </columns>
     </TableView>
   </children>

@@ -7,11 +7,13 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.deptrai.auctionsystem.server.dao.AuctionDAO;
+import org.deptrai.auctionsystem.server.dao.BidDAO;
 import org.deptrai.auctionsystem.server.dao.ItemDAO;
 import org.deptrai.auctionsystem.server.dao.UserDAO;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus; // Giả định bạn có enum này
+import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.items.Item;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
@@ -377,8 +379,8 @@ public class ClientHandler implements Runnable {
             }
 
             // 4. Tạo đối tượng Bid mới (Truyền đúng 4 tham số theo thiết kế của bạn)
-            org.deptrai.auctionsystem.shared.models.bid.Bid newBid =
-                    new org.deptrai.auctionsystem.shared.models.bid.Bid(bidder, auction, bidAmount, LocalDateTime.now());
+            Bid newBid =
+                    new Bid(bidder, auction, bidAmount, LocalDateTime.now());
 
             // 5. KIỂM TRA BẢO MẬT BẰNG HÀM CỦA BẠN
             try {
@@ -391,8 +393,10 @@ public class ClientHandler implements Runnable {
                 return;
             }
 
+
+
             // 6. LƯU XUỐNG DATABASE
-            org.deptrai.auctionsystem.server.dao.BidDAO bidDAO = new org.deptrai.auctionsystem.server.dao.BidDAO();
+            BidDAO bidDAO = new BidDAO();
             boolean isBidSaved = bidDAO.insertBid(newBid); // Gọi đúng 1 tham số
 
             if (!isBidSaved) {
@@ -403,8 +407,13 @@ public class ClientHandler implements Runnable {
 
             // Cập nhật giá hiện tại mới nhất vào bảng Auctions
             auction.setCurrentPrice(bidAmount);
+            if(auction.getStatus() == AuctionStatus.OPEN) {
+              auction.setStatus(AuctionStatus.RUNNING);
+            }
             AuctionDAO auctionDAO = new AuctionDAO();
             boolean isAuctionUpdated = auctionDAO.updateAuctionState(auction); // Lưu lại mức giá mới xuống SQLite
+
+
 
             // 7. CẬP NHẬT ĐỒNG BỘ TRÊN RAM
             auction.getBids().add(newBid);

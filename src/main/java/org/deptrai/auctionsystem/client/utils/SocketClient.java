@@ -25,7 +25,7 @@ public class SocketClient {
   }
 
   // Nhận vào 1 Message, trả về 1 Message
-  public static Message sendRequest(Message request) {
+  public static synchronized Message sendRequest(Message request) {
     if (out == null || in == null) return new Message("FAIL", "NETWORK", "Chưa kết nối");
     try {
       out.writeObject(request);

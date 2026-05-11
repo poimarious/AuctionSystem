@@ -100,6 +100,9 @@ public class MainController {
 
       int limit = Math.min(allAuctions.size(), 6);
 
+      if(allAuctions.size() >= 1) {
+        System.out.println(allAuctions.get(0).getStatus());
+      }
       for (int i = 0; i < limit; i++) {
         try {
           FXMLLoader loader =
