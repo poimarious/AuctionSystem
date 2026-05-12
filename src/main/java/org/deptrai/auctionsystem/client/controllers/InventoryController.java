@@ -14,22 +14,23 @@ import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 
 import javafx.scene.control.TableView;
+// CÁC THƯ VIỆN BỔ SUNG CHO NÚT XÓA
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.geometry.Pos;
-import java.util.List;
 import java.util.Optional;
+import java.util.List;
 
 public class InventoryController {
 
   @FXML private TableView<Auction> inventoryTable;
   @FXML private TableColumn<Auction, String> idColumn;
   @FXML private TableColumn<Auction, String> nameColumn;
-  @FXML private TableColumn<Auction, String> priceColumn;
+  @FXML private TableColumn<Auction, String> priceColumn; // Đổi sang String để format có dấu $
   @FXML private TableColumn<Auction, String> statusColumn;
-  @FXML private TableColumn<Auction, Void> actionColumn; // Cột thao tác
+  @FXML private TableColumn<Auction, Void> actionColumn;
 
   @FXML
   public void handleAddNewProduct(ActionEvent event) {
@@ -39,6 +40,7 @@ public class InventoryController {
             "/org/deptrai/auctionsystem/client/views/add-product-view.fxml",
             "Đăng sản phẩm đấu giá mới");
   }
+
 
   private void loadMyAuctions() {
     // 1. Lấy user hiện tại đang đăng nhập
@@ -77,11 +79,7 @@ public class InventoryController {
 
   @FXML
   public void handleGoBack(ActionEvent event) {
-    // Sửa lại theo góp ý ở phần Profile để tránh lỗi "đơ" khi lùi trang
-    SceneManager.getInstance().switchScene(
-        "/org/deptrai/auctionsystem/client/views/home-view.fxml",
-        "Trang chủ - Auction.UET"
-    );
+    SceneManager.getInstance().goBack();
   }
 
   @FXML
@@ -107,23 +105,23 @@ public class InventoryController {
         new SimpleStringProperty(cellData.getValue().getStatus().toString())
     );
 
-    // === TÍNH NĂNG MỚI: THÊM NÚT XÓA VÀO CỘT THAO TÁC ===
+    // BỔ SUNG: Gọi hàm thiết lập cột thao tác (chứa nút Xóa)
     setupActionColumn();
 
     // 5. Nạp dữ liệu từ Server sau khi đã setup xong các cột
     loadMyAuctions();
   }
 
-  //  Cấu hình nút Xóa cho từng hàng ---
+  // =========================================================
+  // PHẦN CODE BỔ SUNG CHO TÍNH NĂNG XÓA SẢN PHẨM
+  // =========================================================
+
   private void setupActionColumn() {
     actionColumn.setCellFactory(param -> new TableCell<>() {
       private final Button deleteBtn = new Button("Xóa");
 
       {
-        // Giao diện nút Xóa (Nền đỏ, chữ trắng)
         deleteBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
-
-        // Sự kiện khi bấm nút Xóa
         deleteBtn.setOnAction(event -> {
           Auction auction = getTableView().getItems().get(getIndex());
           handleDeleteAuction(auction);
@@ -143,9 +141,7 @@ public class InventoryController {
     });
   }
 
-  // Gửi yêu cầu Xóa lên Server
   private void handleDeleteAuction(Auction auction) {
-    // 1. Hiển thị hộp thoại xác nhận
     Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
     confirmAlert.setTitle("Xác nhận xóa");
     confirmAlert.setHeaderText("Xóa phiên đấu giá: " + auction.getItem().getName());
@@ -154,16 +150,13 @@ public class InventoryController {
     Optional<ButtonType> result = confirmAlert.showAndWait();
     if (result.isPresent() && result.get() == ButtonType.OK) {
 
-      // 2. Nếu chọn OK, gửi yêu cầu lên Server bằng Thread riêng
       new Thread(() -> {
         Message request = new Message("REQUEST", "DELETE_AUCTION", auction.getAuctionId());
         Message response = SocketClient.sendRequest(request);
 
         Platform.runLater(() -> {
           if (response != null && "SUCCESS".equals(response.getStatus())) {
-            // Xóa dòng đó khỏi bảng giao diện ngay lập tức
             inventoryTable.getItems().remove(auction);
-
             Alert successAlert = new Alert(Alert.AlertType.INFORMATION, "Đã xóa sản phẩm thành công!");
             successAlert.show();
           } else {
