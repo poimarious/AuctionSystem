@@ -67,8 +67,10 @@ public class ClientHandler implements Runnable {
             break;
           case "PLACE_BID":
             handlePlaceBid(request);
+            break;
           case "UPDATE_PASSWORD":
             handleUpdatePassword(request);
+            break;
           default:
             out.writeObject(
                 new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
