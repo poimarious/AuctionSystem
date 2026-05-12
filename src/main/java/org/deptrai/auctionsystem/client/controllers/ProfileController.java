@@ -145,16 +145,17 @@ public class ProfileController {
 
   @FXML
   public void handleGoBack(ActionEvent event) {
-    SceneManager.getInstance().goBack();
-  }
-
+    // SỬA: Chuyển thẳng về trang chủ thay vì goBack() để tránh lỗi lịch sử trống
+    SceneManager.getInstance()
+        .switchScene(
+            "/org/deptrai/auctionsystem/client/views/home-view.fxml", "Trang chủ - Auction.UET");}
   @FXML
   public void handleLogout(ActionEvent event) {
     SessionManager.getInstance().logout();
     SceneManager.getInstance().clearHistory();
     SceneManager.getInstance()
         .switchScene(
-            "/org/deptrai/auctionsystem/views/views/login-view.fxml", "Đăng nhập - Auction.UET");
+            "/org/deptrai/auctionsystem/client/views/home-view.fxml", "Trang chủ - Auction.UET");
   }
 
   private void showAlert(Alert.AlertType alertType, String title, String message) {
