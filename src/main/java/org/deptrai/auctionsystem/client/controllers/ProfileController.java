@@ -137,7 +137,12 @@ public class ProfileController {
     }
 
     showAlert(Alert.AlertType.INFORMATION, "Thành công", "Mật khẩu của bạn đã được cập nhật!");
-
+    String[] payload = {currentUser.getUserId(), currentPass, newPass};
+    Message request = new Message("UPDATE_PASSWORD", payload);
+    Message response = SocketClient.sendRequest(request);
+    if (response.getStatus().equals("SUCCESS")) {
+      currentUser.setPassword(newPass);//Cập nhật lại trên RAM;
+    }
     currentPassField.clear();
     newPassField.clear();
     confirmNewPassField.clear();

@@ -438,6 +438,59 @@ public class ClientHandler implements Runnable {
         }
     }
     private void handleUpdatePassword(Message request) {
+      try {
+        // QUY ƯỚC DỮ LIỆU TỪ CLIENT GỬI LÊN (Payload):
+        // Dữ liệu là một mảng String[] gồm 3 phần tử: {userId, currentPassword, newPassword}
+        String[] data = (String[]) request.getData();
+        String userId = data[0];
+        String currentPassword = data[1];
+        String newPassword = data[2];
 
+        // 1. Kiểm tra độ mạnh của mật khẩu mới theo chuẩn ValidationUtils
+        if (!ValidationUtils.isValidPassword(newPassword)) {
+          out.writeObject(new Message(
+                  "FAIL",
+                  "UPDATE_PASSWORD",
+                  "Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt (@#$%^&+=!)"
+          ));
+          out.flush();
+          return;
+        }
+
+        // 2. Xác thực lại với Database (Bảo mật lớp 2)
+
+        User user = userDAO.getUserById(userId);
+        if (user == null) {
+          out.writeObject(new Message("FAIL", "UPDATE_PASSWORD", "Tài khoản không tồn tại trên hệ thống!"));
+          out.flush();
+          return;
+        }
+
+        if (!user.getPassword().equals(currentPassword)) {
+          out.writeObject(new Message("FAIL", "UPDATE_PASSWORD", "Mật khẩu hiện tại không đúng!"));
+          out.flush();
+          return;
+        }
+
+        // 3. Thực hiện lưu mật khẩu mới xuống CSDL
+        boolean isUpdated = userDAO.updatePassword(userId, newPassword);
+
+        // 4. Trả kết quả về cho Client
+        if (isUpdated) {
+          out.writeObject(new Message("SUCCESS", "UPDATE_PASSWORD", "Cập nhật mật khẩu thành công!"));
+        } else {
+          out.writeObject(new Message("FAIL", "UPDATE_PASSWORD", "Lỗi hệ thống khi cập nhật mật khẩu."));
+        }
+        out.flush();
+
+      } catch (Exception e) {
+        e.printStackTrace();
+        try {
+          out.writeObject(new Message("ERROR", "UPDATE_PASSWORD", "Định dạng dữ liệu gửi lên không hợp lệ."));
+          out.flush();
+        } catch (IOException ioException) {
+          ioException.printStackTrace();
+        }
+      }
     }
 }

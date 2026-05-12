@@ -188,4 +188,22 @@ public class UserDAO {
       return false;
     }
   }
+
+
+  public boolean updatePassword(String userId, String newPassword) {
+    String sql = "UPDATE Users SET password = ? WHERE userId = ?";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+      pstmt.setString(1, newPassword);
+      pstmt.setString(2, userId);
+
+      int rowsAffected = pstmt.executeUpdate();
+      return rowsAffected > 0; // Trả về true nếu có ít nhất 1 dòng được cập nhật thành công
+
+    } catch (SQLException e) {
+      System.out.println("Lỗi cập nhật mật khẩu DB: " + e.getMessage());
+      return false;
+    }
+  }
 }
