@@ -136,33 +136,39 @@ public class AuctionDAO {
     return auctionList;
   }
 
-  public boolean deleteAuctionById(String auctionId) {
+  public boolean deleteAuctionById(String auctionId,String itemId) {
+
     String deleteBidsSql = "DELETE FROM Bids WHERE auctionId = ?";
     String deleteAuctionSql = "DELETE FROM Auctions WHERE auctionId = ?";
-
+    String deleteItemSql = "DELETE FROM Items WHERE itemId = ?";
     try (Connection conn = DatabaseConnection.getConnection()) {
-      // Sử dụng Transaction để đảm bảo nếu xóa đấu giá lỗi thì không xóa mất Bids
-      conn.setAutoCommit(false);
+      conn.setAutoCommit(false); // Bắt đầu Transaction
 
       try (PreparedStatement pstmtBids = conn.prepareStatement(deleteBidsSql);
-           PreparedStatement pstmtAuction = conn.prepareStatement(deleteAuctionSql)) {
+          PreparedStatement pstmtAuction = conn.prepareStatement(deleteAuctionSql);
+          PreparedStatement pstmtItem = conn.prepareStatement(deleteItemSql)) {
 
-        // 1. Xóa các lượt đặt giá liên quan trước
+        // 1. Xóa Bids
         pstmtBids.setString(1, auctionId);
         pstmtBids.executeUpdate();
 
-        // 2. Xóa phiên đấu giá
+        // 2. Xóa Auction
         pstmtAuction.setString(1, auctionId);
-        int rowsAffected = pstmtAuction.executeUpdate();
+        pstmtAuction.executeUpdate();
 
-        conn.commit(); // Hoàn tất giao dịch
-        return rowsAffected > 0;
+        // 3. Xóa Item
+        pstmtItem.setString(1, itemId);
+        pstmtItem.executeUpdate();
+
+        conn.commit(); // Thành công thì lưu
+        return true;
+
       } catch (SQLException e) {
-        conn.rollback(); // Hủy bỏ nếu có lỗi xảy ra
+        conn.rollback(); // Lỗi thì khôi phục
         throw e;
       }
     } catch (SQLException e) {
-      System.out.println("Lỗi khi xóa Auction trong DB: " + e.getMessage());
+      System.out.println("Lỗi khi xóa triệt để Auction và Item: " + e.getMessage());
       return false;
     }
   }

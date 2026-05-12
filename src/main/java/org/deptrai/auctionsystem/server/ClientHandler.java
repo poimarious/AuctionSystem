@@ -74,6 +74,9 @@ public class ClientHandler implements Runnable {
           case "DELETE_AUCTION":
             handleDeleteAuction(request);
             break;
+          case "GET_BIDS_HISTORY":
+            handleGetBidsHistory(request);
+            break;
           default:
             out.writeObject(
                 new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
@@ -497,29 +500,58 @@ public class ClientHandler implements Runnable {
       }
     }
 
-    private void handleDeleteAuction(Message request) {
-      try {
-        String auctionId = (String) request.getData();
+  private void handleDeleteAuction(Message request) {
+    try {
+      String auctionId = (String) request.getData();
 
-        AuctionDAO auctionDAO = new AuctionDAO();
-        //  Thực hiện xóa dưới Database
-        boolean isDeleted = auctionDAO.deleteAuctionById(auctionId);
-        if (isDeleted) {
-          AuctionManager.getInstance().removeAuctionFromMemory(auctionId);
-          out.writeObject(new Message("SUCCESS","DELETE_AUCTION","Xóa phiên đấu giá thành công!"));
-        } else {
-          out.writeObject(new Message("FAIL","DELETE_AUCTION","Không tìm thấy hoặc không thể xóa phiên đấu giá này."));
-        }
+      // TỐI ƯU: Lấy thẳng Auction từ RAM để trích xuất itemId
+      Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
+
+      if (auction == null || auction.getItem() == null) {
+        out.writeObject(new Message("FAIL", "DELETE_AUCTION", "Không tìm thấy phiên đấu giá trên hệ thống!"));
         out.flush();
-      } catch (Exception e) {
-        e.printStackTrace();
-        try {
-          out.writeObject(new Message("ERROR", "DELETE_AUCTION", "Lỗi xử lý yêu cầu xóa tại Server."));
-          out.flush();
-        } catch (IOException ioException) {
-          ioException.printStackTrace();
-        }
+        return;
       }
 
+      String itemId = auction.getItem().getItemId();
+      AuctionDAO auctionDAO = new AuctionDAO();
+
+      // Truyền cả 2 ID xuống để xóa dứt điểm trong 1 giao dịch
+      boolean isDeleted = auctionDAO.deleteAuctionById(auctionId, itemId);
+
+      if (isDeleted) {
+        // ĐỒNG BỘ: Xóa khỏi RAM
+        AuctionManager.getInstance().removeAuctionFromMemory(auctionId);
+        out.writeObject(new Message("SUCCESS", "DELETE_AUCTION", "Xóa triệt để phiên đấu giá thành công!"));
+      } else {
+        out.writeObject(new Message("FAIL", "DELETE_AUCTION", "Lỗi cơ sở dữ liệu khi xóa."));
+      }
+      out.flush();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      try {
+        out.writeObject(new Message("ERROR", "DELETE_AUCTION", "Lỗi xử lý yêu cầu xóa tại Server."));
+        out.flush();
+      } catch (IOException ioException) {
+        ioException.printStackTrace();
+      }
     }
+  }
+
+    private void handleGetBidsHistory(Message request) {
+      //Quy ước dữ liệu:
+      try {
+
+
+
+      } catch (Exception e) {
+        e.printStackTrace();
+
+
+      }
+
+
+
+  }
 }
