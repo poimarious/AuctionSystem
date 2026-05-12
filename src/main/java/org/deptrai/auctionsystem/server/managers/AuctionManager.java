@@ -54,6 +54,13 @@ public class AuctionManager {
       auctions.put(auction.getAuctionId(), auction);
     }
   }
+  //Method xóa sp trên RAM ,sử dụng khi seller muốn xóa sản phẩm
+  public void removeAuctionFromMemory(String auctionId) {
+    if (auctionId != null) {
+      auctions.remove(auctionId);
+    }
+  }
+
   private static
   class SingletonHelper { // Helper class to generate instance,because this class only loads once so
                           // it ensures thread-safe

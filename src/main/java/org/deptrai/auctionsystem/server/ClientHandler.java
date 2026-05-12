@@ -71,6 +71,9 @@ public class ClientHandler implements Runnable {
           case "UPDATE_PASSWORD":
             handleUpdatePassword(request);
             break;
+          case "DELETE_AUCTION":
+            handleDeleteAuction(request);
+            break;
           default:
             out.writeObject(
                 new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
@@ -492,5 +495,31 @@ public class ClientHandler implements Runnable {
           ioException.printStackTrace();
         }
       }
+    }
+
+    private void handleDeleteAuction(Message request) {
+      try {
+        String auctionId = (String) request.getData();
+
+        AuctionDAO auctionDAO = new AuctionDAO();
+        //  Thực hiện xóa dưới Database
+        boolean isDeleted = auctionDAO.deleteAuctionById(auctionId);
+        if (isDeleted) {
+          AuctionManager.getInstance().removeAuctionFromMemory(auctionId);
+          out.writeObject(new Message("SUCCESS","DELETE_AUCTION","Xóa phiên đấu giá thành công!"));
+        } else {
+          out.writeObject(new Message("FAIL","DELETE_AUCTION","Không tìm thấy hoặc không thể xóa phiên đấu giá này."));
+        }
+        out.flush();
+      } catch (Exception e) {
+        e.printStackTrace();
+        try {
+          out.writeObject(new Message("ERROR", "DELETE_AUCTION", "Lỗi xử lý yêu cầu xóa tại Server."));
+          out.flush();
+        } catch (IOException ioException) {
+          ioException.printStackTrace();
+        }
+      }
+
     }
 }

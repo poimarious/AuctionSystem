@@ -135,4 +135,35 @@ public class AuctionDAO {
     }
     return auctionList;
   }
+
+  public boolean deleteAuctionById(String auctionId) {
+    String deleteBidsSql = "DELETE FROM Bids WHERE auctionId = ?";
+    String deleteAuctionSql = "DELETE FROM Auctions WHERE auctionId = ?";
+
+    try (Connection conn = DatabaseConnection.getConnection()) {
+      // Sử dụng Transaction để đảm bảo nếu xóa đấu giá lỗi thì không xóa mất Bids
+      conn.setAutoCommit(false);
+
+      try (PreparedStatement pstmtBids = conn.prepareStatement(deleteBidsSql);
+           PreparedStatement pstmtAuction = conn.prepareStatement(deleteAuctionSql)) {
+
+        // 1. Xóa các lượt đặt giá liên quan trước
+        pstmtBids.setString(1, auctionId);
+        pstmtBids.executeUpdate();
+
+        // 2. Xóa phiên đấu giá
+        pstmtAuction.setString(1, auctionId);
+        int rowsAffected = pstmtAuction.executeUpdate();
+
+        conn.commit(); // Hoàn tất giao dịch
+        return rowsAffected > 0;
+      } catch (SQLException e) {
+        conn.rollback(); // Hủy bỏ nếu có lỗi xảy ra
+        throw e;
+      }
+    } catch (SQLException e) {
+      System.out.println("Lỗi khi xóa Auction trong DB: " + e.getMessage());
+      return false;
+    }
+  }
 }
