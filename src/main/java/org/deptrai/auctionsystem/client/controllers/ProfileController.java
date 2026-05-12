@@ -137,7 +137,12 @@ public class ProfileController {
     }
 
     showAlert(Alert.AlertType.INFORMATION, "Thành công", "Mật khẩu của bạn đã được cập nhật!");
-
+    String[] payload = {currentUser.getUserId(), currentPass, newPass};
+    Message request = new Message("UPDATE_PASSWORD", payload);
+    Message response = SocketClient.sendRequest(request);
+    if (response.getStatus().equals("SUCCESS")) {
+      currentUser.setPassword(newPass);//Cập nhật lại trên RAM;
+    }
     currentPassField.clear();
     newPassField.clear();
     confirmNewPassField.clear();
@@ -145,16 +150,17 @@ public class ProfileController {
 
   @FXML
   public void handleGoBack(ActionEvent event) {
-    SceneManager.getInstance().goBack();
-  }
-
+    // SỬA: Chuyển thẳng về trang chủ thay vì goBack() để tránh lỗi lịch sử trống
+    SceneManager.getInstance()
+        .switchScene(
+            "/org/deptrai/auctionsystem/client/views/home-view.fxml", "Trang chủ - Auction.UET");}
   @FXML
   public void handleLogout(ActionEvent event) {
     SessionManager.getInstance().logout();
     SceneManager.getInstance().clearHistory();
     SceneManager.getInstance()
         .switchScene(
-            "/org/deptrai/auctionsystem/views/views/login-view.fxml", "Đăng nhập - Auction.UET");
+            "/org/deptrai/auctionsystem/client/views/home-view.fxml", "Trang chủ - Auction.UET");
   }
 
   private void showAlert(Alert.AlertType alertType, String title, String message) {
