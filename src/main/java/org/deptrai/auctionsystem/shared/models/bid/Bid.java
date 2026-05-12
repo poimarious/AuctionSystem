@@ -41,6 +41,8 @@ public class Bid implements Serializable {
           "Failed when place bid: amount is lower than or equal current price.");
     } else if (bidder.getUserId().equals(auction.getItem().getSeller().getUserId())) {
       throw new AuthenticationException("Failed when place bid: the seller cannot place bid.");
+    } else if (bidder.getBalance() < amount) {
+      throw new InvalidBidException("Failed when place bid: your balance is not enough.");
     }
     return true;
   }

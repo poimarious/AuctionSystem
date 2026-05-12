@@ -361,13 +361,15 @@ public class ClientHandler implements Runnable {
 
     private void handlePlaceBid(Message request) {
         try {
-            // 1. Tách dữ liệu từ Client gửi lên (Quy ước: {auctionId, User, amount})
+            // Dữ liệu Client gửi sang gồm : [auctionId, currentUserId, bidAmount]
             Object[] data = (Object[]) request.getData();
             String auctionId = (String) data[0];
-            User currentUser = (User) data[1];
+            String currentUserId = (String) data[1];
             double bidAmount = (Double) data[2];
 
-            // 2. Ép kiểu User sang Bidder (Đề phòng có ai đó cố tình dùng tài khoản Admin gọi lệnh này)
+            UserDAO userDAO = new UserDAO();
+            User currentUser = userDAO.getUserById(currentUserId);
+
             if (!(currentUser instanceof Bidder)) {
                 out.writeObject(new Message("FAIL", "PLACE_BID", "Chỉ tài khoản Người mua (Bidder) mới có quyền đặt giá!"));
                 out.flush();
@@ -375,21 +377,17 @@ public class ClientHandler implements Runnable {
             }
             Bidder bidder = (Bidder) currentUser;
 
-            // 3. Lấy phiên đấu giá từ RAM (AuctionManager)
+
             Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
             if (auction == null) {
                 out.writeObject(new Message("FAIL", "PLACE_BID", "Phiên đấu giá không tồn tại trên Server!"));
                 out.flush();
                 return;
             }
+            Bid newBid = new Bid(bidder, auction, bidAmount, LocalDateTime.now());
 
-            // 4. Tạo đối tượng Bid mới (Truyền đúng 4 tham số theo thiết kế của bạn)
-            Bid newBid =
-                    new Bid(bidder, auction, bidAmount, LocalDateTime.now());
-
-            // 5. KIỂM TRA BẢO MẬT BẰNG HÀM CỦA BẠN
+            // 5. Bid validate check
             try {
-                // Hàm này sẽ ném Exception nếu có lỗi (Ví dụ: InvalidBidException)
                 newBid.validate();
             } catch (Exception validationException) {
                 // Bắt thông báo lỗi từ Exception và gửi thẳng về cho Client hiển thị
@@ -398,11 +396,10 @@ public class ClientHandler implements Runnable {
                 return;
             }
 
-
-
-            // 6. LƯU XUỐNG DATABASE
+            // 6. Save data to database
             BidDAO bidDAO = new BidDAO();
             boolean isBidSaved = bidDAO.insertBid(newBid); // Gọi đúng 1 tham số
+            userDAO.updateBalance(bidder.getUserId(), bidder.getBalance() - bidAmount);
 
             if (!isBidSaved) {
                 out.writeObject(new Message("FAIL", "PLACE_BID", "Lỗi Database khi lưu lịch sử đặt giá."));
@@ -410,7 +407,7 @@ public class ClientHandler implements Runnable {
                 return;
             }
 
-            // Cập nhật giá hiện tại mới nhất vào bảng Auctions
+            // update new price on price board
             auction.setCurrentPrice(bidAmount);
             if(auction.getStatus() == AuctionStatus.OPEN) {
               auction.setStatus(AuctionStatus.RUNNING);
@@ -418,12 +415,9 @@ public class ClientHandler implements Runnable {
             AuctionDAO auctionDAO = new AuctionDAO();
             boolean isAuctionUpdated = auctionDAO.updateAuctionState(auction); // Lưu lại mức giá mới xuống SQLite
 
-
-
-            // 7. CẬP NHẬT ĐỒNG BỘ TRÊN RAM
+            // Update RAM data
             auction.getBids().add(newBid);
 
-            // 8. Báo thành công
             out.writeObject(new Message("SUCCESS", "PLACE_BID", newBid));
             out.flush();
 

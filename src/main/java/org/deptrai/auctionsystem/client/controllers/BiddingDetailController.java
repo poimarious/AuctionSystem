@@ -123,12 +123,7 @@ public class BiddingDetailController implements AuctionObserver {
       double amount = Double.parseDouble(bidAmountField.getText());
       User currentUser = SessionManager.getInstance().getCurrentUser();
 
-      if (amount <= currentAuction.getCurrentPrice()) {
-        showError("Giá phải cao hơn giá hiện tại!");
-        return;
-      }
-
-      Message bidReq = new Message("REQUEST", "PLACE_BID", new Object[]{currentAuction.getAuctionId(), currentUser, amount});
+      Message bidReq = new Message("REQUEST", "PLACE_BID", new Object[]{currentAuction.getAuctionId(), currentUser.getUserId(), amount});
       new Thread(() -> {
         Message res = SocketClient.sendRequest(bidReq);
         Platform.runLater(() -> {
@@ -137,6 +132,7 @@ public class BiddingDetailController implements AuctionObserver {
             Bid newBid = (Bid) res.getData();
             currentAuction.setCurrentPrice(newBid.getAmount());
             onBidPlaced(currentAuction, newBid);
+            currentUser.setBalance(currentUser.getBalance() - amount);
           } else {
             String realErrorMessage = "Không nhận được phản hồi từ Server (Mất kết nối).";
 
@@ -156,6 +152,7 @@ public class BiddingDetailController implements AuctionObserver {
       }).start();
 
     } catch (Exception e) {
+      System.out.println(e.getMessage());
       showError("Vui lòng nhập giá hợp lệ.");
     }
   }
