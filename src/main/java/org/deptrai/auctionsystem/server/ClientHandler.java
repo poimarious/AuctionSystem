@@ -71,6 +71,12 @@ public class ClientHandler implements Runnable {
           case "UPDATE_PASSWORD":
             handleUpdatePassword(request);
             break;
+          case "DELETE_AUCTION":
+            handleDeleteAuction(request);
+            break;
+          case "GET_BIDS_HISTORY":
+            handleGetBidsHistory(request);
+            break;
           default:
             out.writeObject(
                 new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
@@ -487,4 +493,73 @@ public class ClientHandler implements Runnable {
         }
       }
     }
+
+  private void handleDeleteAuction(Message request) {
+    try {
+      String auctionId = (String) request.getData();
+
+      // TỐI ƯU: Lấy thẳng Auction từ RAM để trích xuất itemId
+      Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
+
+      if (auction == null || auction.getItem() == null) {
+        out.writeObject(new Message("FAIL", "DELETE_AUCTION", "Không tìm thấy phiên đấu giá trên hệ thống!"));
+        out.flush();
+        return;
+      }
+
+      String itemId = auction.getItem().getItemId();
+      AuctionDAO auctionDAO = new AuctionDAO();
+
+      // Truyền cả 2 ID xuống để xóa dứt điểm trong 1 giao dịch
+      boolean isDeleted = auctionDAO.deleteAuctionById(auctionId, itemId);
+
+      if (isDeleted) {
+        // ĐỒNG BỘ: Xóa khỏi RAM
+        AuctionManager.getInstance().removeAuctionFromMemory(auctionId);
+        out.writeObject(new Message("SUCCESS", "DELETE_AUCTION", "Xóa triệt để phiên đấu giá thành công!"));
+      } else {
+        out.writeObject(new Message("FAIL", "DELETE_AUCTION", "Lỗi cơ sở dữ liệu khi xóa."));
+      }
+      out.flush();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      try {
+        out.writeObject(new Message("ERROR", "DELETE_AUCTION", "Lỗi xử lý yêu cầu xóa tại Server."));
+        out.flush();
+      } catch (IOException ioException) {
+        ioException.printStackTrace();
+      }
+    }
+  }
+
+    private void handleGetBidsHistory(Message request) {
+      //Quy ước dữ liệu:{UserId}
+      try {
+        String userId = (String) request.getData();
+        if (userId == null || userId.trim().isEmpty()) {
+          out.writeObject(new Message("FAIL", "GET_BIDS_HISTORY", "ID người dùng không hợp lệ."));
+          out.flush();
+          return;
+        }
+        BidDAO bidDAO = new BidDAO();
+        List<Bid> bidList = bidDAO.getBidsByBidderId(userId);
+        out.writeObject(new Message("SUCCESS","GET_BIDS_HISTORY",bidList));
+        out.flush();
+
+      } catch (Exception e) {
+        System.out.println("Lỗi khi gửi danh sách bid cho Client");
+        e.printStackTrace();
+        try {
+          out.writeObject(new Message("ERROR", "GET_BIDS_HISTORY", "Lỗi hệ thống khi tải lịch sử đặt giá."));
+          out.flush();
+        } catch (IOException ioException) {
+          ioException.printStackTrace();
+        }
+
+      }
+
+
+
+  }
 }

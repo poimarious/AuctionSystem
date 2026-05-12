@@ -2,6 +2,9 @@ package org.deptrai.auctionsystem.client.controllers;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
+
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,8 +14,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
+import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
+import org.deptrai.auctionsystem.shared.network.Message;
 
 public class BidHistoryController {
 
@@ -85,28 +90,48 @@ public class BidHistoryController {
     loadBidHistory();
   }
 
-  private void loadBidHistory() {
-    Object currentUser = SessionManager.getInstance().getCurrentUser();
+    private void loadBidHistory() {
+        Object currentUser = SessionManager.getInstance().getCurrentUser();
 
-    if (currentUser instanceof Bidder bidder) {
+        if (currentUser instanceof Bidder bidder) {
+            String userId = bidder.getUserId();
 
-      // Đã đổi thành bidder.getBidHistory() cho khớp 100% với code của bạn
-      if (bidder.getBidHistory() != null) {
-        ObservableList<Bid> myBids = FXCollections.observableArrayList(bidder.getBidHistory());
-        bidHistoryTable.setItems(myBids);
+            // Chạy luồng phụ để không làm đơ giao diện khi đợi phản hồi từ Server
+            new Thread(() -> {
+                try {
+                    // 1. Gửi yêu cầu lấy lịch sử lên Server
+                    Message request = new Message("GET_BIDS_HISTORY", userId);
+                    Message response = SocketClient.sendRequest(request);
 
-        System.out.println(
-            "Đã tải thành công "
-                + myBids.size()
-                + " lượt đặt giá cho User: "
-                + bidder.getUsername());
-      } else {
-        System.out.println("User này chưa có lịch sử đặt giá nào.");
-      }
-    } else {
-      System.out.println("Người dùng hiện tại không phải là Bidder.");
+                    if (response != null && "SUCCESS".equals(response.getStatus())) {
+                        // 2. Nhận danh sách Bid từ Server
+                        List<Bid> myBids = (List<Bid>) response.getData();
+
+                        // 3. Cập nhật giao diện trên JavaFX Application Thread
+                        Platform.runLater(() -> {
+                            ObservableList<Bid> observableBids = FXCollections.observableArrayList(myBids);
+                            bidHistoryTable.setItems(observableBids);
+
+                            if (myBids.isEmpty()) {
+                                System.out.println("Bạn chưa có lượt đặt giá nào.");
+                            } else {
+                                System.out.println("Đã cập nhật " + myBids.size() + " lượt đặt giá từ Server.");
+                            }
+                        });
+                    } else {
+                        String errorMsg = (response != null) ? (String) response.getData() : "Không có phản hồi từ Server";
+                        System.err.println("Lỗi khi tải lịch sử: " + errorMsg);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Lỗi kết nối mạng khi tải lịch sử đặt giá.");
+                    e.printStackTrace();
+                }
+            }).start();
+
+        } else {
+            System.out.println("Người dùng hiện tại không phải là Bidder.");
+        }
     }
-  }
 
   @FXML
   public void handleGoBack(ActionEvent event) {
