@@ -540,14 +540,28 @@ public class ClientHandler implements Runnable {
   }
 
     private void handleGetBidsHistory(Message request) {
-      //Quy ước dữ liệu:
+      //Quy ước dữ liệu:{UserId}
       try {
-
-
+        String userId = (String) request.getData();
+        if (userId == null || userId.trim().isEmpty()) {
+          out.writeObject(new Message("FAIL", "GET_BIDS_HISTORY", "ID người dùng không hợp lệ."));
+          out.flush();
+          return;
+        }
+        BidDAO bidDAO = new BidDAO();
+        List<Bid> bidList = bidDAO.getBidsByBidderId(userId);
+        out.writeObject(new Message("SUCCESS","GET_BIDS_HISTORY",bidList));
+        out.flush();
 
       } catch (Exception e) {
+        System.out.println("Lỗi khi gửi danh sách bid cho Client");
         e.printStackTrace();
-
+        try {
+          out.writeObject(new Message("ERROR", "GET_BIDS_HISTORY", "Lỗi hệ thống khi tải lịch sử đặt giá."));
+          out.flush();
+        } catch (IOException ioException) {
+          ioException.printStackTrace();
+        }
 
       }
 
