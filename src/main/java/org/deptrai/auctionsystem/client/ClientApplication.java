@@ -29,6 +29,8 @@ public class ClientApplication extends Application {
 
     stage.setTitle("Hệ thống Đấu giá trực tuyến - UET");
     stage.setScene(scene);
+    stage.setWidth(1300);
+    stage.setHeight(800);
     stage.show();
   }
 

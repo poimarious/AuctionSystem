@@ -18,6 +18,8 @@ import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
+import javafx.scene.control.ScrollPane;
+
 
 public class MainController {
 
@@ -28,7 +30,7 @@ public class MainController {
   @FXML private MenuButton userMenu;
   @FXML private Button sellerCenterBtn;
   @FXML private FlowPane productsContainer;
-
+  @FXML private ScrollPane mainScrollPane;
   @FXML
   public void initialize() {
     User currentUser = SessionManager.getInstance().getCurrentUser();
@@ -122,9 +124,19 @@ public class MainController {
           System.err.println("Lỗi nạp item-card: " + e.getMessage());
         }
       }
+      javafx.application.Platform.runLater(() -> {
+        // Bọc thêm 1 lớp runLater để đảm bảo 100% giao diện đã nạp xong hết các nút bấm
+        javafx.application.Platform.runLater(() -> {
+          if (mainScrollPane != null) {
+            mainScrollPane.setVvalue(0.0); // Kéo thanh cuộn lên đỉnh
+            mainScrollPane.requestFocus(); // Đòi lại focus cho ScrollPane, không cho các nút ở dưới giành giật nữa
+          }
+        });
+      });
     } else {
       System.err.println("Không thể lấy danh sách đấu giá từ server");
     }
+
   }
 
   @FXML
