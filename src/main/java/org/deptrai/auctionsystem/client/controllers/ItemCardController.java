@@ -1,11 +1,10 @@
 package org.deptrai.auctionsystem.client.controllers;
 
-import java.nio.file.Files;
+
 import java.time.LocalDateTime;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,6 +16,7 @@ import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.users.User;
 
 import java.io.File;
 
@@ -48,6 +48,15 @@ public class ItemCardController implements AuctionUpdateListener {
       } catch (Exception e) {
         System.err.println("Không thể load ảnh thật từ đường dẫn: " + imagePath);
       }
+    }
+
+    User currentUser = SessionManager.getInstance().getCurrentUser();
+    if(currentUser == null) {
+      bidButton.setVisible(false);
+      bidButton.setManaged(false);
+    } else {
+      bidButton.setVisible(true);
+      bidButton.setManaged(true);
     }
 
     startCountdown();
