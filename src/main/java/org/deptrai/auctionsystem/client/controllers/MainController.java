@@ -27,7 +27,6 @@ public class MainController {
   @FXML private HBox userBox;
   @FXML private Label userNameLabel;
   @FXML private Label walletLabel;
-  @FXML private MenuButton userMenu;
   @FXML private Button sellerCenterBtn;
   @FXML private FlowPane productsContainer;
   @FXML private ScrollPane mainScrollPane;
@@ -98,13 +97,8 @@ public class MainController {
 
     if (response.getStatus().equals("SUCCESS")) {
       List<Auction> allAuctions = (List<Auction>) response.getData();
-      System.out.println(allAuctions.size());
 
       int limit = Math.min(allAuctions.size(), 6);
-
-      if(!allAuctions.isEmpty()) {
-        System.out.println(allAuctions.getFirst().getStatus()); // Test status auction
-      }
 
       for (int i = 0; i < limit; i++) {
         try {

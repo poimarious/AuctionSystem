@@ -3,6 +3,10 @@ package org.deptrai.auctionsystem.client.controllers;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -91,8 +95,9 @@ public class BiddingDetailController implements AuctionUpdateListener {
         System.err.println("Không thể load ảnh thật từ đường dẫn: " + imagePath);
       }
     }
-
-    bidHistoryTable.getItems().setAll(auction.getBids());
+    List<Bid> bids = new ArrayList<>(auction.getBids());
+    bids.sort(Comparator.comparing(Bid::getTimestamp));
+    bidHistoryTable.getItems().setAll(bids);
 
     SocketClient.addListener(this); // New observer
 
