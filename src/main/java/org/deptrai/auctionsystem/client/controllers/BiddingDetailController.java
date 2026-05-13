@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import org.deptrai.auctionsystem.client.utils.AuctionUpdateListener;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
@@ -21,9 +22,8 @@ import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
-import org.deptrai.auctionsystem.shared.observer.AuctionObserver;
 
-public class BiddingDetailController implements AuctionObserver {
+public class BiddingDetailController implements AuctionUpdateListener {
 
   @FXML private ImageView productImageView;
   @FXML private Label nameLabel;
@@ -58,7 +58,18 @@ public class BiddingDetailController implements AuctionObserver {
     // Tự động load dữ liệu từ Session khi vừa vào trang
     Auction selected = SessionManager.getInstance().getSelectedAuction();
     if (selected != null) {
-      setAuctionData(selected);
+      Message req = new Message("GET_AUCTION_BY_ID", selected.getAuctionId());
+
+      Message res = SocketClient.sendRequest(req);
+
+      if (res.getStatus().equals("SUCCESS")) {
+        // Lấy được hàng nóng hổi từ DB Server
+        Auction freshAuction = (Auction) res.getData();
+        setAuctionData(freshAuction);
+      } else {
+        // Dự phòng rủi ro: Nếu mạng lag thì dùng tạm dữ liệu cũ
+        setAuctionData(selected);
+      }
     }
   }
 
@@ -82,7 +93,9 @@ public class BiddingDetailController implements AuctionObserver {
     }
 
     bidHistoryTable.getItems().setAll(auction.getBids());
-    this.currentAuction.attach(this);
+
+    SocketClient.addListener(this); // New observer
+
     startTimer();
   }
 
@@ -110,6 +123,9 @@ public class BiddingDetailController implements AuctionObserver {
   @FXML
   public void handleGoBack(ActionEvent event) {
     if (countdownTimeline != null) countdownTimeline.stop();
+    // Removing observer
+    SocketClient.removeListener(this);
+
     // Kiểm tra xem file của bạn là home-view.fxml hay auction-floor.fxml
     SceneManager.getInstance().switchScene(
         "/org/deptrai/auctionsystem/client/views/home-view.fxml",
@@ -123,27 +139,23 @@ public class BiddingDetailController implements AuctionObserver {
       double amount = Double.parseDouble(bidAmountField.getText());
       User currentUser = SessionManager.getInstance().getCurrentUser();
 
-      Message bidReq = new Message("REQUEST", "PLACE_BID", new Object[]{currentAuction.getAuctionId(), currentUser.getUserId(), amount});
+      Message bidReq = new Message("PLACE_BID", new Object[]{currentAuction.getAuctionId(), currentUser.getUserId(), amount});
       new Thread(() -> {
         Message res = SocketClient.sendRequest(bidReq);
         Platform.runLater(() -> {
-          if (res != null && "SUCCESS".equals(res.getStatus())) {
+          if ("SUCCESS".equals(res.getStatus())) {
             bidAmountField.clear();
-            Bid newBid = (Bid) res.getData();
-            currentAuction.setCurrentPrice(newBid.getAmount());
-            onBidPlaced(currentAuction, newBid);
-            currentUser.setBalance(currentUser.getBalance() - amount);
+            Alert a = new Alert(Alert.AlertType.INFORMATION, "Đặt giá thành công!");
+            a.show();
           } else {
             String realErrorMessage = "Không nhận được phản hồi từ Server (Mất kết nối).";
 
-            if (res != null) {
-              if (res.getData() instanceof String) {
-                // Nếu Server trả về lỗi dạng chuỗi String
-                realErrorMessage = (String) res.getData();
-              } else {
-                // Nếu Server trả về object khác hoặc null
-                realErrorMessage = "Server từ chối yêu cầu nhưng không rõ lý do. Trạng thái: " + res.getStatus();
-              }
+            if (res.getData() instanceof String) {
+              // Nếu Server trả về lỗi dạng chuỗi String
+              realErrorMessage = (String) res.getData();
+            } else {
+              // Nếu Server trả về object khác hoặc null
+              realErrorMessage = "Server từ chối yêu cầu nhưng không rõ lý do. Trạng thái: " + res.getStatus();
             }
 
             showError(realErrorMessage);
@@ -157,18 +169,25 @@ public class BiddingDetailController implements AuctionObserver {
     }
   }
 
-  @Override public void onBidPlaced(Auction a, Bid b) {
-    Platform.runLater(() -> {
-      currentPriceLabel.setText(String.format("$%.2f", a.getCurrentPrice()));
-      bidHistoryTable.getItems().add(b);
-      bidHistoryTable.scrollTo(b);
-    });
-  }
+  @Override
+  public void onAuctionUpdated(Auction updatedAuction) {
+    // Nếu màn hình này đang xem đúng cái sản phẩm vừa được ai đó đặt giá
+    if (this.currentAuction.getAuctionId().equals(updatedAuction.getAuctionId())) {
+      this.currentAuction = updatedAuction;
 
-  @Override public void onAuctionStatusChanged(Auction a) {
-    Platform.runLater(() -> {
-      if (a.getStatus() == AuctionStatus.FINISHED) bidAmountField.setDisable(true);
-    });
+      Platform.runLater(() -> {
+        // 1. Cập nhật giá tiền mới nhất
+        currentPriceLabel.setText(String.format("$%.2f", updatedAuction.getCurrentPrice()));
+
+        // 2. Nạp lại toàn bộ danh sách Bid từ Server (đảm bảo đúng thứ tự và đủ số lượng)
+        bidHistoryTable.getItems().setAll(updatedAuction.getBids());
+
+        // 3. Cuộn xuống cái cuối cùng
+        if (!updatedAuction.getBids().isEmpty()) {
+          bidHistoryTable.scrollTo(updatedAuction.getBids().size() - 1);
+        }
+      });
+    }
   }
 
   private void showError(String msg) {

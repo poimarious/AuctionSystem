@@ -88,10 +88,22 @@ public class ClientHandler implements Runnable {
       System.out.println("Client ngắt kết nối.");
     } finally {
       try {
+        ServerMain.activeClients.remove(this);
         socket.close();
       } catch (IOException e) {
         e.printStackTrace();
       }
+    }
+  }
+
+  public void sendMessage(Message msg) {
+    try {
+      out.reset();
+      out.writeObject(msg);
+      out.flush();
+    } catch (IOException e) {
+      // Nếu lỗi tức là client này rớt mạng -> Rút cáp, xóa khỏi danh sách
+      ServerMain.activeClients.remove(this);
     }
   }
 
@@ -232,7 +244,8 @@ public class ClientHandler implements Runnable {
 
   private void handleCreateAuction(Message request) {
     try {
-      // Quy ước dữ liệu gửi sang: Object[] { Item item, LocalDateTime endTime, imagebytes, filename }
+      // Quy ước dữ liệu gửi sang: Object[] { Item item, LocalDateTime endTime, imagebytes, filename
+      // }
       Object[] data = (Object[]) request.getData();
       Item item = (Item) data[0];
       LocalDateTime endTime = (LocalDateTime) data[1];
@@ -330,6 +343,7 @@ public class ClientHandler implements Runnable {
       e.printStackTrace();
     }
   }
+
   private void handleGetSellerAuctions(Message request) {
     try {
       // Quy ước dữ liệu gửi sang: String clientID
@@ -342,9 +356,9 @@ public class ClientHandler implements Runnable {
 
       // 3. Lọc ra những phiên đấu giá có chứa Item do Seller này đăng bán
       for (Auction auction : allAuctions) {
-        if (auction.getItem() != null &&
-                auction.getItem().getSeller() != null &&
-                auction.getItem().getSeller().getUserId().equals(sellerId)) {
+        if (auction.getItem() != null
+            && auction.getItem().getSeller() != null
+            && auction.getItem().getSeller().getUserId().equals(sellerId)) {
 
           sellerAuctions.add(auction);
         }
@@ -357,7 +371,8 @@ public class ClientHandler implements Runnable {
     } catch (Exception e) {
       e.printStackTrace();
       try {
-        out.writeObject(new Message("FAIL", "GET_SELLER_AUCTIONS", "Lỗi khi tải danh sách kho hàng."));
+        out.writeObject(
+            new Message("FAIL", "GET_SELLER_AUCTIONS", "Lỗi khi tải danh sách kho hàng."));
         out.flush();
       } catch (IOException ioException) {
         ioException.printStackTrace();
@@ -365,134 +380,143 @@ public class ClientHandler implements Runnable {
     }
   }
 
-    private void handlePlaceBid(Message request) {
-        try {
-            // Dữ liệu Client gửi sang gồm : [auctionId, currentUserId, bidAmount]
-            Object[] data = (Object[]) request.getData();
-            String auctionId = (String) data[0];
-            String currentUserId = (String) data[1];
-            double bidAmount = (Double) data[2];
+  private void handlePlaceBid(Message request) {
+    try {
+      // Dữ liệu Client gửi sang gồm : [auctionId, currentUserId, bidAmount]
+      Object[] data = (Object[]) request.getData();
+      String auctionId = (String) data[0];
+      String currentUserId = (String) data[1];
+      double bidAmount = (Double) data[2];
 
-            UserDAO userDAO = new UserDAO();
-            User currentUser = userDAO.getUserById(currentUserId);
+      UserDAO userDAO = new UserDAO();
+      User currentUser = userDAO.getUserById(currentUserId);
 
-            if (!(currentUser instanceof Bidder)) {
-                out.writeObject(new Message("FAIL", "PLACE_BID", "Chỉ tài khoản Người mua (Bidder) mới có quyền đặt giá!"));
-                out.flush();
-                return;
-            }
-            Bidder bidder = (Bidder) currentUser;
-
-
-            Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
-            if (auction == null) {
-                out.writeObject(new Message("FAIL", "PLACE_BID", "Phiên đấu giá không tồn tại trên Server!"));
-                out.flush();
-                return;
-            }
-            Bid newBid = new Bid(bidder, auction, bidAmount, LocalDateTime.now());
-
-            // 5. Bid validate check
-            try {
-                newBid.validate();
-            } catch (Exception validationException) {
-                // Bắt thông báo lỗi từ Exception và gửi thẳng về cho Client hiển thị
-                out.writeObject(new Message("FAIL", "PLACE_BID", validationException.getMessage()));
-                out.flush();
-                return;
-            }
-
-            // 6. Save data to database
-            BidDAO bidDAO = new BidDAO();
-            boolean isBidSaved = bidDAO.insertBid(newBid); // Gọi đúng 1 tham số
-            userDAO.updateBalance(bidder.getUserId(), bidder.getBalance() - bidAmount);
-
-            if (!isBidSaved) {
-                out.writeObject(new Message("FAIL", "PLACE_BID", "Lỗi Database khi lưu lịch sử đặt giá."));
-                out.flush();
-                return;
-            }
-
-            // update new price on price board
-            auction.setCurrentPrice(bidAmount);
-            if(auction.getStatus() == AuctionStatus.OPEN) {
-              auction.setStatus(AuctionStatus.RUNNING);
-            }
-            AuctionDAO auctionDAO = new AuctionDAO();
-            boolean isAuctionUpdated = auctionDAO.updateAuctionState(auction); // Lưu lại mức giá mới xuống SQLite
-
-            // Update RAM data
-            auction.getBids().add(newBid);
-
-            out.writeObject(new Message("SUCCESS", "PLACE_BID", newBid));
-            out.flush();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            try {
-                out.writeObject(new Message("ERROR", "PLACE_BID", "Lỗi xử lý dữ liệu đặt giá tại Server."));
-                out.flush();
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
-        }
-    }
-    private void handleUpdatePassword(Message request) {
-      try {
-        // QUY ƯỚC DỮ LIỆU TỪ CLIENT GỬI LÊN (Payload):
-        // Dữ liệu là một mảng String[] gồm 3 phần tử: {userId, currentPassword, newPassword}
-        String[] data = (String[]) request.getData();
-        String userId = data[0];
-        String currentPassword = data[1];
-        String newPassword = data[2];
-
-        // 1. Kiểm tra độ mạnh của mật khẩu mới theo chuẩn ValidationUtils
-        if (!ValidationUtils.isValidPassword(newPassword)) {
-          out.writeObject(new Message(
-                  "FAIL",
-                  "UPDATE_PASSWORD",
-                  "Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt (@#$%^&+=!)"
-          ));
-          out.flush();
-          return;
-        }
-
-        // 2. Xác thực lại với Database (Bảo mật lớp 2)
-
-        User user = userDAO.getUserById(userId);
-        if (user == null) {
-          out.writeObject(new Message("FAIL", "UPDATE_PASSWORD", "Tài khoản không tồn tại trên hệ thống!"));
-          out.flush();
-          return;
-        }
-
-        if (!user.getPassword().equals(currentPassword)) {
-          out.writeObject(new Message("FAIL", "UPDATE_PASSWORD", "Mật khẩu hiện tại không đúng!"));
-          out.flush();
-          return;
-        }
-
-        // 3. Thực hiện lưu mật khẩu mới xuống CSDL
-        boolean isUpdated = userDAO.updatePassword(userId, newPassword);
-
-        // 4. Trả kết quả về cho Client
-        if (isUpdated) {
-          out.writeObject(new Message("SUCCESS", "UPDATE_PASSWORD", "Cập nhật mật khẩu thành công!"));
-        } else {
-          out.writeObject(new Message("FAIL", "UPDATE_PASSWORD", "Lỗi hệ thống khi cập nhật mật khẩu."));
-        }
+      if (!(currentUser instanceof Bidder bidder)) {
+        out.writeObject(
+            new Message(
+                "FAIL", "PLACE_BID", "Chỉ tài khoản Người mua (Bidder) mới có quyền đặt giá!"));
         out.flush();
+        return;
+      }
 
-      } catch (Exception e) {
-        e.printStackTrace();
-        try {
-          out.writeObject(new Message("ERROR", "UPDATE_PASSWORD", "Định dạng dữ liệu gửi lên không hợp lệ."));
-          out.flush();
-        } catch (IOException ioException) {
-          ioException.printStackTrace();
-        }
+      Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
+      if (auction == null) {
+        out.writeObject(
+            new Message("FAIL", "PLACE_BID", "Phiên đấu giá không tồn tại trên Server!"));
+        out.flush();
+        return;
+      }
+      Bid newBid = new Bid(bidder, auction, bidAmount, LocalDateTime.now());
+
+      // 5. Bid validate check
+      try {
+        newBid.validate();
+      } catch (Exception validationException) {
+        // Bắt thông báo lỗi từ Exception và gửi thẳng về cho Client hiển thị
+        out.writeObject(new Message("FAIL", "PLACE_BID", validationException.getMessage()));
+        out.flush();
+        return;
+      }
+
+      // 6. Save data to database
+      BidDAO bidDAO = new BidDAO();
+      boolean isBidSaved = bidDAO.insertBid(newBid); // Gọi đúng 1 tham số
+//      userDAO.updateBalance(bidder.getUserId(), bidder.getBalance() - bidAmount); DO NOT change balance yet
+
+      if (!isBidSaved) {
+        out.writeObject(new Message("FAIL", "PLACE_BID", "Lỗi Database khi lưu lịch sử đặt giá."));
+        out.flush();
+        return;
+      }
+
+      // update new price on price board
+      auction.setCurrentPrice(bidAmount);
+      if (auction.getStatus() == AuctionStatus.OPEN) {
+        auction.setStatus(AuctionStatus.RUNNING);
+      }
+      AuctionDAO auctionDAO = new AuctionDAO();
+      boolean isAuctionUpdated =
+          auctionDAO.updateAuctionState(auction); // Lưu lại mức giá mới xuống SQLite
+
+      // Update RAM data
+      auction.getBids().add(newBid);
+
+      out.reset();
+      out.writeObject(new Message("SUCCESS", "PLACE_BID", newBid));
+      out.flush();
+
+      ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      try {
+        out.writeObject(new Message("ERROR", "PLACE_BID", "Lỗi xử lý dữ liệu đặt giá tại Server."));
+        out.flush();
+      } catch (IOException ioException) {
+        ioException.printStackTrace();
       }
     }
+  }
+
+  private void handleUpdatePassword(Message request) {
+    try {
+      // QUY ƯỚC DỮ LIỆU TỪ CLIENT GỬI LÊN (Payload):
+      // Dữ liệu là một mảng String[] gồm 3 phần tử: {userId, currentPassword, newPassword}
+      String[] data = (String[]) request.getData();
+      String userId = data[0];
+      String currentPassword = data[1];
+      String newPassword = data[2];
+
+      // 1. Kiểm tra độ mạnh của mật khẩu mới theo chuẩn ValidationUtils
+      if (!ValidationUtils.isValidPassword(newPassword)) {
+        out.writeObject(
+            new Message(
+                "FAIL",
+                "UPDATE_PASSWORD",
+                "Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt (@#$%^&+=!)"));
+        out.flush();
+        return;
+      }
+
+      // 2. Xác thực lại với Database (Bảo mật lớp 2)
+
+      User user = userDAO.getUserById(userId);
+      if (user == null) {
+        out.writeObject(
+            new Message("FAIL", "UPDATE_PASSWORD", "Tài khoản không tồn tại trên hệ thống!"));
+        out.flush();
+        return;
+      }
+
+      if (!user.getPassword().equals(currentPassword)) {
+        out.writeObject(new Message("FAIL", "UPDATE_PASSWORD", "Mật khẩu hiện tại không đúng!"));
+        out.flush();
+        return;
+      }
+
+      // 3. Thực hiện lưu mật khẩu mới xuống CSDL
+      boolean isUpdated = userDAO.updatePassword(userId, newPassword);
+
+      // 4. Trả kết quả về cho Client
+      if (isUpdated) {
+        out.writeObject(new Message("SUCCESS", "UPDATE_PASSWORD", "Cập nhật mật khẩu thành công!"));
+      } else {
+        out.writeObject(
+            new Message("FAIL", "UPDATE_PASSWORD", "Lỗi hệ thống khi cập nhật mật khẩu."));
+      }
+      out.flush();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      try {
+        out.writeObject(
+            new Message("ERROR", "UPDATE_PASSWORD", "Định dạng dữ liệu gửi lên không hợp lệ."));
+        out.flush();
+      } catch (IOException ioException) {
+        ioException.printStackTrace();
+      }
+    }
+  }
 
   private void handleDeleteAuction(Message request) {
     try {
@@ -502,7 +526,8 @@ public class ClientHandler implements Runnable {
       Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
 
       if (auction == null || auction.getItem() == null) {
-        out.writeObject(new Message("FAIL", "DELETE_AUCTION", "Không tìm thấy phiên đấu giá trên hệ thống!"));
+        out.writeObject(
+            new Message("FAIL", "DELETE_AUCTION", "Không tìm thấy phiên đấu giá trên hệ thống!"));
         out.flush();
         return;
       }
@@ -516,7 +541,8 @@ public class ClientHandler implements Runnable {
       if (isDeleted) {
         // ĐỒNG BỘ: Xóa khỏi RAM
         AuctionManager.getInstance().removeAuctionFromMemory(auctionId);
-        out.writeObject(new Message("SUCCESS", "DELETE_AUCTION", "Xóa triệt để phiên đấu giá thành công!"));
+        out.writeObject(
+            new Message("SUCCESS", "DELETE_AUCTION", "Xóa triệt để phiên đấu giá thành công!"));
       } else {
         out.writeObject(new Message("FAIL", "DELETE_AUCTION", "Lỗi cơ sở dữ liệu khi xóa."));
       }
@@ -525,7 +551,8 @@ public class ClientHandler implements Runnable {
     } catch (Exception e) {
       e.printStackTrace();
       try {
-        out.writeObject(new Message("ERROR", "DELETE_AUCTION", "Lỗi xử lý yêu cầu xóa tại Server."));
+        out.writeObject(
+            new Message("ERROR", "DELETE_AUCTION", "Lỗi xử lý yêu cầu xóa tại Server."));
         out.flush();
       } catch (IOException ioException) {
         ioException.printStackTrace();
@@ -533,33 +560,30 @@ public class ClientHandler implements Runnable {
     }
   }
 
-    private void handleGetBidsHistory(Message request) {
-      //Quy ước dữ liệu:{UserId}
-      try {
-        String userId = (String) request.getData();
-        if (userId == null || userId.trim().isEmpty()) {
-          out.writeObject(new Message("FAIL", "GET_BIDS_HISTORY", "ID người dùng không hợp lệ."));
-          out.flush();
-          return;
-        }
-        BidDAO bidDAO = new BidDAO();
-        List<Bid> bidList = bidDAO.getBidsByBidderId(userId);
-        out.writeObject(new Message("SUCCESS","GET_BIDS_HISTORY",bidList));
+  private void handleGetBidsHistory(Message request) {
+    // Quy ước dữ liệu:{UserId}
+    try {
+      String userId = (String) request.getData();
+      if (userId == null || userId.trim().isEmpty()) {
+        out.writeObject(new Message("FAIL", "GET_BIDS_HISTORY", "ID người dùng không hợp lệ."));
         out.flush();
-
-      } catch (Exception e) {
-        System.out.println("Lỗi khi gửi danh sách bid cho Client");
-        e.printStackTrace();
-        try {
-          out.writeObject(new Message("ERROR", "GET_BIDS_HISTORY", "Lỗi hệ thống khi tải lịch sử đặt giá."));
-          out.flush();
-        } catch (IOException ioException) {
-          ioException.printStackTrace();
-        }
-
+        return;
       }
+      BidDAO bidDAO = new BidDAO();
+      List<Bid> bidList = bidDAO.getBidsByBidderId(userId);
+      out.writeObject(new Message("SUCCESS", "GET_BIDS_HISTORY", bidList));
+      out.flush();
 
-
-
+    } catch (Exception e) {
+      System.out.println("Lỗi khi gửi danh sách bid cho Client");
+      e.printStackTrace();
+      try {
+        out.writeObject(
+            new Message("ERROR", "GET_BIDS_HISTORY", "Lỗi hệ thống khi tải lịch sử đặt giá."));
+        out.flush();
+      } catch (IOException ioException) {
+        ioException.printStackTrace();
+      }
+    }
   }
 }

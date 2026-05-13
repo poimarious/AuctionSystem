@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.time.LocalDateTime;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -11,13 +12,15 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
+import org.deptrai.auctionsystem.client.utils.AuctionUpdateListener;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
+import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 
 import java.io.File;
 
-public class ItemCardController {
+public class ItemCardController implements AuctionUpdateListener {
 
   @FXML private ImageView itemImageView;
   @FXML private Label nameLabel;
@@ -48,6 +51,7 @@ public class ItemCardController {
     }
 
     startCountdown();
+    SocketClient.addListener(this);
   }
 
   private void startCountdown() {
@@ -85,6 +89,8 @@ public class ItemCardController {
 
     if (timeline != null) timeline.stop();
 
+    SocketClient.removeListener(this);
+
     // 1. Lưu auction vào Session để trang sau có cái mà hiển thị
     SessionManager.getInstance().setSelectedAuction(this.auction);
 
@@ -94,13 +100,17 @@ public class ItemCardController {
         "Chi tiết đấu giá - " + auction.getItem().getName());
   }
 
-  @FXML
-  public void handleGoBack(ActionEvent event) {
-    if (timeline != null) timeline.stop();
-    // Quay về trang chủ
-    SceneManager.getInstance().switchScene(
-        "/org/deptrai/auctionsystem/client/views/home-view.fxml",
-        "Trang chủ - Auction.UET"
-    );
+  @Override
+  public void onAuctionUpdated(Auction updatedAuction) {
+    // Kiểm tra xem tin nhắn đổi giá có phải dành cho món hàng của cái thẻ này không
+    if (this.auction.getAuctionId().equals(updatedAuction.getAuctionId())) {
+      // Update this card's RAM
+      this.auction = updatedAuction;
+
+      // Nhảy số tiền trên giao diện
+      Platform.runLater(() -> {
+        priceLabel.setText(String.format("$%.2f", updatedAuction.getCurrentPrice()));
+      });
+    }
   }
 }

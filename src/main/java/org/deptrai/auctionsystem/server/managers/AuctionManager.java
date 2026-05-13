@@ -11,6 +11,10 @@ public class AuctionManager {
   // implement treemap with thread-safe
   private final ConcurrentSkipListMap<String, Auction> auctions = new ConcurrentSkipListMap<>();
 
+  private static class SingletonHelper { // Helper class to generate instance,because this class only loads once so it ensures thread-safe
+    private static final AuctionManager INSTANCE = new AuctionManager();
+  }
+
   private AuctionManager() {}
 
   public static AuctionManager getInstance() { // Bill Pugh singleton implementation
@@ -59,11 +63,5 @@ public class AuctionManager {
     if (auctionId != null) {
       auctions.remove(auctionId);
     }
-  }
-
-  private static
-  class SingletonHelper { // Helper class to generate instance,because this class only loads once so
-                          // it ensures thread-safe
-    private static final AuctionManager INSTANCE = new AuctionManager();
   }
 }

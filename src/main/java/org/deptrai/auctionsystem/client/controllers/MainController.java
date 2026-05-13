@@ -91,18 +91,19 @@ public class MainController {
 
   private void loadFeaturedAuctions() {
     productsContainer.getChildren().clear();
-    Message request = new Message("REQUEST", "GET_ALL_AUCTIONS", null);
+    Message request = new Message("GET_ALL_AUCTIONS", null);
     Message response = SocketClient.sendRequest(request);
 
-    if (response != null && response.getStatus().equals("SUCCESS")) {
+    if (response.getStatus().equals("SUCCESS")) {
       List<Auction> allAuctions = (List<Auction>) response.getData();
       System.out.println(allAuctions.size());
 
       int limit = Math.min(allAuctions.size(), 6);
 
-      if(allAuctions.size() >= 1) {
-        System.out.println(allAuctions.get(0).getStatus());
+      if(!allAuctions.isEmpty()) {
+        System.out.println(allAuctions.getFirst().getStatus()); // Test status auction
       }
+
       for (int i = 0; i < limit; i++) {
         try {
           FXMLLoader loader =

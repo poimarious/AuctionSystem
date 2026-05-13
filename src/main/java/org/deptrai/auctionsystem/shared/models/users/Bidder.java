@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
-import org.deptrai.auctionsystem.shared.observer.AuctionObserver;
 
-public class Bidder extends User implements AuctionObserver {
+public class Bidder extends User {
   private List<Bid> bidHistory;
 
   public Bidder(String username, String password, String email) {
@@ -46,40 +45,6 @@ public class Bidder extends User implements AuctionObserver {
   @Override
   public String getInfo() {
     return "Bidder: " + getUsername() + " | Email: " + getEmail();
-  }
-
-  @Override
-  public void onBidPlaced(Auction a, Bid b) {
-    if (this.getUsername().equals(b.getBidder().getUsername())) {
-      System.out.println(
-          "["
-              + this.getUsername()
-              + "] Nice! You are leading! '"
-              + a.getItem().getName()
-              + "' with $"
-              + b.getAmount());
-    } else {
-      System.out.println(
-          "["
-              + this.getUsername()
-              + "] Notice: "
-              + b.getBidder().getUsername()
-              + " just increased the bid for '"
-              + a.getItem().getName()
-              + "' by $"
-              + b.getAmount());
-    }
-  }
-
-  @Override
-  public void onAuctionStatusChanged(Auction a) {
-    System.out.println(
-        "["
-            + this.getUsername()
-            + "] Announcement: Auction '"
-            + a.getItem().getName()
-            + "' has just changed its status to: "
-            + a.getStatus());
   }
 
   // region Getters

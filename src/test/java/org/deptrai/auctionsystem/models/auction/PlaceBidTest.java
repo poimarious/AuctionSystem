@@ -118,30 +118,6 @@ public class PlaceBidTest {
         });
   }
 
-  // Observer test
-  @Test
-  void testObserverMultipleBidders() {
-    // Arrange
-    auction.startAuction();
-    auction.attach(bidder1);
-    auction.attach(bidder2);
-
-    // Act & Assert: Đặt giá liên tiếp
-    assertDoesNotThrow(
-        () -> {
-          bidder1.placeBid(auction, 65.0);
-          bidder2.placeBid(auction, 70.0);
-        },
-        "Pass");
-
-    assertEquals(70.0, auction.getCurrentPrice(), "Current price must be 70.0");
-
-    assertDoesNotThrow(
-        () -> {
-          auction.closeAuction();
-        });
-  }
-
   @Test
   void testConcurrentBidding() throws InterruptedException {
     auction.startAuction();

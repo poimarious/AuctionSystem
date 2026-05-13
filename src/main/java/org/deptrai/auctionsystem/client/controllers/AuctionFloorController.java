@@ -56,7 +56,7 @@ public class AuctionFloorController {
 
     new Thread(() -> {
       Message response = SocketClient.sendRequest(request);
-      if (response != null && "SUCCESS".equals(response.getStatus())) {
+      if ("SUCCESS".equals(response.getStatus())) {
         List<Auction> allAuctions = (List<Auction>) response.getData();
 
         // Cập nhật giao diện an toàn trên luồng UI
