@@ -43,9 +43,11 @@ public class PlaceBidTest {
 
     auction = new Auction(item, endTime);
     bidder1 = new Bidder("poimarious", "poimaious1", "pomarious@gmail.com");
+    bidder1.setBalance(10000000);
     bidder1.setUserId("bidder_01");
     bidder2 = new Bidder("TusBeo", "TusBeo123@", "TusBeo123@gmail.com");
     bidder2.setUserId("bidder_02");
+    bidder2.setBalance(1000000);
   }
 
   @Test
