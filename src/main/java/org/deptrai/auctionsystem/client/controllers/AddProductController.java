@@ -53,7 +53,7 @@ public class AddProductController {
               new DateCell() {
                 public void updateItem(LocalDate date, boolean empty) {
                   super.updateItem(date, empty);
-                  setDisable(empty || !date.isAfter(LocalDate.now()));
+                  setDisable(empty || date.isBefore(LocalDate.now()) || date.isAfter(LocalDate.now().plusYears(1)));
                 }
               });
     }
@@ -96,6 +96,14 @@ public class AddProductController {
     } catch (NumberFormatException e) {
       showAlert(Alert.AlertType.ERROR, "Lỗi định dạng", "Giá phải là một con số!");
       return;
+    }
+
+    if(endDate.isBefore(LocalDate.now())) {
+      showAlert(Alert.AlertType.WARNING, "Lỗi thời gian", "Không thể chọn ngày kết thúc trong quá khứ!");
+      return ;
+    } else if(endDate.isAfter(LocalDate.now().plusYears(1))) {
+      showAlert(Alert.AlertType.WARNING, "Lỗi thời gian", "Thời gian đấu giá tối đa là 1 năm!");
+      return ;
     }
 
     User currentUser = SessionManager.getInstance().getCurrentUser();
