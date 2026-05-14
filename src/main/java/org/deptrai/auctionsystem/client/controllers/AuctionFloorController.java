@@ -14,6 +14,7 @@ import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.network.Message;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AuctionFloorController {
@@ -22,6 +23,7 @@ public class AuctionFloorController {
   @FXML private TextField searchField;
   @FXML private ComboBox<String> categoryCombo;
   @FXML private ComboBox<String> statusCombo;
+  private List<Auction> allAuctionsList = new ArrayList<>();
 
   /**
    * 1. SỬA NÚT QUAY LẠI: Ép về thẳng Home View
@@ -40,6 +42,7 @@ public class AuctionFloorController {
     if (categoryCombo != null) {
       categoryCombo.getItems().addAll("Tất cả", "Art", "Electronics", "Vehicle");
       categoryCombo.getSelectionModel().selectFirst();
+      categoryCombo.setOnAction(event -> filterAuctions());
     }
     if (statusCombo != null) {
       statusCombo.getItems().addAll("Tất cả", "Đang diễn ra", "Sắp kết thúc");
@@ -58,11 +61,39 @@ public class AuctionFloorController {
       Message response = SocketClient.sendRequest(request);
       if ("SUCCESS".equals(response.getStatus())) {
         List<Auction> allAuctions = (List<Auction>) response.getData();
+        //1
+        allAuctionsList = allAuctions;
 
         // Cập nhật giao diện an toàn trên luồng UI
         Platform.runLater(() -> displayAuctions(allAuctions));
       }
     }).start();
+  }
+  // Hàm lọc dữ liệu nội bộ trên RAM
+  private void filterAuctions() {
+    String selectedCategory = categoryCombo.getValue();
+
+    // Nếu chọn "Tất cả"  hiển thị lại toàn bộ kho gốc
+    if (selectedCategory == null || selectedCategory.equals("Tất cả")) {
+      displayAuctions(allAuctionsList);
+      return;
+    }
+
+    // chọn loại
+    List<Auction> filteredList = new ArrayList<>();
+
+    // Lục lọi trong kho gốc
+    for (Auction auction : allAuctionsList) {
+      if (auction.getItem() != null && auction.getItem().getCategory() != null) {
+        // Khớp thì nhặt bỏ vào giỏ
+        if (auction.getItem().getCategory().equalsIgnoreCase(selectedCategory)) {
+          filteredList.add(auction);
+        }
+      }
+    }
+
+    // Vẽ lại màn hình với danh sách đã lọc
+    displayAuctions(filteredList);
   }
 
   private void displayAuctions(List<Auction> auctions) {
