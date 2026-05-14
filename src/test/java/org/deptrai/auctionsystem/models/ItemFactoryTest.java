@@ -1,4 +1,4 @@
-package org.deptrai.auctionsystem.models.items;
+package org.deptrai.auctionsystem.models;
 
 import org.deptrai.auctionsystem.shared.models.items.ArtFactory;
 import org.deptrai.auctionsystem.shared.models.items.ElectronicsFactory;
