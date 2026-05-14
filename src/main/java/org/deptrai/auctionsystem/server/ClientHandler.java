@@ -244,7 +244,7 @@ public class ClientHandler implements Runnable {
 
   private void handleCreateAuction(Message request) {
     try {
-      // Quy ước dữ liệu gửi sang: Object[] { Item item, LocalDateTime endTime, imagebytes, filename
+      // Quy ước dữ liệu gửi sang: Object[] {Item item, LocalDateTime endTime, imagebytes, filename}
       // }
       Object[] data = (Object[]) request.getData();
       Item item = (Item) data[0];

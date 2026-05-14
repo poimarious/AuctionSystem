@@ -78,7 +78,11 @@
                 </HBox>
 
                 <Separator orientation="VERTICAL" prefHeight="30.0" />
-                <Label styleClass="nav-icon" text="🔔" textFill="WHITE" />
+                <MenuButton fx:id="notificationBell" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-size: 16; -fx-cursor: hand;" text="🔔" textFill="WHITE">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="Không có thông báo mới" />
+                  </items>
+                </MenuButton>
               </children>
             </HBox>
           </children>

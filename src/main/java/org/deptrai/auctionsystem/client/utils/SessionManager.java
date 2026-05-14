@@ -1,5 +1,8 @@
 package org.deptrai.auctionsystem.client.utils;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.users.User;
 
@@ -14,6 +17,8 @@ public class SessionManager {
 
   // Biến lắng nghe sự thay đổi số dư ví
   private Runnable balanceListener;
+
+  private final ObservableList<String> notifications = FXCollections.observableArrayList();
 
   private SessionManager() {}
 
@@ -61,5 +66,15 @@ public class SessionManager {
     if (balanceListener != null) {
       balanceListener.run();
     }
+  }
+
+  public ObservableList<String> getNotifications() {
+    return notifications;
+  }
+
+  public void addNotification(String msg) {
+    Platform.runLater(() -> {
+      notifications.add(0, msg);
+    });
   }
 }

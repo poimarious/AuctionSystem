@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javafx.application.Platform;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.bid.Bid;
+import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 
 public class SocketClient {
@@ -43,10 +46,25 @@ public class SocketClient {
             if (msg.getCommand().equals("AUCTION_UPDATE")) {
               // Nhận được Broadcast -> Báo cho giao diện cập nhật ngay lập tức
               Auction updatedAuction = (Auction) msg.getData();
+
+              // add notification to all user's notification box
+              if(!updatedAuction.getBids().isEmpty()) {
+                Bid bid = updatedAuction.getBids().get(updatedAuction.getBids().size() - 1);
+                User currentUser = SessionManager.getInstance().getCurrentUser();
+                if(currentUser != null && !currentUser.getUserId().equals(bid.getBidder().getUserId())) {
+                  String text = bid.getTimestamp().format(DateTimeFormatter.ofPattern("HH:mm")) + " || "
+                          + bid.getBidder().getUsername()
+                          + " vừa ra giá $" + bid.getAmount()
+                          + " cho " + updatedAuction.getItem().getName();
+                  SessionManager.getInstance().addNotification(text);
+                }
+              }
+
               for (AuctionUpdateListener listener : listeners) {
                 Platform.runLater(() -> listener.onAuctionUpdated(updatedAuction));
               }
-            } else {
+            }
+            else {
               // Tin nhắn trả lời bình thường -> Nhét vào hàng đợi cho hàm sendRequest lấy
               responseQueue.put(msg);
             }
