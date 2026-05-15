@@ -32,6 +32,8 @@ public class AddProductController {
   @FXML private TextArea descriptionInput;
   @FXML private ImageView previewImage;
   @FXML private Label placeholderLabel;
+  @FXML private ComboBox<String> hourCombo;
+  @FXML private ComboBox<String> minuteCombo;
   private String selectedImagePath = "";
 
   @FXML
@@ -56,6 +58,21 @@ public class AddProductController {
                   setDisable(empty || date.isBefore(LocalDate.now()) || date.isAfter(LocalDate.now().plusYears(1)));
                 }
               });
+      // Nạp dữ liệu cho ô chọn Giờ (00 - 23)
+      if (hourCombo != null) {
+        for (int i = 0; i < 24; i++) {
+          hourCombo.getItems().add(String.format("%02d", i));
+        }
+        hourCombo.getSelectionModel().select("23"); // Mặc định là 23 giờ
+      }
+
+      // Nạp dữ liệu cho ô chọn Phút (00 - 59)
+      if (minuteCombo != null) {
+        for (int i = 0; i < 60; i++) {
+          minuteCombo.getItems().add(String.format("%02d", i));
+        }
+        minuteCombo.getSelectionModel().select("59"); // Mặc định là 59 phút
+      }
     }
   }
 
@@ -98,13 +115,32 @@ public class AddProductController {
       return;
     }
 
-    if(endDate.isBefore(LocalDate.now())) {
-      showAlert(Alert.AlertType.WARNING, "Lỗi thời gian", "Không thể chọn ngày kết thúc trong quá khứ!");
+    String hourStr = hourCombo.getValue();
+    String minuteStr = minuteCombo.getValue();
+
+    if (hourStr == null || minuteStr == null) {
+      showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng chọn đầy đủ Giờ và Phút!");
+      return;
+    }
+
+    // Chuyển đổi thành LocalTime
+    int hour = Integer.parseInt(hourStr);
+    int minute = Integer.parseInt(minuteStr);
+    LocalTime time = LocalTime.of(hour, minute);
+
+    // Gộp LocalDate và LocalTime thành LocalDateTime chuẩn xác đến từng phút
+    LocalDateTime endDateTime = endDate.atTime(time);
+
+    // Kiểm tra thời gian kết thúc phải lớn hơn thời điểm hiện tại
+    if(endDateTime.isBefore(LocalDateTime.now())) {
+      showAlert(Alert.AlertType.WARNING, "Lỗi thời gian", "Không thể chọn thời gian kết thúc trong quá khứ!");
       return ;
-    } else if(endDate.isAfter(LocalDate.now().plusYears(1))) {
+    } else if(endDateTime.isAfter(LocalDateTime.now().plusYears(1))) {
       showAlert(Alert.AlertType.WARNING, "Lỗi thời gian", "Thời gian đấu giá tối đa là 1 năm!");
       return ;
     }
+
+
 
     User currentUser = SessionManager.getInstance().getCurrentUser();
 
@@ -139,9 +175,6 @@ public class AddProductController {
         }
       }
 
-      LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
-
-      // NÂNG CẤP PAYLOAD: Gửi kèm cả mảng Byte và Tên file ảnh
       Object[] payload = new Object[] {newItem, endDateTime, imageBytes, fileName};
       Message request = new Message("REQUEST", "CREATE_AUCTION", payload);
 

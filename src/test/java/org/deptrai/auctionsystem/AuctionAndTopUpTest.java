@@ -1,4 +1,4 @@
-package org.deptrai.auctionsystem.server;
+package org.deptrai.auctionsystem;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
+import org.deptrai.auctionsystem.server.ClientHandler;
 import org.deptrai.auctionsystem.server.dao.UserDAO;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
@@ -15,19 +16,6 @@ import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.User;
 
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.List;
-import org.deptrai.auctionsystem.client.utils.SocketClient;
-import org.deptrai.auctionsystem.server.dao.UserDAO;
-import org.deptrai.auctionsystem.server.managers.AuctionManager;
-import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
-import org.deptrai.auctionsystem.shared.models.auction.Auction;
-import org.deptrai.auctionsystem.shared.models.users.Bidder;
-import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

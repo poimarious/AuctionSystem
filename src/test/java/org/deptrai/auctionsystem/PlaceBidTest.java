@@ -1,4 +1,4 @@
-package org.deptrai.auctionsystem.models;
+package org.deptrai.auctionsystem;
 
 import static org.junit.jupiter.api.Assertions.*;
 

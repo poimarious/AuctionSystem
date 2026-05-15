@@ -1,4 +1,4 @@
-package org.deptrai.auctionsystem.server;
+package org.deptrai.auctionsystem;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,8 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
+import org.deptrai.auctionsystem.server.ClientHandler;
 import org.deptrai.auctionsystem.server.dao.AuctionDAO;
-import org.deptrai.auctionsystem.server.dao.ItemDAO;
 import org.deptrai.auctionsystem.server.dao.UserDAO;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.server.utils.DatabaseConnection;

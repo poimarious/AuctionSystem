@@ -1,4 +1,4 @@
-package org.deptrai.auctionsystem.server;
+package org.deptrai.auctionsystem;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
+import org.deptrai.auctionsystem.server.ClientHandler;
 import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;

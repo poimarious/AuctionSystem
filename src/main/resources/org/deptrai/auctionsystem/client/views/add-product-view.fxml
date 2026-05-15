@@ -86,8 +86,15 @@
 
             <VBox spacing="5.0">
               <children>
-                <Label style="-fx-font-weight: bold;" text="Thời gian kết thúc"/>
-                <DatePicker maxWidth="Infinity" fx:id="endDatePicker"/>
+                <Label style="-fx-font-weight: bold;" text="Thời gian kết thúc (Ngày - Giờ - Phút)"/>
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                  <children>
+                    <DatePicker fx:id="endDatePicker" maxWidth="Infinity" HBox.hgrow="ALWAYS" promptText="Chọn ngày"/>
+                    <ComboBox fx:id="hourCombo" prefWidth="75.0" promptText="Giờ"/>
+                    <Label text=":" style="-fx-font-weight: bold;"/>
+                    <ComboBox fx:id="minuteCombo" prefWidth="75.0" promptText="Phút"/>
+                  </children>
+                </HBox>
               </children>
             </VBox>
 
