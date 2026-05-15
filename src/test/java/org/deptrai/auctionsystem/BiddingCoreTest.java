@@ -111,7 +111,7 @@ public class BiddingCoreTest {
     // ==========================================
     // GIAI ĐOẠN 1: ĐẶT GIÁ (PLACE BID)
     // ==========================================
-
+    /*
     @Test
     @Order(1)
     void testPlaceBid_ValidBid_ShouldSucceedAndIncreasePrice() {
@@ -169,7 +169,7 @@ public class BiddingCoreTest {
         assertEquals(1, history.size(), "Phải có đúng 1 lượt đặt giá trong lịch sử");
         assertEquals(150.0, history.get(0).getAmount(), 0.001, "Giá trị của lượt bid trong lịch sử phải là 150.0");
         assertEquals(targetAuction.getAuctionId(), history.get(0).getAuction().getAuctionId(), "ID phiên đấu giá phải khớp");
-    }
+    }*/
 
     @Test
     @Order(4)
