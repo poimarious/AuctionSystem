@@ -628,6 +628,8 @@ public class ClientHandler implements Runnable {
           }
         }
       }
+      out.writeObject(new Message("SUCCESS", "FINISH_AUCTION", "Đã xử lý xong"));
+      out.flush();
     } catch (Exception e) {
       System.out.println("Lỗi khi kết thúc phiên đấu giá: " + e.getMessage());
     }
