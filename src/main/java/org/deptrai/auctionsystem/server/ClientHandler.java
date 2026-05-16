@@ -204,13 +204,24 @@ public class ClientHandler implements Runnable {
   }
 
   private void handleGetAllAuctions(Message request) {
-
     try {
-      // Lấy toàn bộ danh sách từ AuctionManager
-      List<Auction> auctions = AuctionManager.getInstance().getAllAuctions();
+      // 1. Lấy toàn bộ danh sách phiên đấu giá hiện có trên RAM (Cache)
+      List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
 
-      out.writeObject(new Message("SUCCESS", "GET_ALL_AUCTIONS", auctions));
+      // 2. Tạo một danh sách mới để chỉ chứa các phiên đang mở/đang diễn ra
+      List<Auction> activeAuctions = new java.util.ArrayList<>();
+
+      // 3. Lọc theo trạng thái
+      for (Auction auction : allAuctions) {
+        if (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING) {
+          activeAuctions.add(auction);
+        }
+      }
+
+      // 4. Gửi danh sách ĐÃ LỌC về cho Trang chủ (AuctionFloorController)
+      out.writeObject(new Message("SUCCESS", "GET_ALL_AUCTIONS", activeAuctions));
       out.flush();
+
     } catch (IOException e) {
       System.out.println("Lỗi khi gửi danh sách Auction cho Client.");
       e.printStackTrace();
