@@ -3,6 +3,7 @@ package org.deptrai.auctionsystem.client.controllers;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.Duration;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -13,6 +14,8 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -42,6 +45,9 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
   @FXML private TextField bidAmountField;
 
+  @FXML private LineChart<String, Number> bidChart;
+  private XYChart.Series<String, Number> priceSeries;
+
   private Auction currentAuction;
   private Timeline countdownTimeline;
 
@@ -49,8 +55,10 @@ public class BiddingDetailController implements AuctionUpdateListener {
   public void initialize() {
     // Cấu hình bảng
     amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
-    timeColumn.setCellValueFactory(cellData ->
-        new SimpleStringProperty(cellData.getValue().getTimestamp().toString().substring(11, 19)));
+    timeColumn.setCellValueFactory(cellData -> {
+      DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM HH:mm:ss");
+      return new SimpleStringProperty(cellData.getValue().getTimestamp().format(fmt));
+    });
 
     bidderColumn.setCellValueFactory(cellData -> {
       if (cellData.getValue().getBidder() != null) {
@@ -58,6 +66,15 @@ public class BiddingDetailController implements AuctionUpdateListener {
       }
       return new SimpleStringProperty("N/A");
     });
+
+    // Khởi tạo đường biểu diễn giá
+    priceSeries = new XYChart.Series<>();
+    priceSeries.setName("Mức giá đặt");
+
+    // Gắn đường dây này vào biểu đồ
+    if (bidChart != null) {
+      bidChart.getData().add(priceSeries);
+    }
 
     // Tự động load dữ liệu từ Session khi vừa vào trang
     Auction selected = SessionManager.getInstance().getSelectedAuction();
@@ -98,6 +115,8 @@ public class BiddingDetailController implements AuctionUpdateListener {
     List<Bid> bids = new ArrayList<>(auction.getBids());
     bids.sort(Comparator.comparing(Bid::getTimestamp));
     bidHistoryTable.getItems().setAll(bids);
+
+    refreshChart(bids);
 
     SocketClient.addListener(this); // New observer
 
@@ -184,23 +203,63 @@ public class BiddingDetailController implements AuctionUpdateListener {
     }
   }
 
+  // Hàm vẽ lại biểu đồ với thuật toán Downsampling (Tối đa 15 điểm)
+  private void refreshChart(List<Bid> allBids) {
+    priceSeries.getData().clear(); // Xóa khung vẽ cũ
+    if (allBids == null || allBids.isEmpty()) return;
+
+    int MAX_POINTS = 10;
+    List<Bid> displayBids = new ArrayList<>();
+
+    // Nếu số lượng ít thì lấy hết
+    if (allBids.size() <= MAX_POINTS) {
+      displayBids.addAll(allBids);
+    } else {
+      // Luôn lấy điểm đầu tiên được đặt
+      displayBids.add(allBids.getFirst());
+
+      // Chia đều khoảng cách để bốc mẫu các điểm ở giữa
+      double step = (double) (allBids.size() - 1) / (MAX_POINTS - 1);
+      for (int i = 1; i < MAX_POINTS - 1; i++) {
+        int index = (int) Math.round(i * step);
+        displayBids.add(allBids.get(index));
+      }
+
+      // Luôn lấy điểm mới nhất vừa được đặt
+      displayBids.add(allBids.getLast());
+    }
+
+    // Vẽ danh sách đã nén lên màn hình
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM HH:mm:ss");
+    for (Bid b : displayBids) {
+      String timeStr = b.getTimestamp().format(formatter);
+      priceSeries.getData().add(new XYChart.Data<>(timeStr, b.getAmount()));
+    }
+  }
+
   @Override
   public void onAuctionUpdated(Auction updatedAuction) {
     // Nếu màn hình này đang xem đúng cái sản phẩm vừa được ai đó đặt giá
     if (this.currentAuction.getAuctionId().equals(updatedAuction.getAuctionId())) {
       this.currentAuction = updatedAuction;
 
+      // Tạo bản sao và ép sắp xếp theo đúng thứ tự thời gian tăng dần
+      List<Bid> sortedBids = new ArrayList<>(updatedAuction.getBids());
+      sortedBids.sort(Comparator.comparing(Bid::getTimestamp));
+
       Platform.runLater(() -> {
         // 1. Cập nhật giá tiền mới nhất
         currentPriceLabel.setText(String.format("$%.2f", updatedAuction.getCurrentPrice()));
 
         // 2. Nạp lại toàn bộ danh sách Bid từ Server (đảm bảo đúng thứ tự và đủ số lượng)
-        bidHistoryTable.getItems().setAll(updatedAuction.getBids());
+        bidHistoryTable.getItems().setAll(sortedBids);
 
         // 3. Cuộn xuống cái cuối cùng
-        if (!updatedAuction.getBids().isEmpty()) {
-          bidHistoryTable.scrollTo(updatedAuction.getBids().size() - 1);
+        if (!sortedBids.isEmpty()) {
+          bidHistoryTable.scrollTo(sortedBids.size() - 1);
         }
+
+        refreshChart(sortedBids);
       });
     }
   }
