@@ -9,9 +9,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <VBox xmlns:fx="http://javafx.com/fxml/1"
-  style="-fx-background-color: #f0f2f5;" spacing="25.0" stylesheets="@style.css"
-  xmlns="http://javafx.com/javafx/21"
-  fx:controller="org.deptrai.auctionsystem.client.controllers.BidHistoryController">
+      style="-fx-background-color: #f0f2f5;" spacing="25.0" stylesheets="@style.css"
+      xmlns="http://javafx.com/javafx/21"
+      fx:controller="org.deptrai.auctionsystem.client.controllers.BidHistoryController">
   <children>
     <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ ">
       <padding>
@@ -20,10 +20,10 @@
     </Button>
     <HBox spacing="15.0">
       <children>
-        <Button style="-fx-background-color: #2c3e50; -fx-text-fill: white;" text="Tất cả"/>
-        <Button text="Đang diễn ra"/>
-        <Button text="Đã thắng"/>
-        <Button text="Đã kết thúc"/>
+        <Button onAction="#handleShowAll" style="-fx-background-color: #2c3e50; -fx-text-fill: white;" text="Tất cả"/>
+        <Button onAction="#handleShowRunning" text="Đang diễn ra"/>
+        <Button onAction="#handleShowWon" text="Đã thắng"/>
+        <Button onAction="#handleShowFinished" text="Đã kết thúc"/>
       </children>
     </HBox>
 

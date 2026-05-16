@@ -2,6 +2,7 @@ package org.deptrai.auctionsystem.client.controllers;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList; // BỔ SUNG IMPORT
 import java.util.List;
 
 import javafx.application.Platform;
@@ -28,6 +29,9 @@ public class BidHistoryController {
   @FXML private TableColumn<Bid, String> timeRemainingColumn;
   @FXML private TableColumn<Bid, String> statusColumn;
   @FXML private TableColumn<Bid, String> imageColumn;
+
+  // --- Kho chứa gốc lưu TOÀN BỘ lịch sử trên RAM ---
+  private List<Bid> allBidsList = new ArrayList<>();
 
   @FXML
   public void initialize() {
@@ -79,7 +83,6 @@ public class BidHistoryController {
     statusColumn.setCellValueFactory(
         cellData -> {
           if (cellData.getValue().getAuction() != null) {
-            // Bạn có thể tùy chỉnh hiển thị dựa trên Enum AuctionStatus
             return new SimpleStringProperty(
                 cellData.getValue().getAuction().getStatus().toString());
           }
@@ -90,48 +93,124 @@ public class BidHistoryController {
     loadBidHistory();
   }
 
-    private void loadBidHistory() {
-        Object currentUser = SessionManager.getInstance().getCurrentUser();
+  private void loadBidHistory() {
+    Object currentUser = SessionManager.getInstance().getCurrentUser();
 
-        if (currentUser instanceof Bidder bidder) {
-            String userId = bidder.getUserId();
+    if (currentUser instanceof Bidder bidder) {
+      String userId = bidder.getUserId();
 
-            // Chạy luồng phụ để không làm đơ giao diện khi đợi phản hồi từ Server
-            new Thread(() -> {
-                try {
-                    // 1. Gửi yêu cầu lấy lịch sử lên Server
-                    Message request = new Message("GET_BIDS_HISTORY", userId);
-                    Message response = SocketClient.sendRequest(request);
+      // Chạy luồng phụ để không làm đơ giao diện khi đợi phản hồi từ Server
+      new Thread(() -> {
+        try {
+          Message request = new Message("GET_BIDS_HISTORY", userId);
+          Message response = SocketClient.sendRequest(request);
 
-                    if (response != null && "SUCCESS".equals(response.getStatus())) {
-                        // 2. Nhận danh sách Bid từ Server
-                        List<Bid> myBids = (List<Bid>) response.getData();
+          if (response != null && "SUCCESS".equals(response.getStatus())) {
+            List<Bid> myBids = (List<Bid>) response.getData();
 
-                        // 3. Cập nhật giao diện trên JavaFX Application Thread
-                        Platform.runLater(() -> {
-                            ObservableList<Bid> observableBids = FXCollections.observableArrayList(myBids);
-                            bidHistoryTable.setItems(observableBids);
+            Platform.runLater(() -> {
 
-                            if (myBids.isEmpty()) {
-                                System.out.println("Bạn chưa có lượt đặt giá nào.");
-                            } else {
-                                System.out.println("Đã cập nhật " + myBids.size() + " lượt đặt giá từ Server.");
-                            }
-                        });
-                    } else {
-                        String errorMsg = (response != null) ? (String) response.getData() : "Không có phản hồi từ Server";
-                        System.err.println("Lỗi khi tải lịch sử: " + errorMsg);
-                    }
-                } catch (Exception e) {
-                    System.err.println("Lỗi kết nối mạng khi tải lịch sử đặt giá.");
-                    e.printStackTrace();
-                }
-            }).start();
+              // SỬA CHỖ NÀY: Cất nguyên bản toàn bộ danh sách vào kho gốc
+              allBidsList = myBids;
 
-        } else {
-            System.out.println("Người dùng hiện tại không phải là Bidder.");
+              filterBids("ALL"); // Mặc định hiển thị tất cả
+
+              if (myBids.isEmpty()) {
+                System.out.println("Bạn chưa có lượt đặt giá nào.");
+              } else {
+                System.out.println("Đã tải " + myBids.size() + " lượt đặt giá từ Server.");
+              }
+            });
+          } else {
+            String errorMsg = (response != null) ? (String) response.getData() : "Không có phản hồi từ Server";
+            System.err.println("Lỗi khi tải lịch sử: " + errorMsg);
+          }
+        } catch (Exception e) {
+          System.err.println("Lỗi kết nối mạng khi tải lịch sử đặt giá.");
+          e.printStackTrace();
         }
+      }).start();
+
+    } else {
+      System.out.println("Người dùng hiện tại không phải là Bidder.");
     }
+  }
+
+  // --- SỬA CHỖ NÀY: Mang logic Gom nhóm xuống hàm Lọc ---
+  private void filterBids(String filterType) {
+    if (allBidsList == null) return;
+
+    // Danh sách trung gian để chuẩn bị xét duyệt
+    List<Bid> listToProcess = allBidsList;
+
+    // NẾU KHÔNG PHẢI "ALL" THÌ MỚI GOM NHÓM (Để loại bỏ giá cũ, lấy giá cao nhất)
+    if (!"ALL".equals(filterType)) {
+      java.util.Map<String, Bid> highestBidsMap = new java.util.HashMap<>();
+      for (Bid bid : allBidsList) {
+        if (bid.getAuction() != null && bid.getAuction().getItem() != null) {
+          String productName = bid.getAuction().getItem().getName();
+          if (!highestBidsMap.containsKey(productName) || bid.getAmount() > highestBidsMap.get(productName).getAmount()) {
+            highestBidsMap.put(productName, bid);
+          }
+        }
+      }
+      listToProcess = new java.util.ArrayList<>(highestBidsMap.values());
+    }
+
+    List<Bid> filteredList = new ArrayList<>();
+
+    for (Bid bid : listToProcess) {
+      if (bid.getAuction() == null) continue;
+
+      String status = bid.getAuction().getStatus().toString();
+
+      switch (filterType) {
+        case "ALL":
+          filteredList.add(bid);
+          break;
+        case "RUNNING":
+          if ("RUNNING".equalsIgnoreCase(status)) {
+            filteredList.add(bid);
+          }
+          break;
+        case "FINISHED":
+          if ("FINISHED".equalsIgnoreCase(status) || "CLOSED".equalsIgnoreCase(status)) {
+            filteredList.add(bid);
+          }
+          break;
+        case "WON":
+          if (("FINISHED".equalsIgnoreCase(status) || "CLOSED".equalsIgnoreCase(status))
+              && bid.getAmount() == bid.getAuction().getCurrentPrice()) {
+            filteredList.add(bid);
+          }
+          break;
+      }
+    }
+
+    ObservableList<Bid> observableBids = FXCollections.observableArrayList(filteredList);
+    bidHistoryTable.setItems(observableBids);
+  }
+
+  // --- 4 Hàm dành cho 4 cái nút trên FXML ---
+  @FXML
+  public void handleShowAll(ActionEvent event) {
+    filterBids("ALL");
+  }
+
+  @FXML
+  public void handleShowRunning(ActionEvent event) {
+    filterBids("RUNNING");
+  }
+
+  @FXML
+  public void handleShowFinished(ActionEvent event) {
+    filterBids("FINISHED");
+  }
+
+  @FXML
+  public void handleShowWon(ActionEvent event) {
+    filterBids("WON");
+  }
 
   @FXML
   public void handleGoBack(ActionEvent event) {
