@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
+import org.deptrai.auctionsystem.client.utils.SearchEngine;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
@@ -19,6 +20,7 @@ import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -40,6 +42,11 @@ public class MainController {
   private ScrollPane mainScrollPane;
   @FXML
   private MenuButton notificationBell;
+  @FXML
+  private TextField searchField;
+
+  private List<Auction> allAuctions = new ArrayList<>();
+
 
   @FXML
   public void initialize() {
@@ -78,6 +85,14 @@ public class MainController {
       Platform.runLater(() -> {
         notificationBell.show();
         notificationBell.hide();
+      });
+    }
+
+    if(searchField != null) {
+      searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+        List<Auction> searchResult = SearchEngine.searchAuctions(allAuctions, newValue);
+
+        displayAuctions(searchResult);
       });
     }
   }
@@ -121,28 +136,10 @@ public class MainController {
     Message response = SocketClient.sendRequest(request);
 
     if (response.getStatus().equals("SUCCESS")) {
-      List<Auction> allAuctions = (List<Auction>) response.getData();
+      allAuctions = (List<Auction>) response.getData();
 
-      int limit = Math.min(allAuctions.size(), 6);
+      displayAuctions(allAuctions);
 
-      for (int i = 0; i < limit; i++) {
-        try {
-          FXMLLoader loader =
-                  new FXMLLoader(
-                          getClass().getResource("/org/deptrai/auctionsystem/client/views/item-card.fxml"));
-          Node itemCard = loader.load();
-
-          ItemCardController cardController = loader.getController();
-          if (cardController != null) {
-            cardController.setData(allAuctions.get(i));
-          }
-
-          productsContainer.getChildren().add(itemCard);
-
-        } catch (IOException e) {
-          System.err.println("Lỗi nạp item-card: " + e.getMessage());
-        }
-      }
       javafx.application.Platform.runLater(() -> {
         // Bọc thêm 1 lớp runLater để đảm bảo 100% giao diện đã nạp xong hết các nút bấm
         javafx.application.Platform.runLater(() -> {
@@ -246,4 +243,25 @@ public class MainController {
             .switchScene("/org/deptrai/auctionsystem/client/views/seller.fxml", "Kênh Người Bán");
   }
 
+  private void displayAuctions(List<Auction> auctionsToDisplay) {
+    javafx.application.Platform.runLater(() -> {
+      productsContainer.getChildren().clear();
+
+      int limit = Math.min(auctionsToDisplay.size(), 6);
+
+      for (int i = 0; i < limit; i++) {
+        try {
+          FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/deptrai/auctionsystem/client/views/item-card.fxml"));
+          Node itemCard = loader.load();
+          ItemCardController cardController = loader.getController();
+          if (cardController != null) {
+            cardController.setData(auctionsToDisplay.get(i));
+          }
+          productsContainer.getChildren().add(itemCard);
+        } catch (IOException e) {
+          System.err.println("Lỗi nạp item-card: " + e.getMessage());
+        }
+      }
+    });
+  }
 }
