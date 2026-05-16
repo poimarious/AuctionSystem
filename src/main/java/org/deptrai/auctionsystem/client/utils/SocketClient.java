@@ -48,15 +48,28 @@ public class SocketClient {
               Auction updatedAuction = (Auction) msg.getData();
 
               // add notification to all user's notification box
-              if(!updatedAuction.getBids().isEmpty()) {
-                Bid bid = updatedAuction.getBids().get(updatedAuction.getBids().size() - 1);
-                User currentUser = SessionManager.getInstance().getCurrentUser();
-                if(currentUser != null && !currentUser.getUserId().equals(bid.getBidder().getUserId())) {
-                  String text = bid.getTimestamp().format(DateTimeFormatter.ofPattern("HH:mm")) + " || "
-                          + bid.getBidder().getUsername()
-                          + " vừa ra giá $" + bid.getAmount()
-                          + " cho " + updatedAuction.getItem().getName();
+              User currentUser = SessionManager.getInstance().getCurrentUser();
+
+              if (currentUser != null) {
+                String currentStatus = updatedAuction.getStatus().toString();
+
+                // TRƯỜNG HỢP 1: Phiên đấu giá vừa kết thúc
+                if (currentStatus.equals("FINISHED") || currentStatus.equals("CANCELED")) {
+                  String timeNow = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+                  String text = timeNow + " || Phiên đấu giá [" + updatedAuction.getItem().getName() + "] đã KẾT THÚC.";
                   SessionManager.getInstance().addNotification(text);
+                }
+                // TRƯỜNG HỢP 2: Có người đặt giá mới (Vẫn đang chạy)
+                else if (!updatedAuction.getBids().isEmpty()) {
+                  Bid bid = updatedAuction.getBids().get(updatedAuction.getBids().size() - 1);
+                  // Không gửi thông báo cho chính người vừa đặt giá
+                  if (!currentUser.getUserId().equals(bid.getBidder().getUserId())) {
+                    String text = bid.getTimestamp().format(DateTimeFormatter.ofPattern("HH:mm")) + " || "
+                            + bid.getBidder().getUsername()
+                            + " vừa ra giá $" + bid.getAmount()
+                            + " cho " + updatedAuction.getItem().getName();
+                    SessionManager.getInstance().addNotification(text);
+                  }
                 }
               }
 

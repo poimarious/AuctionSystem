@@ -118,6 +118,16 @@ public class BiddingDetailController implements AuctionUpdateListener {
       expiryTimerLabel.setText("00:00:00");
       bidAmountField.setDisable(true);
       countdownTimeline.stop();
+
+      // Chỉ gửi yêu cầu kết thúc lên Server nếu phiên đấu giá thực sự ĐANG MỞ
+      if (currentAuction.getStatus() == org.deptrai.auctionsystem.shared.models.auction.AuctionStatus.OPEN ||
+              currentAuction.getStatus() == org.deptrai.auctionsystem.shared.models.auction.AuctionStatus.RUNNING) {
+
+        new Thread(() -> {
+          Message request = new Message("FINISH_AUCTION", currentAuction.getAuctionId());
+          SocketClient.sendRequest(request);
+        }).start();
+      }
     } else {
       expiryTimerLabel.setText(String.format("%02d:%02d:%02d",
           res.toHours(), res.toMinutesPart(), res.toSecondsPart()));

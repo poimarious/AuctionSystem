@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.deptrai.auctionsystem.server.dao.AuctionDAO;
 import org.deptrai.auctionsystem.server.dao.BidDAO;
@@ -76,6 +77,9 @@ public class ClientHandler implements Runnable {
             break;
           case "GET_BIDS_HISTORY":
             handleGetBidsHistory(request);
+            break;
+          case "FINISH_AUCTION":
+            handleFinishAuction(request);
             break;
           default:
             out.writeObject(
@@ -209,7 +213,7 @@ public class ClientHandler implements Runnable {
       List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
 
       // 2. Tạo một danh sách mới để chỉ chứa các phiên đang mở/đang diễn ra
-      List<Auction> activeAuctions = new java.util.ArrayList<>();
+      List<Auction> activeAuctions = new ArrayList<>();
 
       // 3. Lọc theo trạng thái
       for (Auction auction : allAuctions) {
@@ -595,6 +599,37 @@ public class ClientHandler implements Runnable {
       } catch (IOException ioException) {
         ioException.printStackTrace();
       }
+    }
+  }
+
+  private void handleFinishAuction(Message request) {
+    try {
+      String auctionId = (String) request.getData();
+      Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
+
+      // CHẶN SPAM: Chỉ xử lý nếu phiên đấu giá đang ở trạng thái OPEN hoặc RUNNING
+      if (auction != null && (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING)) {
+
+        // KIỂM TRA BẢO MẬT: Đảm bảo thời gian hiện tại trên Server thực sự đã vượt qua endTime
+        if (!LocalDateTime.now().isBefore(auction.getEndTime())) {
+
+          // 1. Cập nhật trạng thái thành FINISHED
+          auction.setStatus(AuctionStatus.FINISHED);
+
+          // 2. Lưu trạng thái mới xuống Database
+          AuctionDAO auctionDAO = new AuctionDAO();
+          boolean isUpdated = auctionDAO.updateAuctionState(auction);
+
+          if (isUpdated) {
+            System.out.println("Phiên đấu giá [" + auction.getItem().getName() + "] đã KẾT THÚC.");
+
+            // 3. Phát thông báo (Broadcast) cho toàn bộ Client đang online để họ đồng bộ lại giao diện
+            ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
+          }
+        }
+      }
+    } catch (Exception e) {
+      System.out.println("Lỗi khi kết thúc phiên đấu giá: " + e.getMessage());
     }
   }
 }
