@@ -43,14 +43,16 @@ public class AuctionDAO {
 
   // Use when there's a new bid/closing auction
   public boolean updateAuctionState(Auction auction) {
-    String sql = "UPDATE Auctions SET currentPrice = ?, status = ? WHERE auctionId = ?";
+    String sql = "UPDATE Auctions SET currentPrice = ?, status = ?, endTime = ? WHERE auctionId = ?";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       pstmt.setDouble(1, auction.getCurrentPrice());
       pstmt.setString(2, auction.getStatus().name());
-      pstmt.setString(3, auction.getAuctionId());
+      // SỬA: Lưu lại thời gian kết thúc (có thể đã được gia hạn)
+      pstmt.setString(3, auction.getEndTime().toString());
+      pstmt.setString(4, auction.getAuctionId());
 
       pstmt.executeUpdate();
       return true;

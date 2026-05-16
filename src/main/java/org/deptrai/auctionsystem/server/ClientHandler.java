@@ -13,7 +13,7 @@ import org.deptrai.auctionsystem.server.dao.ItemDAO;
 import org.deptrai.auctionsystem.server.dao.UserDAO;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
-import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus; // Giả định bạn có enum này
+import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.items.Item;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
@@ -22,7 +22,7 @@ import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 import org.deptrai.auctionsystem.utils.ValidationUtils;
 
-public class ClientHandler implements Runnable {
+public class  ClientHandler implements Runnable {
   private final Socket socket;
   private final UserDAO userDAO;
   private ObjectOutputStream out;
@@ -444,14 +444,30 @@ public class ClientHandler implements Runnable {
         return;
       }
 
+      // ================= TÍNH NĂNG ANTI-SNIPER (GIA HẠN THỜI GIAN) =================
+      // x = 30 giây (Thời gian chót), y = 60 giây (Thời gian được cộng thêm)
+      long THRESHOLD_SECONDS = 30;
+      long EXTEND_SECONDS = 60;
+
+      java.time.Duration remainingTime = java.time.Duration.between(LocalDateTime.now(), auction.getEndTime());
+
+      // Nếu thời gian còn lại nhỏ hơn hoặc bằng 30 giây (và phiên chưa kết thúc)
+      if (!remainingTime.isNegative() && remainingTime.getSeconds() <= THRESHOLD_SECONDS) {
+        // Cộng thêm 60s vào thời gian kết thúc
+        auction.setEndTime(auction.getEndTime().plusSeconds(EXTEND_SECONDS));
+        System.out.println(" Phiên [" + auction.getItem().getName() + "] được gia hạn thêm " + EXTEND_SECONDS + "s");
+      }
+      // =============================================================================
+
       // update new price on price board
       auction.setCurrentPrice(bidAmount);
       if (auction.getStatus() == AuctionStatus.OPEN) {
         auction.setStatus(AuctionStatus.RUNNING);
       }
+
+      // Lúc này hàm updateAuctionState sẽ tự động lưu cả giá mới, trạng thái mới và endTime mới
       AuctionDAO auctionDAO = new AuctionDAO();
-      boolean isAuctionUpdated =
-          auctionDAO.updateAuctionState(auction); // Lưu lại mức giá mới xuống SQLite
+      boolean isAuctionUpdated = auctionDAO.updateAuctionState(auction);
 
       // Update RAM data
       auction.getBids().add(newBid);
@@ -460,6 +476,7 @@ public class ClientHandler implements Runnable {
       out.writeObject(new Message("SUCCESS", "PLACE_BID", newBid));
       out.flush();
 
+      // Khi Broadcast được gửi đi, gói bưu kiện 'auction' này đã mang theo endTime mới!
       ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
 
     } catch (Exception e) {
