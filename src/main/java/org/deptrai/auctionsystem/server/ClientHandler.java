@@ -5,15 +5,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import org.deptrai.auctionsystem.server.dao.AuctionDAO;
-import org.deptrai.auctionsystem.server.dao.BidDAO;
-import org.deptrai.auctionsystem.server.dao.ItemDAO;
-import org.deptrai.auctionsystem.server.dao.UserDAO;
+import java.util.Set;
+
+import javafx.scene.control.PasswordField;
+import org.deptrai.auctionsystem.server.dao.*;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.items.Item;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
@@ -27,6 +30,11 @@ public class  ClientHandler implements Runnable {
   private final UserDAO userDAO;
   private ObjectOutputStream out;
   private ObjectInputStream in;
+  private User authenticatedUser;
+
+  public User getAuthenticatedUser() {
+    return authenticatedUser;
+  }
 
   public ClientHandler(Socket socket) {
     this.socket = socket;
@@ -81,6 +89,9 @@ public class  ClientHandler implements Runnable {
           case "FINISH_AUCTION":
             handleFinishAuction(request);
             break;
+          case "GET_NOTIFICATIONS":
+            handleGetNotifications(request);
+            break;
           default:
             out.writeObject(
                 new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
@@ -121,6 +132,7 @@ public class  ClientHandler implements Runnable {
 
     try {
       if (user != null && user.getPassword().equals(password)) {
+        this.authenticatedUser = user;
         out.writeObject(new Message("SUCCESS", "LOGIN", user));
       } else {
         out.writeObject(new Message("FAIL", "LOGIN", "Sai tên đăng nhập hoặc mật khẩu."));
@@ -209,21 +221,31 @@ public class  ClientHandler implements Runnable {
 
   private void handleGetAllAuctions(Message request) {
     try {
-      // 1. Lấy toàn bộ danh sách phiên đấu giá hiện có trên RAM (Cache)
+      // Lấy toàn bộ từ RAM (Cache)
       List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
+      List<AuctionSummary> activeAuctionsDTO = new ArrayList<>();
 
-      // 2. Tạo một danh sách mới để chỉ chứa các phiên đang mở/đang diễn ra
-      List<Auction> activeAuctions = new ArrayList<>();
-
-      // 3. Lọc theo trạng thái
+      // Lọc và ánh xạ sang DTO siêu nhẹ
       for (Auction auction : allAuctions) {
         if (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING) {
-          activeAuctions.add(auction);
+
+          AuctionSummary auctionSummary = new AuctionSummary(
+                  auction.getAuctionId(),
+                  auction.getItem().getName(),
+                  auction.getItem().getDescription(),
+                  auction.getItem().getCategory(),
+                  auction.getCurrentPrice(),
+                  auction.getStatus(),
+                  auction.getEndTime(),
+                  auction.getItem().getImageUrl()
+          );
+
+          activeAuctionsDTO.add(auctionSummary);
         }
       }
 
-      // 4. Gửi danh sách ĐÃ LỌC về cho Trang chủ (AuctionFloorController)
-      out.writeObject(new Message("SUCCESS", "GET_ALL_AUCTIONS", activeAuctions));
+      // Gửi gói tin DTO gọn nhẹ về cho Client
+      out.writeObject(new Message("SUCCESS", "GET_ALL_AUCTIONS", activeAuctionsDTO));
       out.flush();
 
     } catch (IOException e) {
@@ -479,6 +501,42 @@ public class  ClientHandler implements Runnable {
       // Khi Broadcast được gửi đi, gói bưu kiện 'auction' này đã mang theo endTime mới!
       ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
 
+      new Thread(()-> {
+        NotificationDAO notiDAO = new NotificationDAO();
+        Set<String> targetUserIds = new HashSet<>();
+
+        if(auction.getItem() != null && auction.getItem().getSeller() != null) {
+          targetUserIds.add(auction.getItem().getSeller().getUserId());
+        }
+
+        for(Bid bid : auction.getBids()) {
+          if(bid.getBidder() != null) {
+            targetUserIds.add(bid.getBidder().getUserId());
+          }
+        }
+
+        targetUserIds.remove(bidder.getUserId());
+
+        String timeStampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String notiMsg = timeStampStr + " || " + bidder.getUsername() + " vừa đặt giá cho " + auction.getItem().getName() +
+                " lên $" + bidAmount;
+
+        for(String userid : targetUserIds) {
+          boolean isOnline = false;
+
+          for(ClientHandler client : ServerMain.activeClients) {
+            if(client.getAuthenticatedUser() != null && client.getAuthenticatedUser().getUserId().equals(userid)) {
+              client.sendMessage(new Message("SUCCESS", "PUSH_NOTIFICATION_BELL", notiMsg));
+              isOnline = true;
+              break;
+            }
+          }
+          if(!isOnline) {
+            notiDAO.insertNotification(userid, notiMsg);
+          }
+        }
+      }).start();
+
     } catch (Exception e) {
       e.printStackTrace();
       try {
@@ -649,6 +707,24 @@ public class  ClientHandler implements Runnable {
       out.flush();
     } catch (Exception e) {
       System.out.println("Lỗi khi kết thúc phiên đấu giá: " + e.getMessage());
+    }
+  }
+
+  private void handleGetNotifications(Message request) {
+    try {
+      String userId = (String) request.getData();
+      NotificationDAO notiDAO = new NotificationDAO();
+
+      // Lấy danh sách chưa đọc từ DB lên
+      List<String> unreadNotifs = notiDAO.getUnreadNotifications(userId);
+
+      out.writeObject(new Message("SUCCESS", "GET_NOTIFICATIONS", unreadNotifs));
+      out.flush();
+
+      // Đọc xong thì tự động xóa trong DB
+      notiDAO.deleteNotificationsByUserId(userId);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 }

@@ -18,6 +18,8 @@ public class SessionManager {
   // Biến lắng nghe sự thay đổi số dư ví
   private Runnable balanceListener;
 
+  private String selectedAuctionId;
+
   private final ObservableList<String> notifications = FXCollections.observableArrayList();
 
   private SessionManager() {}
@@ -32,11 +34,13 @@ public class SessionManager {
   public User getCurrentUser() {
     return currentUser;
   }
+  public String getSelectedAuctionId() {return selectedAuctionId;}
 
   // --- QUẢN LÝ NGƯỜI DÙNG ---
   public void setCurrentUser(User user) {
     this.currentUser = user;
   }
+  public void setSelectedAuctionId(String selectAuctionId) {this.selectedAuctionId = selectAuctionId;}
 
   public void logout() {
     this.currentUser = null;
@@ -77,4 +81,5 @@ public class SessionManager {
       notifications.add(0, msg);
     });
   }
+
 }

@@ -15,6 +15,7 @@ import org.deptrai.auctionsystem.client.utils.SearchEngine;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
@@ -45,7 +46,7 @@ public class MainController {
   @FXML
   private TextField searchField;
 
-  private List<Auction> allAuctions = new ArrayList<>();
+  private List<AuctionSummary> allAuctions = new ArrayList<>();
 
 
   @FXML
@@ -90,7 +91,7 @@ public class MainController {
 
     if(searchField != null) {
       searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-        List<Auction> searchResult = SearchEngine.searchAuctions(allAuctions, newValue);
+        List<AuctionSummary> searchResult = SearchEngine.searchAuctions(allAuctions, newValue);
 
         displayAuctions(searchResult);
       });
@@ -121,6 +122,25 @@ public class MainController {
     walletLabel.setText(String.format("Ví: $%,.2f", balance));
 
     User currentUser = SessionManager.getInstance().getCurrentUser();
+
+    if (currentUser != null) {
+      new Thread(() -> {
+        // Hỏi Server: "Tôi vừa online, có thông báo nào tích lũy lúc tôi offline không?"
+        Message req = new Message("GET_NOTIFICATIONS", currentUser.getUserId());
+        Message res = SocketClient.sendRequest(req);
+
+        if (res != null && "SUCCESS".equals(res.getStatus())) {
+          List<String> offlineNotifs = (List<String>) res.getData();
+          Platform.runLater(() -> {
+            // Đổ toàn bộ thông báo tích lũy vào chuông thông báo trên RAM Client
+            for (String msg : offlineNotifs) {
+              SessionManager.getInstance().addNotification(msg);
+            }
+          });
+        }
+      }).start();
+    }
+
     if (currentUser instanceof Seller) {
       sellerCenterBtn.setVisible(true);
       sellerCenterBtn.setManaged(true);
@@ -136,7 +156,7 @@ public class MainController {
     Message response = SocketClient.sendRequest(request);
 
     if (response.getStatus().equals("SUCCESS")) {
-      allAuctions = (List<Auction>) response.getData();
+      allAuctions = (List<AuctionSummary>) response.getData();
 
       displayAuctions(allAuctions);
 
@@ -153,6 +173,28 @@ public class MainController {
       System.err.println("Không thể lấy danh sách đấu giá từ server");
     }
 
+  }
+
+  private void displayAuctions(List<AuctionSummary> auctionsToDisplay) {
+    javafx.application.Platform.runLater(() -> {
+      productsContainer.getChildren().clear();
+
+      int limit = Math.min(auctionsToDisplay.size(), 6);
+
+      for (int i = 0; i < limit; i++) {
+        try {
+          FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/deptrai/auctionsystem/client/views/item-card.fxml"));
+          Node itemCard = loader.load();
+          ItemCardController cardController = loader.getController();
+          if (cardController != null) {
+            cardController.setData(auctionsToDisplay.get(i));
+          }
+          productsContainer.getChildren().add(itemCard);
+        } catch (IOException e) {
+          System.err.println("Lỗi nạp item-card: " + e.getMessage());
+        }
+      }
+    });
   }
 
   private void updateNotification() {
@@ -243,25 +285,5 @@ public class MainController {
             .switchScene("/org/deptrai/auctionsystem/client/views/seller.fxml", "Kênh Người Bán");
   }
 
-  private void displayAuctions(List<Auction> auctionsToDisplay) {
-    javafx.application.Platform.runLater(() -> {
-      productsContainer.getChildren().clear();
 
-      int limit = Math.min(auctionsToDisplay.size(), 6);
-
-      for (int i = 0; i < limit; i++) {
-        try {
-          FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/deptrai/auctionsystem/client/views/item-card.fxml"));
-          Node itemCard = loader.load();
-          ItemCardController cardController = loader.getController();
-          if (cardController != null) {
-            cardController.setData(auctionsToDisplay.get(i));
-          }
-          productsContainer.getChildren().add(itemCard);
-        } catch (IOException e) {
-          System.err.println("Lỗi nạp item-card: " + e.getMessage());
-        }
-      }
-    });
-  }
 }

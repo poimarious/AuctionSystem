@@ -65,6 +65,14 @@ public class DatabaseConnection {
             + "FOREIGN KEY(bidderId) REFERENCES Users(userId), "
             + "FOREIGN KEY(auctionId) REFERENCES Auctions(auctionId)"
             + ");";
+    String sqlCreateNotifications = "CREATE TABLE IF NOT EXISTS notifications ("
+            + "notification_id TEXT PRIMARY KEY, "
+            + "user_id TEXT, "
+            + "message TEXT, "
+            + "is_read INTEGER DEFAULT 0, "
+            + "created_at TEXT"
+            + ");";
+
 
     try (Connection conn = getConnection();
          Statement stmt = conn.createStatement()) {
@@ -76,6 +84,7 @@ public class DatabaseConnection {
       stmt.execute(sqlCreateItems);
       stmt.execute(sqlCreateAuctions);
       stmt.execute(sqlCreateBids);
+      stmt.execute(sqlCreateNotifications);
 
       // 2. Kiểm tra và nâng cấp Schema (Migration)
       updateSchema(conn);

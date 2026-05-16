@@ -53,6 +53,8 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
   @FXML
   public void initialize() {
+
+
     // Cấu hình bảng
     amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
     timeColumn.setCellValueFactory(cellData -> {
@@ -77,20 +79,25 @@ public class BiddingDetailController implements AuctionUpdateListener {
     }
 
     // Tự động load dữ liệu từ Session khi vừa vào trang
-    Auction selected = SessionManager.getInstance().getSelectedAuction();
-    if (selected != null) {
-      Message req = new Message("GET_AUCTION_BY_ID", selected.getAuctionId());
+    String selectedId = SessionManager.getInstance().getSelectedAuctionId();
 
-      Message res = SocketClient.sendRequest(req);
+    if (selectedId != null) {
+      // Bọc vào Thread phụ để không làm đơ ứng dụng khi tải
+      new Thread(() -> {
+        Message req = new Message("GET_AUCTION_BY_ID", selectedId);
+        Message res = SocketClient.sendRequest(req);
 
-      if (res.getStatus().equals("SUCCESS")) {
-        // Lấy được hàng nóng hổi từ DB Server
-        Auction freshAuction = (Auction) res.getData();
-        setAuctionData(freshAuction);
-      } else {
-        // Dự phòng rủi ro: Nếu mạng lag thì dùng tạm dữ liệu cũ
-        setAuctionData(selected);
-      }
+        Platform.runLater(() -> {
+          if (res != null && "SUCCESS".equals(res.getStatus())) {
+            Auction freshAuction = (Auction) res.getData();
+            setAuctionData(freshAuction);
+          } else {
+            // Xử lý khi mạng lỗi hoặc phiên đấu giá bị xóa
+            showError("Không thể tải thông tin phiên đấu giá. Vui lòng thử lại sau!");
+            handleGoBack(null); // Đẩy người dùng quay lại trang trước
+          }
+        });
+      }).start();
     }
   }
 

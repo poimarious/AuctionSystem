@@ -13,6 +13,7 @@ import org.deptrai.auctionsystem.client.utils.SearchEngine;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.network.Message;
 
 import java.io.IOException;
@@ -31,8 +32,7 @@ public class AuctionFloorController {
   private ComboBox<String> categoryCombo;
   @FXML
   private ComboBox<String> statusCombo;
-  private List<Auction> allAuctionsList = new ArrayList<>();
-  private List<Auction> cacheAuctions = new ArrayList<>();
+  private List<AuctionSummary> allAuctionsList = new ArrayList<>();
 
   /**
    * 1. SỬA NÚT QUAY LẠI: Ép về thẳng Home View
@@ -78,8 +78,8 @@ public class AuctionFloorController {
     new Thread(() -> {
       Message response = SocketClient.sendRequest(request);
       if ("SUCCESS".equals(response.getStatus())) {
-        List<Auction> allAuctions = (List<Auction>) response.getData();
-        //1
+        List<AuctionSummary> allAuctions = (List<AuctionSummary>) response.getData();
+
         allAuctionsList = allAuctions;
 
         // Cập nhật giao diện an toàn trên luồng UI
@@ -94,19 +94,18 @@ public class AuctionFloorController {
     String keyword = searchField.getText();
 
     //Tìm các auctions theo keyword trước
-    List<Auction> tempResult = SearchEngine.searchAuctions(allAuctionsList, keyword);
+    List<AuctionSummary> tempResult = SearchEngine.searchAuctions(allAuctionsList, keyword);
 
     // lọc theo category và status
-    List<Auction> finalResults = new ArrayList<>();
+    List<AuctionSummary> finalResults = new ArrayList<>();
     LocalDateTime now = LocalDateTime.now();
 
 
-    for (Auction auction : tempResult) {
+    for (AuctionSummary auction : tempResult) {
       // Kiểm tra xem sản phẩm có khớp danh mục không
       boolean matchCategory = (selectedCategory == null || selectedCategory.equals("Tất cả")) ||
-              (auction.getItem() != null &&
-                      auction.getItem().getCategory() != null &&
-                      auction.getItem().getCategory().equalsIgnoreCase(selectedCategory));
+              (auction.getCategory() != null &&
+                      auction.getCategory().equalsIgnoreCase(selectedCategory));
 
       boolean matchStatus = true;
 
@@ -139,9 +138,9 @@ public class AuctionFloorController {
     displayAuctions(finalResults);
   }
 
-  private void displayAuctions(List<Auction> auctions) {
+  private void displayAuctions(List<AuctionSummary> auctions) {
     productsContainer.getChildren().clear();
-    for (Auction auction : auctions) {
+    for (AuctionSummary auction : auctions) {
       try {
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/org/deptrai/auctionsystem/client/views/item-card.fxml"));

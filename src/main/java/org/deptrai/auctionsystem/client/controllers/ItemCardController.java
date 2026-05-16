@@ -16,6 +16,7 @@ import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 
@@ -29,15 +30,15 @@ public class ItemCardController implements AuctionUpdateListener {
   @FXML private Label timerLabel;
   @FXML private Button bidButton;
 
-  private Auction auction;
+  private AuctionSummary auction;
   private Timeline timeline;
 
-  public void setData(Auction auction) {
+  public void setData(AuctionSummary auction) {
     this.auction = auction;
-    nameLabel.setText(auction.getItem().getName());
+    nameLabel.setText(auction.getItemName());
     priceLabel.setText(String.format("$%.2f", auction.getCurrentPrice()));
 
-    String imagePath = auction.getItem().getImageUrl();
+    String imagePath = auction.getImageUrl();
 
     if(imagePath != null && !imagePath.isEmpty()) {
       try {
@@ -105,19 +106,18 @@ public class ItemCardController implements AuctionUpdateListener {
    */
   @FXML
   public void handleBidAction() {
-    if (this.auction == null) return;
-
-    if (timeline != null) timeline.stop();
+    if(this.auction == null) return ;
+    if(timeline != null) timeline.stop();
 
     SocketClient.removeListener(this);
 
     // 1. Lưu auction vào Session để trang sau có cái mà hiển thị
-    SessionManager.getInstance().setSelectedAuction(this.auction);
+    SessionManager.getInstance().setSelectedAuctionId(auction.getAuctionId());
 
     // 2. Chuyển sang đúng file FXML bạn vừa gửi
     SceneManager.getInstance().switchScene(
         "/org/deptrai/auctionsystem/client/views/bidding-detail.fxml",
-        "Chi tiết đấu giá - " + auction.getItem().getName());
+        "Chi tiết đấu giá - " + auction.getItemName());
   }
 
   @Override
@@ -125,7 +125,8 @@ public class ItemCardController implements AuctionUpdateListener {
     // Kiểm tra xem tin nhắn đổi giá có phải dành cho món hàng của cái thẻ này không
     if (this.auction.getAuctionId().equals(updatedAuction.getAuctionId())) {
       // Update this card's RAM
-      this.auction = updatedAuction;
+      this.auction.setStatus(updatedAuction.getStatus());
+      this.auction.setCurrentPrice(updatedAuction.getCurrentPrice());
 
       // Nhảy số tiền trên giao diện
       Platform.runLater(() -> {

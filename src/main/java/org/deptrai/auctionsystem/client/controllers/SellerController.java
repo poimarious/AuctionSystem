@@ -11,6 +11,7 @@ import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 
@@ -53,7 +54,7 @@ public class SellerController {
         Message response = SocketClient.sendRequest(request);
 
         if (response != null && "SUCCESS".equals(response.getStatus())) {
-          List<Auction> sellerAuctions = (List<Auction>) response.getData();
+          List<AuctionSummary> sellerAuctions = (List<AuctionSummary>) response.getData();
 
           // Quay lại luồng UI chính để cập nhật giao diện
           Platform.runLater(() -> displayAuctions(sellerAuctions));
@@ -69,12 +70,12 @@ public class SellerController {
   /**
    * Hàm quan trọng: Biến List dữ liệu thành các thẻ ItemCard FXML
    */
-  private void displayAuctions(List<Auction> auctions) {
+  private void displayAuctions(List<AuctionSummary> auctions) {
     if (productsContainer == null) return;
 
     productsContainer.getChildren().clear(); // Xóa các thẻ cũ (nếu có)
 
-    for (Auction auction : auctions) {
+    for (AuctionSummary auction : auctions) {
       try {
         // Nạp file FXML của thẻ sản phẩm
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/deptrai/auctionsystem/client/views/item-card.fxml"));
