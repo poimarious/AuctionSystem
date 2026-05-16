@@ -7,6 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.server.ClientHandler;
 import org.deptrai.auctionsystem.server.dao.AuctionDAO;
@@ -111,18 +113,26 @@ public class BiddingCoreTest {
     // ==========================================
     // GIAI ĐOẠN 1: ĐẶT GIÁ (PLACE BID)
     // ==========================================
-    /*
     @Test
     @Order(1)
     void testPlaceBid_ValidBid_ShouldSucceedAndIncreasePrice() {
         // 1. Tạo đối tượng Bid với giá 150.0 (Lớn hơn giá gốc 100.0)
         double bidAmount = 150.0;
-        Bid newBid = new Bid(null, testBidder, targetAuction, bidAmount, LocalDateTime.now());
+
+        //Bid newBid = new Bid(null, testBidder, targetAuction, bidAmount, LocalDateTime.now());
+
+        Object[] payload = new Object[] {
+                targetAuction.getAuctionId(),
+                testBidder.getUserId(),
+                bidAmount
+        };
 
         // 2. Gửi Request
         // Giả định Server của bạn đang nhận Payload là đối tượng Bid
-        Message request = new Message("PLACE_BID", newBid);
+        Message request = new Message("PLACE_BID", payload);
         Message response = SocketClient.sendRequest(request);
+
+        System.out.println(response.getData());
 
         // 3. Kiểm tra kết quả trả về
         assertEquals("SUCCESS", response.getStatus(), "Đặt giá hợp lệ phải thành công");
@@ -140,8 +150,15 @@ public class BiddingCoreTest {
         Auction fakeAuction = new Auction(targetAuction.getItem(), LocalDateTime.now());
         fakeAuction.setAuctionId("FAKE_AUCTION_ID_123");
 
-        Bid newBid = new Bid(null, testBidder, fakeAuction, 200.0, LocalDateTime.now());
-        Message request = new Message("PLACE_BID", newBid);
+        //Bid newBid = new Bid(null, testBidder, fakeAuction, 200.0, LocalDateTime.now());
+
+        Object[] payload = new Object[] {
+                fakeAuction.getAuctionId(),
+                testBidder.getUserId(),
+                200.0
+        };
+
+        Message request = new Message("PLACE_BID", payload);
         Message response = SocketClient.sendRequest(request);
 
         // Dựa theo logic ClientHandler, nếu lỗi DB hoặc Auction không hợp lệ, phải trả về FAIL
@@ -169,7 +186,7 @@ public class BiddingCoreTest {
         assertEquals(1, history.size(), "Phải có đúng 1 lượt đặt giá trong lịch sử");
         assertEquals(150.0, history.get(0).getAmount(), 0.001, "Giá trị của lượt bid trong lịch sử phải là 150.0");
         assertEquals(targetAuction.getAuctionId(), history.get(0).getAuction().getAuctionId(), "ID phiên đấu giá phải khớp");
-    }*/
+    }
 
     @Test
     @Order(4)
