@@ -89,6 +89,9 @@ public class  ClientHandler implements Runnable {
           case "GET_NOTIFICATIONS":
             handleGetNotifications(request);
             break;
+          case "CHECKOUT":
+            handleCheckout(request);
+            break;
           default:
             out.writeObject(
                 new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
@@ -822,6 +825,80 @@ public class  ClientHandler implements Runnable {
       notiDAO.deleteNotificationsByUserId(userId);
     } catch (IOException e) {
       e.printStackTrace();
+    }
+  }
+
+  private void handleCheckout(Message request) {
+    try {
+      String auctionId = (String) request.getData();
+      Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
+
+      // 1. KIỂM TRA TRẠNG THÁI: Chỉ cho phép thanh toán nếu đã FINISHED
+      if (auction == null || auction.getStatus() != AuctionStatus.FINISHED) {
+        out.writeObject(new Message("FAIL", "CHECKOUT", "Phiên đấu giá không hợp lệ hoặc đã được thanh toán."));
+        out.flush();
+        return;
+      }
+
+      Bidder winner = auction.getWinner();
+      if (winner == null) {
+        out.writeObject(new Message("FAIL", "CHECKOUT", "Không có người chiến thắng để thanh toán."));
+        out.flush();
+        return;
+      }
+
+      UserDAO userDAO = new UserDAO();
+
+
+      // Lấy thông tin cả Người Mua và Người Bán để đảm bảo số dư không bị lệch
+      User dbWinner = userDAO.getUserById(winner.getUserId());
+      String sellerId = auction.getItem().getSeller().getUserId();
+      User dbSeller = userDAO.getUserById(sellerId);
+
+      double finalPrice = auction.getCurrentPrice();
+
+
+      if (dbWinner.getBalance() < finalPrice) {
+        out.writeObject(new Message("FAIL", "CHECKOUT", "Tài khoản không đủ số dư để thanh toán!"));
+        out.flush();
+        return;
+      }
+
+      // 3. THỰC HIỆN CHUYỂN TIỀN (TRANSACTION)
+      // Bước 3.1: Trừ tiền người mua
+      boolean isBuyerDeducted = userDAO.updateBalance(dbWinner.getUserId(), dbWinner.getBalance() - finalPrice);
+
+      if (isBuyerDeducted) {
+        // Bước 3.2: Cộng tiền cho người bán
+        boolean isSellerAdded = userDAO.updateBalance(sellerId, dbSeller.getBalance() + finalPrice);
+
+        if (isSellerAdded) {
+          // 4. CẬP NHẬT TRẠNG THÁI THÀNH PAID
+          auction.setStatus(AuctionStatus.PAID);
+
+          AuctionDAO auctionDAO = new AuctionDAO();
+          auctionDAO.updateAuctionState(auction); // Lưu trạng thái mới xuống DB
+
+          // Phát loa thông báo cho TẤT CẢ các Client cập nhật lại UI (Đổi nhãn thành Đã thanh toán)
+          ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
+
+          out.writeObject(new Message("SUCCESS", "CHECKOUT", "Thanh toán thành công!"));
+        } else {
+          out.writeObject(new Message("FAIL", "CHECKOUT", "Lỗi chuyển tiền cho người bán."));
+        }
+      } else {
+        out.writeObject(new Message("FAIL", "CHECKOUT", "Lỗi khi trừ tiền người mua."));
+      }
+      out.flush();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      try {
+        out.writeObject(new Message("ERROR", "CHECKOUT", "Lỗi Server khi xử lý thanh toán."));
+        out.flush();
+      } catch (IOException ex) {
+        ex.printStackTrace();
+      }
     }
   }
 }
