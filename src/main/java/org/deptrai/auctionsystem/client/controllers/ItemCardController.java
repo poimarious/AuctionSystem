@@ -44,7 +44,7 @@ public class ItemCardController implements AuctionUpdateListener {
       try {
         File imgFile = new File(imagePath);
         if(imgFile.exists()) {
-          Image realImage = new Image(imgFile.toURI().toString());
+          Image realImage = new Image(imgFile.toURI().toString(), 250, 250, true, true);
           itemImageView.setImage(realImage);
         }
       } catch (Exception e) {

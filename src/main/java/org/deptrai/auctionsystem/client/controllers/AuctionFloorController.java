@@ -139,7 +139,15 @@ public class AuctionFloorController {
   }
 
   private void displayAuctions(List<AuctionSummary> auctions) {
+    // trước khi clear product container, phải remove tất cả controller
+    for(Node node : productsContainer.getChildren()) {
+      if(node.getUserData() instanceof ItemCardController oldController) {
+        SocketClient.removeListener(oldController);
+      }
+    }
+
     productsContainer.getChildren().clear();
+
     for (AuctionSummary auction : auctions) {
       try {
         FXMLLoader loader = new FXMLLoader(

@@ -2,6 +2,7 @@ package org.deptrai.auctionsystem.server.managers;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import org.deptrai.auctionsystem.server.dao.AuctionDAO;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
@@ -9,7 +10,7 @@ import org.deptrai.auctionsystem.shared.models.items.Item;
 
 public class AuctionManager {
   // implement treemap with thread-safe
-  private final ConcurrentSkipListMap<String, Auction> auctions = new ConcurrentSkipListMap<>();
+  private final ConcurrentHashMap<String, Auction> auctions = new ConcurrentHashMap<>();
 
   private static class SingletonHelper { // Helper class to generate instance,because this class only loads once so it ensures thread-safe
     private static final AuctionManager INSTANCE = new AuctionManager();
