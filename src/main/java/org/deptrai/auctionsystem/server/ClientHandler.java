@@ -452,6 +452,33 @@ public class  ClientHandler implements Runnable {
         return;
       }
 
+      // ================= KIỂM TRA SỐ DƯ ĐỘNG TRÊN RAM (ON-THE-FLY BALANCE CHECK) =================
+      double lockedBalance = 0.0;
+      List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
+
+      for (Auction a : allAuctions) {
+        if (a.getStatus() == AuctionStatus.OPEN || a.getStatus() == AuctionStatus.RUNNING) {
+          Bidder topBidder = a.getWinner();
+          // Nếu User hiện tại đang là người dẫn đầu ở một phiên đấu giá
+          if (topBidder != null && topBidder.getUserId().equals(bidder.getUserId())) {
+            // Chỉ cộng tiền giam nếu đó là một phiên đấu giá KHÁC.
+            // Nếu là phiên hiện tại, ta bỏ qua để lát nữa tính bằng mức giá mới (bidAmount)
+            if (!a.getAuctionId().equals(auctionId)) {
+              lockedBalance += a.getCurrentPrice();
+            }
+          }
+        }
+      }
+
+      double totalRequiredBalance = lockedBalance + bidAmount;
+
+      if (totalRequiredBalance > bidder.getBalance()) {
+        out.writeObject(new Message("FAIL", "PLACE_BID",
+                String.format("Số dư không đủ! Bạn đã đặt giá tổng cộng $%.2f ở các phiên khác.", lockedBalance)));
+        out.flush();
+        return;
+      }
+      // =========================================================================================
       // 6. Save data to database
       BidDAO bidDAO = new BidDAO();
       boolean isBidSaved = bidDAO.insertBid(newBid); // Gọi đúng 1 tham số
