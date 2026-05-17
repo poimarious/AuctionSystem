@@ -6,9 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
+
 import javafx.application.Platform;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
@@ -22,6 +21,12 @@ public class SocketClient {
 
   private static final BlockingQueue<Message> responseQueue = new ArrayBlockingQueue<>(1);
   private static final List<AuctionUpdateListener> listeners = new CopyOnWriteArrayList<>();
+
+  private static final ExecutorService clientExecutor = Executors.newCachedThreadPool();
+
+  public static void runAsync(Runnable task) {
+    clientExecutor.submit(task);
+  }
 
   public static void addListener(AuctionUpdateListener listener) {
     listeners.add(listener);

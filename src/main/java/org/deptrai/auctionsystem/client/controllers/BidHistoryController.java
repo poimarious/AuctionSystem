@@ -100,7 +100,8 @@ public class BidHistoryController {
       String userId = bidder.getUserId();
 
       // Chạy luồng phụ để không làm đơ giao diện khi đợi phản hồi từ Server
-      new Thread(() -> {
+
+      SocketClient.runAsync(() -> {
         try {
           Message request = new Message("GET_BIDS_HISTORY", userId);
           Message response = SocketClient.sendRequest(request);
@@ -129,6 +130,9 @@ public class BidHistoryController {
           System.err.println("Lỗi kết nối mạng khi tải lịch sử đặt giá.");
           e.printStackTrace();
         }
+      });
+      new Thread(() -> {
+
       }).start();
 
     } else {

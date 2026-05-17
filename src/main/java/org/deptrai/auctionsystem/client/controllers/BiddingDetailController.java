@@ -83,7 +83,8 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
     if (selectedId != null) {
       // Bọc vào Thread phụ để không làm đơ ứng dụng khi tải
-      new Thread(() -> {
+
+      SocketClient.runAsync(() -> {
         Message req = new Message("GET_AUCTION_BY_ID", selectedId);
         Message res = SocketClient.sendRequest(req);
 
@@ -97,7 +98,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
             handleGoBack(null); // Đẩy người dùng quay lại trang trước
           }
         });
-      }).start();
+      });
     }
   }
 
@@ -149,10 +150,10 @@ public class BiddingDetailController implements AuctionUpdateListener {
       if (currentAuction.getStatus() == org.deptrai.auctionsystem.shared.models.auction.AuctionStatus.OPEN ||
               currentAuction.getStatus() == org.deptrai.auctionsystem.shared.models.auction.AuctionStatus.RUNNING) {
 
-        new Thread(() -> {
+        SocketClient.runAsync(() -> {
           Message request = new Message("FINISH_AUCTION", currentAuction.getAuctionId());
           SocketClient.sendRequest(request);
-        }).start();
+        });
       }
     } else {
       expiryTimerLabel.setText(String.format("%02d:%02d:%02d",
@@ -181,7 +182,8 @@ public class BiddingDetailController implements AuctionUpdateListener {
       User currentUser = SessionManager.getInstance().getCurrentUser();
 
       Message bidReq = new Message("PLACE_BID", new Object[]{currentAuction.getAuctionId(), currentUser.getUserId(), amount});
-      new Thread(() -> {
+
+      SocketClient.runAsync(() -> {
         Message res = SocketClient.sendRequest(bidReq);
         Platform.runLater(() -> {
           if ("SUCCESS".equals(res.getStatus())) {
@@ -202,7 +204,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
             showError(realErrorMessage);
           }
         });
-      }).start();
+      });
 
     } catch (Exception e) {
       System.out.println(e.getMessage());

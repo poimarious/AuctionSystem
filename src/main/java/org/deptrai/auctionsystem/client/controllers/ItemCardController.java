@@ -6,7 +6,9 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,6 +19,7 @@ import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
+import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 
@@ -79,9 +82,25 @@ public class ItemCardController implements AuctionUpdateListener {
         java.time.Duration.between(LocalDateTime.now(), auction.getEndTime());
 
     if (remaining.isNegative() || remaining.isZero()) {
+
+      User currentUser = SessionManager.getInstance().getCurrentUser();
+
       timerLabel.setText("00:00:00");
       timerLabel.setStyle("-fx-text-fill: red;");
-      if (bidButton != null) bidButton.setDisable(true);
+      if (bidButton != null) {
+        if(currentUser instanceof Bidder) {
+          if(auction.getStatus().equals("PAID")) {
+            bidButton.setText("Đã thanh toán");
+            bidButton.setDisable(true);
+          }
+          else {
+            bidButton.setText("Thanh toán");
+            bidButton.setOnAction(event -> {
+              handleDirectCheckout();
+            });
+          }
+        }
+      }
       if (timeline != null) timeline.stop();
 
       // Chỉ gửi yêu cầu kết thúc lên Server nếu phiên đấu giá thực sự ĐANG MỞ
@@ -101,6 +120,46 @@ public class ItemCardController implements AuctionUpdateListener {
     }
   }
 
+  private void handleDirectCheckout() {
+    User currentUser = SessionManager.getInstance().getCurrentUser();
+    double price = auction.getCurrentPrice();
+
+    Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION,
+            "Bạn có chắc muốn thanh toán $" + String.format("%.2f", price) + "?",
+            ButtonType.YES, ButtonType.NO);
+    confirmAlert.setTitle("Xác nhận than toán");
+    confirmAlert.setHeaderText(null);
+
+    confirmAlert.showAndWait().ifPresent(response -> {
+      if(response == ButtonType.YES) {
+        Message request = new Message("CHECKOUT", auction.getAuctionId());
+        SocketClient.runAsync(() -> {
+          Message server_response = SocketClient.sendRequest(request);
+          Platform.runLater(() -> {
+            if (server_response.getStatus().equals("SUCCESS")) {
+              double newBalance = currentUser.getBalance() - price;
+              currentUser.setBalance(newBalance);
+              SessionManager.getInstance().notifyBalanceChanged();
+
+              if (bidButton != null) {
+                bidButton.setText("Đã thanh toán");
+                bidButton.setDisable(true);
+              }
+
+              Alert successAlert = new Alert(Alert.AlertType.INFORMATION,
+                      "Thanh toán hoàn tất sản phẩm thuộc về sở hữu của bạn");
+              successAlert.show();
+            }
+            else {
+              Alert failAlert = new Alert(Alert.AlertType.ERROR,
+                      (String) server_response.getData()); // Lấy thông báo lỗi hiển thị
+              failAlert.show();
+            }
+          });
+        });
+      }
+    });
+  }
   /**
    * HÀM QUAN TRỌNG: Chuyển sang trang bidding-detail
    */

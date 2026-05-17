@@ -62,8 +62,8 @@
                   <children>
                     <Label text="Email:" textFill="#7f8c8d"/>
                     <Label GridPane.columnIndex="1" text="............" fx:id="profileEmailLabel"/>
-                    <Label GridPane.rowIndex="1" text="Ngày tham gia:" textFill="#7f8c8d"/>
-                    <Label GridPane.columnIndex="1" GridPane.rowIndex="1" text="09/05/2026"/>
+<!--                    <Label GridPane.rowIndex="1" text="Ngày tham gia:" textFill="#7f8c8d"/>-->
+<!--                    <Label GridPane.columnIndex="1" GridPane.rowIndex="1" text="09/05/2026"/>-->
                   </children>
                   <columnConstraints>
                     <ColumnConstraints prefWidth="120.0"/>

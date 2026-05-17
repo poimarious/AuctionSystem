@@ -20,6 +20,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.geometry.Pos;
+
+import java.net.Socket;
 import java.util.Optional;
 import java.util.List;
 
@@ -49,7 +51,8 @@ public class InventoryController {
     if (currentUser == null) return;
 
     // 2. Chạy luồng phụ để hỏi Server
-    new Thread(() -> {
+
+    SocketClient.runAsync(() -> {
       // Gửi Message kèm theo ID của Seller
       Message request = new Message("REQUEST", "GET_SELLER_AUCTIONS", currentUser.getUserId());
       Message response = SocketClient.sendRequest(request);
@@ -69,12 +72,12 @@ public class InventoryController {
       } else {
         Platform.runLater(() -> {
           String errorMsg = (response != null && response.getData() instanceof String)
-              ? (String) response.getData()
-              : "Lỗi kết nối mạng!";
+                  ? (String) response.getData()
+                  : "Lỗi kết nối mạng!";
           System.out.println("Lỗi tải kho hàng: " + errorMsg);
         });
       }
-    }).start();
+    });
   }
 
   @FXML
@@ -150,7 +153,7 @@ public class InventoryController {
     Optional<ButtonType> result = confirmAlert.showAndWait();
     if (result.isPresent() && result.get() == ButtonType.OK) {
 
-      new Thread(() -> {
+      SocketClient.runAsync(() -> {
         Message request = new Message("REQUEST", "DELETE_AUCTION", auction.getAuctionId());
         Message response = SocketClient.sendRequest(request);
 
@@ -161,12 +164,12 @@ public class InventoryController {
             successAlert.show();
           } else {
             String errorMsg = (response != null && response.getData() instanceof String)
-                ? (String) response.getData() : "Lỗi Server";
+                    ? (String) response.getData() : "Lỗi Server";
             Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Không thể xóa: " + errorMsg);
             errorAlert.show();
           }
         });
-      }).start();
+      });
     }
   }
 }

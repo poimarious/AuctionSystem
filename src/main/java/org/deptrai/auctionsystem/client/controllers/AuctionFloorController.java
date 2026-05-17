@@ -100,7 +100,7 @@ public class AuctionFloorController {
     }
     Message request = new Message("GET_ALL_AUCTIONS", userId);
 
-    new Thread(() -> {
+    SocketClient.runAsync(() -> {
       Message response = SocketClient.sendRequest(request);
       if ("SUCCESS".equals(response.getStatus())) {
         List<AuctionSummary> allAuctions = (List<AuctionSummary>) response.getData();
@@ -110,7 +110,7 @@ public class AuctionFloorController {
         // Cập nhật giao diện an toàn trên luồng UI
         Platform.runLater(() -> filterAuctions());
       }
-    }).start();
+    });
   }
   // Hàm lọc dữ liệu nội bộ trên RAM
   private void filterAuctions() {
