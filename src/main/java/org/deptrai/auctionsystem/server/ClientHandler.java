@@ -6,10 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javafx.scene.control.PasswordField;
 import org.deptrai.auctionsystem.server.dao.*;
@@ -688,24 +685,20 @@ public class  ClientHandler implements Runnable {
         // KIỂM TRA BẢO MẬT: Đảm bảo thời gian hiện tại trên Server thực sự đã vượt qua endTime
         if (!LocalDateTime.now().isBefore(auction.getEndTime())) {
 
-          // 1. Cập nhật trạng thái thành FINISHED (Hoặc CANCELED nếu ế)
-          if (auction.getBids().isEmpty()) {
-            auction.setStatus(AuctionStatus.CANCELED);
-          } else {
-            auction.setStatus(AuctionStatus.FINISHED);
-          }
+          // ĐÃ SỬA: Dù có lượt đặt giá hay không, khi hết giờ trạng thái luôn là FINISHED
+          auction.setStatus(AuctionStatus.FINISHED);
 
-          // 2. Lưu trạng thái mới xuống Database
+          // 2. Lưu trạng thái FINISHED mới này xuống Database
           AuctionDAO auctionDAO = new AuctionDAO();
           boolean isUpdated = auctionDAO.updateAuctionState(auction);
 
           if (isUpdated) {
             System.out.println("Phiên đấu giá [" + auction.getItem().getName() + "] đã KẾT THÚC.");
 
-            // 3. Phát Broadcast cho toàn bộ Client đang online để UI thẻ sản phẩm đóng lại
+            // 3. Phát Broadcast cho toàn bộ Client đang online để cập nhật lại giao diện thẻ sản phẩm công khai
             ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
 
-            // ==================== BẮT ĐẦU XỬ LÝ THÔNG BÁO (ONLINE/OFFLINE) ====================
+            // ==================== XỬ LÝ HỆ THỐNG THÔNG BÁO (ONLINE/OFFLINE) ====================
             new Thread(() -> {
               NotificationDAO notiDAO = new NotificationDAO();
               String timeStampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
@@ -716,25 +709,27 @@ public class  ClientHandler implements Runnable {
                 sellerId = auction.getItem().getSeller().getUserId();
               }
 
-              // Dùng Map để lưu cặp [ID Người nhận -> Nội dung thông báo]
-              java.util.Map<String, String> targetUsers = new java.util.HashMap<>();
+              // Dùng Map để định danh [ID Người nhận -> Nội dung thông báo tương ứng]
+              Map<String, String> targetUsers = new HashMap<>();
 
-              if (auction.getStatus() == AuctionStatus.CANCELED) {
-                if (sellerId != null) {
-                  targetUsers.put(sellerId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã BỊ HỦY do không có ai đặt giá.");
+              // Lấy thông tin người thắng cuộc từ danh sách bid trên RAM
+              Bidder winner = auction.getWinner();
+              String winnerId = (winner != null) ? winner.getUserId() : null;
+              double finalPrice = auction.getCurrentPrice();
+
+              // 1. Phân loại thông báo gửi cho Người Bán (Seller)
+              if (sellerId != null) {
+                if (winner == null) {
+                  // Trường hợp phiên đấu giá kết thúc thành công nhưng không có ai tham gia đặt giá
+                  targetUsers.put(sellerId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC nhưng không có người đặt giá.");
+                } else {
+                  // Trường hợp kết thúc thành công và có người mua chốt hạ
+                  targetUsers.put(sellerId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC và được bán thành công với mức giá $" + finalPrice + ".");
                 }
-              } else {
-                // Lấy thông tin người thắng và giá chốt
-                Bidder winner = auction.getWinner();
-                String winnerId = (winner != null) ? winner.getUserId() : null;
-                double finalPrice = auction.getCurrentPrice();
+              }
 
-                // Thông báo cho Seller
-                if (sellerId != null) {
-                  targetUsers.put(sellerId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC với giá bán $" + finalPrice + ".");
-                }
-
-                // Tập hợp tất cả những người đã từng tham gia Bid (dùng Set để không bị trùng lặp)
+              // 2. Phân loại thông báo gửi cho những Người Mua (Bidders) đã từng tham gia đặt giá
+              if (winner != null) {
                 Set<String> participantIds = new HashSet<>();
                 for (Bid bid : auction.getBids()) {
                   if (bid.getBidder() != null) {
@@ -742,7 +737,7 @@ public class  ClientHandler implements Runnable {
                   }
                 }
 
-                // Phân loại Thắng/Thua cho từng người tham gia
+                // Quét qua danh sách để phân định rạch ròi ai Thắng - ai Thua
                 for (String pId : participantIds) {
                   if (pId.equals(winnerId)) {
                     targetUsers.put(pId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC. Chúc mừng, bạn đã THẮNG với mức giá $" + finalPrice + "!");
@@ -752,13 +747,13 @@ public class  ClientHandler implements Runnable {
                 }
               }
 
-              // 4. Bắt đầu gửi đi cho từng người trong danh sách vừa tạo
+              // 3. Tiến hành phân phối thông báo đến đích (Online đẩy qua Socket, Offline găm vào DB)
               for (java.util.Map.Entry<String, String> entry : targetUsers.entrySet()) {
                 String targetUserId = entry.getKey();
                 String msgText = entry.getValue();
                 boolean isOnline = false;
 
-                // Quét xem người này có đang online không
+                // Quét nhanh danh sách kết nối đang hoạt động trên Server
                 for (ClientHandler client : ServerMain.activeClients) {
                   if (client.getAuthenticatedUser() != null && client.getAuthenticatedUser().getUserId().equals(targetUserId)) {
                     client.sendMessage(new Message("SUCCESS", "PUSH_NOTIFICATION_BELL", msgText));
@@ -767,13 +762,13 @@ public class  ClientHandler implements Runnable {
                   }
                 }
 
-                // Nếu offline thì lưu vào DB
+                // Nếu người dùng không online, lưu thông báo này vào bảng lưu trữ để hiển thị sau
                 if (!isOnline) {
                   notiDAO.insertNotification(targetUserId, msgText);
                 }
               }
             }).start();
-            // ==================== KẾT THÚC XỬ LÝ THÔNG BÁO ====================
+            // ==================== KẾT THÚC XỬ LÝ HỆ THỐNG THÔNG BÁO ====================
 
           }
         }
