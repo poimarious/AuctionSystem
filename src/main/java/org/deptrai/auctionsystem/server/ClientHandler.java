@@ -221,14 +221,30 @@ public class  ClientHandler implements Runnable {
 
   private void handleGetAllAuctions(Message request) {
     try {
-      // Lấy toàn bộ từ RAM (Cache)
+      // 1. Nhận userId từ Client (Có thể null nếu người dùng chưa đăng nhập - Guest)
+      String userId = null;
+      if (request.getData() instanceof String) {
+        userId = (String) request.getData();
+      }
+
       List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
       List<AuctionSummary> activeAuctionsDTO = new ArrayList<>();
 
-      // Lọc và ánh xạ sang DTO siêu nhẹ
       for (Auction auction : allAuctions) {
-        if (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING) {
+        // Điều kiện 1: Phiên đang mở
+        boolean isOngoing = (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING);
 
+        // Điều kiện 2: Phiên đã kết thúc HOẶC đã thanh toán, và người đang đăng nhập là người chiến thắng
+        boolean isWonByMe = false;
+        if (userId != null && (auction.getStatus() == AuctionStatus.FINISHED || auction.getStatus() == AuctionStatus.PAID)) {
+          Bidder winner = auction.getWinner();
+          if (winner != null && winner.getUserId().equals(userId)) {
+            isWonByMe = true;
+          }
+        }
+
+        // Nếu thỏa mãn 1 trong 2 điều kiện thì gửi về Client
+        if (isOngoing || isWonByMe) {
           AuctionSummary auctionSummary = new AuctionSummary(
                   auction.getAuctionId(),
                   auction.getItem().getName(),
@@ -244,11 +260,10 @@ public class  ClientHandler implements Runnable {
         }
       }
 
-      // Gửi gói tin DTO gọn nhẹ về cho Client
       out.writeObject(new Message("SUCCESS", "GET_ALL_AUCTIONS", activeAuctionsDTO));
       out.flush();
 
-    } catch (IOException e) {
+    } catch (Exception e) {
       System.out.println("Lỗi khi gửi danh sách Auction cho Client.");
       e.printStackTrace();
     }

@@ -16,6 +16,7 @@ import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
+import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
@@ -158,22 +159,21 @@ public class MainController {
 
   private void loadFeaturedAuctions() {
     productsContainer.getChildren().clear();
-    Message request = new Message("GET_ALL_AUCTIONS", null);
+
+    Object currentUser = SessionManager.getInstance().getCurrentUser();
+    String userId = null;
+    if (currentUser instanceof Bidder bidder) {
+      userId = bidder.getUserId();
+    }
+    Message request = new Message("GET_ALL_AUCTIONS", userId);
     Message response = SocketClient.sendRequest(request);
 
     if (response.getStatus().equals("SUCCESS")) {
       List<AuctionSummary> rawAuctions = (List<AuctionSummary>) response.getData();
 
-      // 1. Chỉ lọc lấy những cái Đang bán (Bỏ qua đã kết thúc)
-      allAuctions = new java.util.ArrayList<>();
-      for (AuctionSummary auc : rawAuctions) {
-        if (auc.getStatus() != null) {
-          String status = auc.getStatus().toString();
-          if ("RUNNING".equalsIgnoreCase(status) || "OPEN".equalsIgnoreCase(status)) {
-            allAuctions.add(auc);
-          }
-        }
-      }
+
+      allAuctions = new java.util.ArrayList<>(rawAuctions);
+
 
       displayAuctions(allAuctions);
 

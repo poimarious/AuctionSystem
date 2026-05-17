@@ -11,10 +11,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SearchEngine;
+import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
+import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.network.Message;
 
 import java.io.IOException;
@@ -91,7 +93,12 @@ public class AuctionFloorController {
 
   private void loadAuctionsFromServer() {
     // Gửi yêu cầu qua Socket
-    Message request = new Message("REQUEST", "GET_ALL_AUCTIONS", null);
+    Object currentUser = SessionManager.getInstance().getCurrentUser();
+    String userId = null;
+    if (currentUser instanceof Bidder bidder) {
+      userId = bidder.getUserId();
+    }
+    Message request = new Message("GET_ALL_AUCTIONS", userId);
 
     new Thread(() -> {
       Message response = SocketClient.sendRequest(request);
