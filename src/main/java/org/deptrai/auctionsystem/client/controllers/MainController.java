@@ -177,6 +177,13 @@ public class MainController {
 
   private void displayAuctions(List<AuctionSummary> auctionsToDisplay) {
     javafx.application.Platform.runLater(() -> {
+
+      for(Node node : productsContainer.getChildren()) {
+        if(node.getUserData() instanceof ItemCardController oldController) {
+          SocketClient.removeListener(oldController);
+        }
+      }
+
       productsContainer.getChildren().clear();
 
       int limit = Math.min(auctionsToDisplay.size(), 6);
