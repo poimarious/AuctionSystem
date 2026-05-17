@@ -102,7 +102,7 @@ public class AuctionDAO {
   public List<Auction> getAllAuctions() {
     List<Auction> auctionList = new ArrayList<>();
     String sql =
-        "SELECT * FROM Auctions"; // Lấy tất cả, hoặc bạn có thể thêm: WHERE status = 'OPEN'
+        "SELECT * FROM Auctions ORDER BY rowid ASC"; // Lấy tất cả, hoặc bạn có thể thêm: WHERE status = 'OPEN'
 
     try (Connection conn = DatabaseConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(sql);

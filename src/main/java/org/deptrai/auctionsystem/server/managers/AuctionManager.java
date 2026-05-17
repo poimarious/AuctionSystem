@@ -10,7 +10,7 @@ import org.deptrai.auctionsystem.shared.models.items.Item;
 
 public class AuctionManager {
   // implement treemap with thread-safe
-  private final ConcurrentHashMap<String, Auction> auctions = new ConcurrentHashMap<>();
+  private final Map<String, Auction> auctions = Collections.synchronizedMap(new LinkedHashMap<>());
 
   private static class SingletonHelper { // Helper class to generate instance,because this class only loads once so it ensures thread-safe
     private static final AuctionManager INSTANCE = new AuctionManager();
@@ -38,7 +38,14 @@ public class AuctionManager {
   }
 
   public List<Auction> getAllAuctions() {
-    return new ArrayList<>(auctions.values());
+    List<Auction> list;
+    // 1. Khóa Map lại trong chốc lát để bốc dữ liệu ra an toàn (Thread-safe)
+    synchronized (auctions) {
+      list = new ArrayList<>(auctions.values());
+    }
+    // 2. Lật ngược danh sách (Reverse) ngay tại Server
+    Collections.reverse(list);
+    return list;
   }
 
   // MAYBE NEED ONE MORE METHOD THAT CONNECT TO DATABASE

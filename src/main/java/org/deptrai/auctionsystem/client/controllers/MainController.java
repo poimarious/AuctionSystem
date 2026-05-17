@@ -156,7 +156,18 @@ public class MainController {
     Message response = SocketClient.sendRequest(request);
 
     if (response.getStatus().equals("SUCCESS")) {
-      allAuctions = (List<AuctionSummary>) response.getData();
+      List<AuctionSummary> rawAuctions = (List<AuctionSummary>) response.getData();
+
+      // 1. Chỉ lọc lấy những cái Đang bán (Bỏ qua đã kết thúc)
+      allAuctions = new java.util.ArrayList<>();
+      for (AuctionSummary auc : rawAuctions) {
+        if (auc.getStatus() != null) {
+          String status = auc.getStatus().toString();
+          if ("RUNNING".equalsIgnoreCase(status) || "OPEN".equalsIgnoreCase(status)) {
+            allAuctions.add(auc);
+          }
+        }
+      }
 
       displayAuctions(allAuctions);
 
@@ -290,6 +301,19 @@ public class MainController {
   public void handleGoToSellerCenter(ActionEvent event) {
     SceneManager.getInstance()
             .switchScene("/org/deptrai/auctionsystem/client/views/seller.fxml", "Kênh Người Bán");
+  }
+  // Hàm xử lý sự kiện khi ấn nút "Làm mới"
+  @FXML
+  public void handleReload(ActionEvent event) {
+    System.out.println("Đang tải lại danh sách đấu giá mới nhất...");
+
+    // Xóa chữ trong ô tìm kiếm (nếu đang có) để hiển thị lại toàn bộ danh sách
+    if (searchField != null) {
+      searchField.clear();
+    }
+
+    // Gọi lại hàm lấy dữ liệu (hàm này đã có sẵn logic sắp xếp ID mới nhất lên đầu)
+    loadFeaturedAuctions();
   }
 
 
