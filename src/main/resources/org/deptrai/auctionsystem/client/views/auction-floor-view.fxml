@@ -38,7 +38,7 @@
     </HBox>
 
     <ScrollPane style="-fx-background-color: transparent; -fx-background: transparent;"
-                fitToWidth="true" VBox.vgrow="ALWAYS">
+                fitToWidth="true" VBox.vgrow="ALWAYS" fx:id="floorScrollPane">
       <content>
         <FlowPane hgap="25.0" stylesheets="@style.css" vgap="25.0" fx:id="productsContainer">
           <padding>

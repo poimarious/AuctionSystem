@@ -46,6 +46,12 @@ public class MainController {
   @FXML
   private TextField searchField;
 
+  @FXML
+  private ScrollPane floorScrollPane;
+
+  private final int PAGE_SIZE = 12;
+  private int currentIndex = 0;
+  private List <AuctionSummary> currentFilteredList = new ArrayList<>();
   private List<AuctionSummary> allAuctions = new ArrayList<>();
 
 

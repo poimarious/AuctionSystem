@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
@@ -32,6 +33,13 @@ public class AuctionFloorController {
   private ComboBox<String> categoryCombo;
   @FXML
   private ComboBox<String> statusCombo;
+  @FXML
+  private ScrollPane floorScrollPane;
+
+  private final int PAGE_SIZE = 12;
+  private int currentIndex = 0;
+  private List<AuctionSummary> currentFilteredList = new ArrayList<>();
+
   private List<AuctionSummary> allAuctionsList = new ArrayList<>();
 
   /**
@@ -67,6 +75,16 @@ public class AuctionFloorController {
       });
     }
 
+    if(floorScrollPane != null) {
+      floorScrollPane.vvalueProperty().addListener((observable, oldValue, newValue) -> {
+        if(newValue.doubleValue() >= 0.9) {
+          loadMoreAuctions();
+        }
+      });
+    } else {
+      System.err.println("CẢNH BÁO: floorScrollPane bị NULL! Hãy kiểm tra lại SceneBuilder.");
+    }
+
     // 2. SỬA CÁCH LOAD DỮ LIỆU: Lấy từ Server thay vì AuctionManager
     loadAuctionsFromServer();
   }
@@ -83,7 +101,7 @@ public class AuctionFloorController {
         allAuctionsList = allAuctions;
 
         // Cập nhật giao diện an toàn trên luồng UI
-        Platform.runLater(() -> displayAuctions(allAuctions));
+        Platform.runLater(() -> filterAuctions());
       }
     }).start();
   }
@@ -134,12 +152,9 @@ public class AuctionFloorController {
       }
     }
 
-    // Vẽ lại màn hình với danh sách đã lọc
-    displayAuctions(finalResults);
-  }
+    this.currentFilteredList = finalResults;
+    this.currentIndex = 0;
 
-  private void displayAuctions(List<AuctionSummary> auctions) {
-    // trước khi clear product container, phải remove tất cả controller
     for(Node node : productsContainer.getChildren()) {
       if(node.getUserData() instanceof ItemCardController oldController) {
         SocketClient.removeListener(oldController);
@@ -148,21 +163,43 @@ public class AuctionFloorController {
 
     productsContainer.getChildren().clear();
 
-    for (AuctionSummary auction : auctions) {
-      try {
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/org/deptrai/auctionsystem/client/views/item-card.fxml"));
-        Node itemCard = loader.load();
-
-        ItemCardController cardController = loader.getController();
-        if (cardController != null) {
-          cardController.setData(auction);
-        }
-
-        productsContainer.getChildren().add(itemCard);
-      } catch (IOException e) {
-        System.err.println("Lỗi nạp item-card trên sàn: " + e.getMessage());
-      }
+    if(floorScrollPane != null ) {
+      floorScrollPane.setVvalue(0.0);
     }
+    loadMoreAuctions();
+  }
+
+  private void loadMoreAuctions() {
+    // Nếu đã load hết danh sách thì không làm gì cả
+    if (currentIndex >= currentFilteredList.size()) {
+      return;
+    }
+
+    // Tính toán điểm dừng cho lô tiếp theo
+    int endIndex = Math.min(currentIndex + PAGE_SIZE, currentFilteredList.size());
+    List<AuctionSummary> batch = currentFilteredList.subList(currentIndex, endIndex);
+
+    // Bọc trong runLater để đảm bảo FXML được vẽ trên luồng chính của JavaFX
+    Platform.runLater(() -> {
+      for (AuctionSummary auction : batch) {
+        try {
+          FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/deptrai/auctionsystem/client/views/item-card.fxml"));
+          Node itemCard = loader.load();
+
+          ItemCardController cardController = loader.getController();
+          if (cardController != null) {
+            cardController.setData(auction);
+            // LƯU LẠI CONTROLLER VÀO UI ĐỂ DỌN RÁC (Tránh Memory Leak)
+            itemCard.setUserData(cardController);
+          }
+
+          productsContainer.getChildren().add(itemCard);
+        } catch (IOException e) {
+          System.err.println("Lỗi nạp item-card: " + e.getMessage());
+        }
+      }
+      // Cập nhật lại chỉ số cho lần cuộn tiếp theo
+      currentIndex = endIndex;
+    });
   }
 }

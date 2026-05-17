@@ -1,19 +1,15 @@
 package org.deptrai.auctionsystem.server.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.items.Item;
+import org.deptrai.auctionsystem.shared.models.users.User;
 
 public class AuctionDAO {
   public boolean insertAuction(Auction auction) {
@@ -101,39 +97,100 @@ public class AuctionDAO {
   // Thêm hàm này vào dưới cùng của class AuctionDAO để đồng bộ với auction manager
   public List<Auction> getAllAuctions() {
     List<Auction> auctionList = new ArrayList<>();
-    String sql =
-        "SELECT * FROM Auctions ORDER BY rowid ASC"; // Lấy tất cả, hoặc bạn có thể thêm: WHERE status = 'OPEN'
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        ResultSet rs = pstmt.executeQuery()) {
+         Statement stmt = conn.createStatement()) {
+      Map<String, User> userCache = new HashMap<>();
+      try(ResultSet rs = stmt.executeQuery("SELECT * FROM Users")) {
+        while(rs.next()) {
+          String role = rs.getString("role");
+          String userId = rs.getString("userId");
+          String username = rs.getString("username");
+          String pass = rs.getString("password");
+          String email = rs.getString("email");
+          double balance = rs.getDouble("balance");
 
-      ItemDAO itemDAO = new ItemDAO();
-      BidDAO bidDAO = new BidDAO();
-
-      while (rs.next()) {
-        String auctionId = rs.getString("auctionId");
-        String itemId = rs.getString("itemId");
-        double currentPrice = rs.getDouble("currentPrice");
-        String statusStr = rs.getString("status");
-        String endTimeStr = rs.getString("endTime");
-
-        Item item = itemDAO.getItemById(itemId);
-        AuctionStatus status = AuctionStatus.valueOf(statusStr);
-        LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
-
-        Auction auction =
-            new Auction(
-                auctionId, item, currentPrice, status, endTime, new CopyOnWriteArrayList<>());
-
-        // Nạp luôn danh sách lịch sử Bid của phiên đấu giá này
-        List<Bid> auctionBids = bidDAO.getBidsByAuctionId(auctionId, auction);
-        auction.setBids(auctionBids);
-
-        auctionList.add(auction);
+          User u = null;
+          if ("BIDDER".equals(role)) {
+            u = new org.deptrai.auctionsystem.shared.models.users.Bidder(userId, username, pass, email, new CopyOnWriteArrayList<>());
+          } else if ("SELLER".equals(role)) {
+            u = new org.deptrai.auctionsystem.shared.models.users.Seller(userId, username, pass, email);
+          } else if ("ADMIN".equals(role)) {
+            u = new org.deptrai.auctionsystem.shared.models.users.Admin(userId, username, pass, email, rs.getInt("adminLevel"));
+          }
+          if (u != null) {
+            u.setBalance(balance);
+            userCache.put(userId, u);
+          }
+        }
       }
-    } catch (SQLException e) {
-      System.out.println("Lỗi khi lấy danh sách tất cả Auction từ DB: " + e.getMessage());
+
+      Map<String, Item> itemCache = new HashMap<>();
+      try (ResultSet rs = stmt.executeQuery("SELECT * FROM Items")) {
+        while (rs.next()) {
+          String itemId = rs.getString("itemId");
+          String category = rs.getString("category");
+          org.deptrai.auctionsystem.shared.models.users.Seller seller =
+                  (org.deptrai.auctionsystem.shared.models.users.Seller) userCache.get(rs.getString("sellerId"));
+
+          org.deptrai.auctionsystem.shared.models.items.ItemFactory factory = null;
+          if ("Electronics".equals(category))
+            factory = new org.deptrai.auctionsystem.shared.models.items.ElectronicsFactory();
+          else if ("Art".equals(category)) factory = new org.deptrai.auctionsystem.shared.models.items.ArtFactory();
+          else if ("Vehicle".equals(category))
+            factory = new org.deptrai.auctionsystem.shared.models.items.VehicleFactory();
+
+          if (factory != null) {
+            Item item = factory.createItem(rs.getString("name"), rs.getString("description"), rs.getDouble("startingPrice"), seller);
+            item.setItemId(itemId);
+            item.setImageUrl(rs.getString("imageUrl"));
+
+            if (item instanceof org.deptrai.auctionsystem.shared.models.items.Electronics e) {
+              e.setBrand(rs.getString("brand")).setWarrantyMonths(rs.getInt("warrantyMonths"));
+            } else if (item instanceof org.deptrai.auctionsystem.shared.models.items.Art a) {
+              a.setArtist(rs.getString("artist")).setYearCreated(rs.getInt("yearCreated"));
+            } else if (item instanceof org.deptrai.auctionsystem.shared.models.items.Vehicle v) {
+              v.setMake(rs.getString("make")).setMileage(rs.getInt("mileage"));
+            }
+            itemCache.put(itemId, item);
+          }
+        }
+      }
+
+      Map<String, Auction> auctionCache = new LinkedHashMap<>();
+      try (ResultSet rs = stmt.executeQuery("SELECT * FROM Auctions ORDER BY rowid ASC")) {
+        while (rs.next()) {
+          String auctionId = rs.getString("auctionId");
+          Item item = itemCache.get(rs.getString("itemId"));
+          AuctionStatus status = AuctionStatus.valueOf(rs.getString("status"));
+          LocalDateTime endTime = LocalDateTime.parse(rs.getString("endTime"));
+
+          Auction auction = new Auction(auctionId, item, rs.getDouble("currentPrice"), status, endTime, new CopyOnWriteArrayList<>());
+          auctionCache.put(auctionId, auction);
+          auctionList.add(auction); // Giữ đúng thứ tự cho danh sách trả về
+        }
+      }
+
+      try (ResultSet rs = stmt.executeQuery("SELECT * FROM Bids ORDER BY timestamp ASC")) {
+        while (rs.next()) {
+          String auctionId = rs.getString("auctionId");
+          Auction auction = auctionCache.get(auctionId);
+
+          if (auction != null) {
+            org.deptrai.auctionsystem.shared.models.users.Bidder bidder =
+                    (org.deptrai.auctionsystem.shared.models.users.Bidder) userCache.get(rs.getString("bidderId"));
+
+            Bid bid = new Bid(
+                    rs.getString("bidId"), bidder, auction, rs.getDouble("amount"), LocalDateTime.parse(rs.getString("timestamp"))
+            );
+            auction.getBids().add(bid);
+          }
+        }
+      }
+
+    } catch(Exception e) {
+      System.out.println("Lỗi khi lấy danh sách tất cả Auction bằng Cache RAM: " + e.getMessage());
+      e.printStackTrace();
     }
     return auctionList;
   }
