@@ -18,6 +18,7 @@ import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.User;
@@ -89,7 +90,7 @@ public class ItemCardController implements AuctionUpdateListener {
       timerLabel.setStyle("-fx-text-fill: red;");
       if (bidButton != null) {
         if(currentUser instanceof Bidder) {
-          if(auction.getStatus().equals("PAID")) {
+          if(auction.getStatus().equals(AuctionStatus.PAID)) {
             bidButton.setText("Đã thanh toán");
             bidButton.setDisable(true);
           }
