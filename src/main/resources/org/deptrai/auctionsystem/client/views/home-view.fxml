@@ -20,23 +20,23 @@
 
 <ScrollPane fx:id="mainScrollPane" vbarPolicy="ALWAYS" fitToHeight="true" fitToWidth="true" style="-fx-background-color: transparent;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.client.controllers.MainController">
   <content>
-    <VBox alignment="TOP_CENTER" spacing="0.0" style="-fx-background-color: #f0f2f5;">
+    <VBox alignment="TOP_CENTER" spacing="0.0" style="-fx-background-color: #282a36;">
       <children>
 
-        <HBox alignment="CENTER" prefHeight="85.0" spacing="25.0" styleClass="header-bar">
+        <HBox alignment="CENTER" prefHeight="85.0" spacing="25.0" style="-fx-background-color: #44475a; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);" styleClass="header-bar">
           <padding>
             <Insets left="40.0" right="40.0" />
           </padding>
           <children>
-            <Label style="-fx-font-weight: bold; -fx-font-size: 26; -fx-letter-spacing: 1;" text="AUCTION SYSTEM" textFill="WHITE" />
+            <Label style="-fx-font-weight: bold; -fx-font-size: 26; -fx-letter-spacing: 1;" text="AUCTION SYSTEM" textFill="#bd93f9" />
 
             <ComboBox prefHeight="40.0" prefWidth="140.0" promptText="Danh mục" style="-fx-background-radius: 5;" />
 
-            <HBox alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 5; -fx-padding: 0 10 0 10;">
+            <HBox alignment="CENTER" style="-fx-background-color: #282a36; -fx-border-color: #6272a4; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 0 10 0 10;">
               <children>
-                <Label text="🔍" textFill="#7f8c8d" />
-                <TextField fx:id="searchField" prefHeight="40.0" prefWidth="350.0" promptText="Tìm kiếm sản phẩm, nghệ sĩ..." style="-fx-background-color: transparent;" />
-                <Button onAction="#handleReload" text="🔄 Làm mới" style="-fx-cursor: hand; -fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Label text="🔍" textFill="#8be9fd" />
+                <TextField fx:id="searchField" prefHeight="40.0" prefWidth="350.0" promptText="Tìm kiếm sản phẩm, nghệ sĩ..." style="-fx-background-color: transparent; -fx-text-fill: #f8f8f2;" />
+                <Button onAction="#handleReload" text="🔄 Làm mới" style="-fx-cursor: hand; -fx-background-color: #bd93f9; -fx-text-fill: #282a36; -fx-font-weight: bold; -fx-background-radius: 5;"/>
               </children>
             </HBox>
 
@@ -44,7 +44,8 @@
 
             <HBox alignment="CENTER" spacing="15.0">
               <children>
-                <Button fx:id="sellerCenterBtn" managed="false" mnemonicParsing="false" onAction="#handleGoToSellerCenter" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;" text="🏪 Kênh Người Bán" visible="false">
+
+                <Button fx:id="sellerCenterBtn" managed="false" mnemonicParsing="false" onAction="#handleGoToSellerCenter" style="-fx-background-color: #50fa7b; -fx-text-fill: #282a36; -fx-font-weight: bold; -fx-background-radius: 5;" text="🏪 Kênh Người Bán" visible="false">
                   <HBox.margin>
                     <Insets right="15.0" />
                   </HBox.margin>
@@ -52,14 +53,14 @@
 
                 <HBox fx:id="guestBox" alignment="CENTER" spacing="15.0">
                   <children>
-                    <Button mnemonicParsing="false" onAction="#handleLogin" styleClass="btn-login" text="ĐĂNG NHẬP" />
-                    <Button mnemonicParsing="false" onAction="#handleRegister" styleClass="btn-register" text="ĐĂNG KÝ" />
+                    <Button mnemonicParsing="false" onAction="#handleLogin" styleClass="btn-login" text="ĐĂNG NHẬP" style="-fx-background-color: transparent; -fx-text-fill: #f8f8f2; -fx-font-weight: bold;" />
+                    <Button mnemonicParsing="false" onAction="#handleRegister" styleClass="btn-register" text="ĐĂNG KÝ" style="-fx-background-color: #ff79c6; -fx-text-fill: #282a36; -fx-font-weight: bold; -fx-background-radius: 20;" />
                   </children>
                 </HBox>
 
                 <HBox fx:id="userBox" alignment="CENTER_RIGHT" managed="false" spacing="20.0">
                   <children>
-                    <MenuButton fx:id="userMenu" mnemonicParsing="false" styleClass="user-menu-button" text="👤" textFill="WHITE">
+                    <MenuButton fx:id="userMenu" mnemonicParsing="false" styleClass="user-menu-button" text="👤" textFill="#f8f8f2">
                       <font><Font size="18.0" /></font>
                       <items>
                         <MenuItem mnemonicParsing="false" onAction="#handleShowProfile" text="👤 Hồ sơ cá nhân" />
@@ -71,15 +72,15 @@
 
                     <VBox alignment="CENTER_RIGHT">
                       <children>
-                        <Label fx:id="userNameLabel" style="-fx-font-weight: bold; -fx-font-size: 16;" text="Tên tk" textFill="WHITE" />
-                        <Label fx:id="walletLabel" style="-fx-font-weight: bold; -fx-font-size: 14;" text="Ví: $15,000" textFill="#27ae60" />
+                        <Label fx:id="userNameLabel" style="-fx-font-weight: bold; -fx-font-size: 16;" text="Tên tk" textFill="#8be9fd" />
+                        <Label fx:id="walletLabel" style="-fx-font-weight: bold; -fx-font-size: 14;" text="Ví: $15,000" textFill="#50fa7b" />
                       </children>
                     </VBox>
                   </children>
                 </HBox>
 
                 <Separator orientation="VERTICAL" prefHeight="30.0" />
-                <MenuButton fx:id="notificationBell" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-size: 16; -fx-cursor: hand;" text="🔔" textFill="WHITE">
+                <MenuButton fx:id="notificationBell" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-size: 16; -fx-cursor: hand;" text="🔔" textFill="#f1fa8c">
                   <items>
                     <MenuItem mnemonicParsing="false" text="Không có thông báo mới" />
                   </items>
@@ -89,18 +90,18 @@
           </children>
         </HBox>
 
-        <StackPane focusTraversable="true" prefHeight="400.0" style="-fx-background-color: #1a252f;">
+        <StackPane focusTraversable="true" prefHeight="400.0" style="-fx-background-color: #1e1f29;">
           <children>
             <ImageView fitHeight="400.0" fitWidth="1300.0" opacity="0.4" pickOnBounds="true" preserveRatio="true" />
             <VBox alignment="CENTER_LEFT" spacing="20.0">
               <children>
-                <Button onAction="#handleOpenAuctionFloor" prefHeight="55.0" prefWidth="220.0" styleClass="btn-register" text="KHÁM PHÁ NGAY" />
-                <Label lineSpacing="10.0" text="Khám phá những bộ sưu tập&#10;độc bản và giá trị nhất." textFill="WHITE">
+                <Button onAction="#handleOpenAuctionFloor" prefHeight="55.0" prefWidth="220.0" styleClass="btn-register" text="KHÁM PHÁ NGAY" style="-fx-background-color: #bd93f9; -fx-text-fill: #282a36; -fx-font-weight: bold; -fx-background-radius: 25;" />
+                <Label lineSpacing="10.0" text="Khám phá những bộ sưu tập&#10;độc bản và giá trị nhất." textFill="#f8f8f2">
                   <font>
                     <Font name="System Bold" size="44.0" />
                   </font>
                 </Label>
-                <Label style="-fx-font-weight: bold;" text="TRANG THÔNG TIN ĐẤU GIÁ TRỰC TUYẾN" textFill="#27ae60">
+                <Label style="-fx-font-weight: bold;" text="TRANG THÔNG TIN ĐẤU GIÁ TRỰC TUYẾN" textFill="#50fa7b">
                   <font>
                     <Font size="16.0" />
                   </font>
@@ -117,8 +118,8 @@
 
           <HBox alignment="BOTTOM_LEFT" spacing="15.0">
             <children>
-              <Label style="-fx-font-size: 30; -fx-font-weight: bold;" text="Sản phẩm đang đấu giá" textFill="#2c3e50" />
-              <Label style="-fx-font-size: 18;" text="(sản phẩm mới hôm nay)" textFill="#7f8c8d" />
+              <Label style="-fx-font-size: 30; -fx-font-weight: bold;" text="Sản phẩm đang đấu giá" textFill="#bd93f9" />
+              <Label style="-fx-font-size: 18;" text="(sản phẩm mới hôm nay)" textFill="#6272a4" />
             </children>
           </HBox>
 

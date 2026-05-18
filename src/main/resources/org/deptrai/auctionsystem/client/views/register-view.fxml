@@ -13,16 +13,16 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<StackPane xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: #2c3e50;"
-  prefHeight="650.0"
-  prefWidth="850.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21"
-  fx:controller="org.deptrai.auctionsystem.client.controllers.RegisterController">
+<StackPane xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: #1e1f29;"
+           prefHeight="650.0"
+           prefWidth="850.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21"
+           fx:controller="org.deptrai.auctionsystem.client.controllers.RegisterController">
   <children>
     <Button
-      style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-cursor: hand;"
-      StackPane.alignment="TOP_LEFT" mnemonicParsing="false"
-      onAction="#handleBackToLogin"
-      styleClass="btn-back" text="⬅ ">
+            style="-fx-background-color: transparent; -fx-text-fill: #f8f8f2; -fx-font-size: 20px; -fx-font-weight: bold; -fx-cursor: hand;"
+            StackPane.alignment="TOP_LEFT" mnemonicParsing="false"
+            onAction="#handleBackToLogin"
+            styleClass="btn-back" text="⬅ ">
       <StackPane.margin>
         <Insets left="20.0" top="20.0"/>
       </StackPane.margin>
@@ -32,12 +32,12 @@
     </Button>
 
     <VBox
-      style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 20, 0, 0, 0);"
-      alignment="CENTER" maxWidth="450.0"
-      spacing="25.0">
+            style="-fx-background-color: #282a36; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 20, 0, 0, 0); -fx-border-color: #6272a4; -fx-border-radius: 15;"
+            alignment="CENTER" maxWidth="450.0"
+            spacing="25.0">
       <children>
 
-        <Label text="TẠO TÀI KHOẢN MỚI" textFill="#2c3e50">
+        <Label text="TẠO TÀI KHOẢN MỚI" textFill="#bd93f9">
           <font>
             <Font name="System Bold" size="26.0"/>
           </font>
@@ -54,38 +54,36 @@
                        fx:id="fullNameField"/>
 
             <PasswordField prefHeight="40.0" promptText="Mật khẩu" styleClass="password-field"
-              fx:id="passwordField"/>
+                           fx:id="passwordField"/>
             <PasswordField prefHeight="40.0" promptText="Xác nhận mật khẩu"
-              styleClass="password-field" fx:id="confirmPasswordField"/>
+                           styleClass="password-field" fx:id="confirmPasswordField"/>
 
             <Separator/>
-
-
 
             <VBox spacing="5.0">
               <children>
                 <HBox spacing="20.0">
                   <children>
-                    <RadioButton mnemonicParsing="false" selected="true" text="Người mua (Bidder)">
+                    <RadioButton mnemonicParsing="false" selected="true" text="Người mua (Bidder)" style="-fx-text-fill: #f8f8f2;">
                       <toggleGroup>
                         <ToggleGroup fx:id="roleGroup"/>
                       </toggleGroup>
                     </RadioButton>
-                    <RadioButton mnemonicParsing="false" text="Người bán (Seller)"
-                      toggleGroup="$roleGroup" userData="Seller"/>
+                    <RadioButton mnemonicParsing="false" text="Người bán (Seller)" style="-fx-text-fill: #f8f8f2;"
+                                 toggleGroup="$roleGroup" userData="Seller"/>
                   </children>
                 </HBox>
-                <Label text="Bạn muốn tham gia với vai trò:" textFill="#7f8c8d"/>
+                <Label text="Bạn muốn tham gia với vai trò:" textFill="#6272a4"/>
               </children>
             </VBox>
           </children>
         </VBox>
 
         <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#handleRegisterAction"
-                prefHeight="45.0" styleClass="btn-register" text="HOÀN TẤT ĐĂNG KÝ"/>
+                prefHeight="45.0" styleClass="btn-register" text="HOÀN TẤT ĐĂNG KÝ" style="-fx-background-color: #50fa7b; -fx-text-fill: #282a36; -fx-font-weight: bold;"/>
 
         <Hyperlink onAction="#handleBackToLogin" text="Đã có tài khoản? Đăng nhập ngay"
-                   textFill="#3498db"/>
+                   textFill="#8be9fd"/>
       </children>
       <padding>
         <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>

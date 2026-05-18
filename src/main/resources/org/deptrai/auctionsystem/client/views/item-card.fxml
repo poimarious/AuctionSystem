@@ -10,6 +10,7 @@
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1"
             prefHeight="340.0" prefWidth="280.0" styleClass="item-card"
+            style="-fx-background-color: #44475a; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 15, 0, 0, 5);"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/21"
             fx:controller="org.deptrai.auctionsystem.client.controllers.ItemCardController">
 
@@ -29,17 +30,19 @@
       </padding>
 
       <Label styleClass="product-title" text="Tên sản phẩm" fx:id="nameLabel"
-             style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+             style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #f8f8f2;"/>
 
       <HBox alignment="CENTER_LEFT" spacing="15.0">
         <Label styleClass="price-label" text="\$0.00" fx:id="priceLabel"
-               style="-fx-text-fill: #e74c3c; -fx-font-weight: bold;"/>
-        <Label styleClass="timer-label" text="00:00:00" fx:id="timerLabel"/>
+               style="-fx-text-fill: #50fa7b; -fx-font-weight: bold;"/>
+        <Label styleClass="timer-label" text="00:00:00" fx:id="timerLabel"
+               style="-fx-text-fill: #ff5555; -fx-font-weight: bold;"/>
       </HBox>
     </VBox>
 
     <Button maxWidth="Infinity" mnemonicParsing="false"
             onAction="#handleBidAction"
+            style="-fx-background-color: #bd93f9; -fx-text-fill: #282a36; -fx-font-weight: bold;"
             styleClass="btn-bid" text="XEM CHI TIẾT" fx:id="bidButton"/>
   </VBox>
 </AnchorPane>

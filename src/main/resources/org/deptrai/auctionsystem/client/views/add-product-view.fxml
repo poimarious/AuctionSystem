@@ -14,18 +14,19 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <VBox xmlns:fx="http://javafx.com/fxml/1"
-      style="-fx-background-color: white; -fx-background-radius: 15;" spacing="25.0"
+      style="-fx-background-color: #282a36;"
+      spacing="25.0"
       stylesheets="@style.css" xmlns="http://javafx.com/javafx/25"
       fx:controller="org.deptrai.auctionsystem.client.controllers.AddProductController">
   <children>
 
-    <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅">
+    <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅" style="-fx-text-fill: #f8f8f2;">
       <padding>
         <Insets bottom="8.0" left="12.0" right="15.0" top="8.0"/>
       </padding>
     </Button>
 
-    <Label text="ĐĂNG SẢN PHẨM ĐẤU GIÁ MỚI" textFill="#2c3e50">
+    <Label text="ĐĂNG SẢN PHẨM ĐẤU GIÁ MỚI" textFill="#bd93f9">
       <font>
         <Font name="System Bold" size="24.0"/>
       </font>
@@ -39,18 +40,20 @@
       <children>
         <VBox alignment="TOP_CENTER" prefWidth="300.0" spacing="15.0">
           <children>
-            <Label style="-fx-font-weight: bold;" text="Hình ảnh sản phẩm"/>
+            <Label style="-fx-font-weight: bold; -fx-text-fill: #f8f8f2;"
+                   text="Hình ảnh sản phẩm"/>
             <StackPane
-                    style="-fx-border-color: #dcdde1; -fx-border-radius: 10; -fx-border-style: dashed; -fx-border-width: 2;"
+                    style="-fx-border-color: #6272a4; -fx-border-radius: 10; -fx-border-style: dashed; -fx-border-width: 2; -fx-background-color: #44475a;"
                     prefHeight="250.0"
                     prefWidth="250.0">
               <children>
                 <ImageView fitHeight="240.0" fitWidth="240.0" pickOnBounds="true"
                            preserveRatio="true" fx:id="previewImage"/>
-                <Label text="Chưa có ảnh" textFill="#bdc3c7" fx:id="placeholderLabel"/>
+                <Label text="Chưa có ảnh" textFill="#6272a4" fx:id="placeholderLabel"/>
               </children>
             </StackPane>
-            <Button style="-fx-text-fill: #2c3e50; -fx-border-color: #2c3e50;" maxWidth="Infinity"
+            <Button style="-fx-text-fill: #f8f8f2; -fx-border-color: #bd93f9; -fx-background-color: transparent; -fx-font-weight: bold;"
+                    maxWidth="Infinity"
                     onAction="#handleChooseImage" styleClass="btn-login"
                     text="📁 CHỌN ẢNH TỪ MÁY TÍNH"/>
           </children>
@@ -62,14 +65,16 @@
               <children>
                 <VBox HBox.hgrow="ALWAYS" spacing="5.0">
                   <children>
-                    <Label style="-fx-font-weight: bold;" text="Danh mục"/>
+                    <Label style="-fx-font-weight: bold; -fx-text-fill: #f8f8f2;"
+                           text="Danh mục"/>
                     <ComboBox maxWidth="Infinity" promptText="Chọn loại hàng..."
                               fx:id="categoryCombo"/>
                   </children>
                 </VBox>
                 <VBox HBox.hgrow="ALWAYS" spacing="5.0">
                   <children>
-                    <Label style="-fx-font-weight: bold;" text="Giá khởi điểm ($)"/>
+                    <Label style="-fx-font-weight: bold; -fx-text-fill: #f8f8f2;"
+                           text="Giá khởi điểm ($)"/>
                     <TextField promptText="0.00" fx:id="basePriceInput"/>
                   </children>
                 </VBox>
@@ -78,7 +83,8 @@
 
             <VBox spacing="5.0">
               <children>
-                <Label style="-fx-font-weight: bold;" text="Tên sản phẩm"/>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #f8f8f2;"
+                       text="Tên sản phẩm"/>
                 <TextField promptText="Ví dụ: Mô hình siêu xe Ferrari 1:18"
                            fx:id="productNameInput"/>
               </children>
@@ -86,12 +92,13 @@
 
             <VBox spacing="5.0">
               <children>
-                <Label style="-fx-font-weight: bold;" text="Thời gian kết thúc (Ngày - Giờ - Phút)"/>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #f8f8f2;"
+                       text="Thời gian kết thúc (Ngày - Giờ - Phút)"/>
                 <HBox spacing="10.0" alignment="CENTER_LEFT">
                   <children>
                     <DatePicker fx:id="endDatePicker" maxWidth="Infinity" HBox.hgrow="ALWAYS" promptText="Chọn ngày"/>
                     <ComboBox fx:id="hourCombo" prefWidth="75.0" promptText="Giờ"/>
-                    <Label text=":" style="-fx-font-weight: bold;"/>
+                    <Label text=":" style="-fx-font-weight: bold; -fx-text-fill: #f8f8f2;"/>
                     <ComboBox fx:id="minuteCombo" prefWidth="75.0" promptText="Phút"/>
                   </children>
                 </HBox>
@@ -100,7 +107,8 @@
 
             <VBox VBox.vgrow="ALWAYS" spacing="5.0">
               <children>
-                <Label style="-fx-font-weight: bold;" text="Mô tả sản phẩm"/>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #f8f8f2;"
+                       text="Mô tả sản phẩm"/>
                 <TextArea prefHeight="100.0" promptText="Mô tả tình trạng sản phẩm, xuất xứ..."
                           wrapText="true" fx:id="descriptionInput"/>
               </children>
@@ -111,9 +119,11 @@
     </HBox>
     <HBox alignment="CENTER_RIGHT" spacing="15.0">
       <children>
-        <Button style="-fx-background-color: #7f8c8d;" onAction="#handleGoBack" prefWidth="120.0"
+        <Button style="-fx-background-color: #ff5555; -fx-text-fill: #f8f8f2; -fx-font-weight: bold;"
+                onAction="#handleGoBack" prefWidth="120.0"
                 styleClass="btn-bid" text="HỦY BỎ"/>
         <Button onAction="#handleUploadProduct" prefWidth="200.0" styleClass="btn-bid"
+                style="-fx-background-color: #50fa7b; -fx-text-fill: #282a36; -fx-font-weight: bold;"
                 text="ĐĂNG TẢI NGAY"/>
       </children>
     </HBox>

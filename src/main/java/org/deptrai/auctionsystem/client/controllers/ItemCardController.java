@@ -108,10 +108,10 @@ public class ItemCardController implements AuctionUpdateListener {
       if (auction.getStatus() == org.deptrai.auctionsystem.shared.models.auction.AuctionStatus.OPEN ||
               auction.getStatus() == org.deptrai.auctionsystem.shared.models.auction.AuctionStatus.RUNNING) {
 
-        new Thread(() -> {
+        SocketClient.runAsync(() -> {
           Message request = new Message("FINISH_AUCTION", auction.getAuctionId());
           SocketClient.sendRequest(request);
-        }).start();
+        });
       }
     } else {
       timerLabel.setText(

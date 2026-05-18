@@ -11,6 +11,7 @@ import java.util.*;
 import javafx.scene.control.PasswordField;
 import org.deptrai.auctionsystem.server.dao.*;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
+import org.deptrai.auctionsystem.server.utils.ServerThreadPool;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
@@ -543,7 +544,7 @@ public class  ClientHandler implements Runnable {
       // Khi Broadcast được gửi đi, gói bưu kiện 'auction' này đã mang theo endTime mới!
       ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
 
-      new Thread(()-> {
+      ServerThreadPool.submitTask(()-> {
         NotificationDAO notiDAO = new NotificationDAO();
         Set<String> targetUserIds = new HashSet<>();
 
@@ -577,7 +578,7 @@ public class  ClientHandler implements Runnable {
             notiDAO.insertNotification(userid, notiMsg);
           }
         }
-      }).start();
+      });
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -744,7 +745,7 @@ public class  ClientHandler implements Runnable {
             ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
 
             // ==================== XỬ LÝ HỆ THỐNG THÔNG BÁO (ONLINE/OFFLINE) ====================
-            new Thread(() -> {
+            ServerThreadPool.submitTask(() -> {
               NotificationDAO notiDAO = new NotificationDAO();
               String timeStampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
               String itemName = auction.getItem().getName();
@@ -812,7 +813,7 @@ public class  ClientHandler implements Runnable {
                   notiDAO.insertNotification(targetUserId, msgText);
                 }
               }
-            }).start();
+            });
             // ==================== KẾT THÚC XỬ LÝ HỆ THỐNG THÔNG BÁO ====================
 
           }

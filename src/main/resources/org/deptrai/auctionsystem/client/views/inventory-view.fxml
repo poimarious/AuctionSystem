@@ -9,10 +9,11 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml/1"
+      style="-fx-background-color: #282a36;"
       spacing="20.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25"
       fx:controller="org.deptrai.auctionsystem.client.controllers.InventoryController">
   <children>
-    <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ ">
+    <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ " style="-fx-text-fill: #f8f8f2;">
       <padding>
         <Insets bottom="8.0" left="12.0" right="15.0" top="8.0"/>
       </padding>
@@ -21,11 +22,11 @@
     <HBox alignment="CENTER_LEFT" spacing="20.0">
       <children>
         <Label style="-fx-font-size: 22; -fx-font-weight: bold;" text="KHO HÀNG CỦA TÔI"
-               textFill="#2c3e50"/>
+               textFill="#bd93f9"/>
 
         <Region HBox.hgrow="ALWAYS"/>
 
-        <Button onAction="#handleAddNewProduct" styleClass="btn-bid" text="+ ĐĂNG SẢN PHẨM MỚI"/>
+        <Button onAction="#handleAddNewProduct" styleClass="btn-bid" text="+ ĐĂNG SẢN PHẨM MỚI" style="-fx-background-color: #50fa7b; -fx-text-fill: #282a36; -fx-font-weight: bold;"/>
       </children>
     </HBox>
 
