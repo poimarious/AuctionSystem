@@ -3,10 +3,7 @@ package org.deptrai.auctionsystem.client.controllers;
 import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
@@ -25,6 +22,8 @@ public class ProfileController {
   @FXML private PasswordField currentPassField;
   @FXML private PasswordField newPassField;
   @FXML private PasswordField confirmNewPassField;
+
+  @FXML private Button topUpButton;
 
   @FXML
   public void initialize() {
@@ -52,6 +51,11 @@ public class ProfileController {
       profileNameLabel.setText("Khách");
       profileRoleLabel.setText("Chưa đăng nhập");
       balanceLabel.setText("$0.00");
+    }
+
+    if(currentUser instanceof Seller) {
+      topUpButton.setVisible(false);
+      topUpButton.setDisable(true);
     }
   }
 
