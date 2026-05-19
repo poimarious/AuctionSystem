@@ -169,11 +169,7 @@ public class MainController {
     Message response = SocketClient.sendRequest(request);
 
     if (response.getStatus().equals("SUCCESS")) {
-      List<AuctionSummary> rawAuctions = (List<AuctionSummary>) response.getData();
-
-
-      allAuctions = new java.util.ArrayList<>(rawAuctions);
-
+      allAuctions = (List<AuctionSummary>) response.getData();
 
       displayAuctions(allAuctions);
 
