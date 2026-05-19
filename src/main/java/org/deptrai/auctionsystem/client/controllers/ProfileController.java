@@ -8,6 +8,7 @@ import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.users.Admin;
+import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
@@ -54,24 +55,72 @@ public class ProfileController {
     }
 
     if(currentUser instanceof Seller) {
-      topUpButton.setVisible(false);
-      topUpButton.setDisable(true);
+      topUpButton.setText("Rút tiền");
     }
   }
 
   @FXML
-  public void handleTopUpWallet(ActionEvent event) {
+  public void handleWithdrawWallet(ActionEvent event) {
     User currentUser = SessionManager.getInstance().getCurrentUser();
-
     if (currentUser == null) {
       showAlert(Alert.AlertType.ERROR, "Lỗi xác thực", "Bạn cần đăng nhập để nạp tiền!");
       return;
     }
 
     TextInputDialog dialog = new TextInputDialog("");
-    dialog.setTitle("Nạp tiền vào ví");
+    dialog.setTitle("Rút tiền");
     dialog.setHeaderText("Số dư hiện tại: " + String.format("$%.2f", currentUser.getBalance()));
-    dialog.setContentText("Vui lòng nhập số tiền muốn nạp ($):");
+    dialog.setContentText("Vui lòng nhập số tiền muốn rút ($):");
+    Optional<String> result = dialog.showAndWait();
+    result.ifPresent(amountStr -> {
+      try {
+        double amount = Double.parseDouble(amountStr);
+        if (amount <= 0) {
+          showAlert(Alert.AlertType.WARNING, "Lỗi nhập liệu", "Số tiền nạp phải lớn hơn 0!");
+          return;
+        }
+
+        Object[] topUpData = {currentUser.getUserId(), amount};
+        Message request = new Message("WITHDRAW", topUpData);
+        Message response = SocketClient.sendRequest(request);
+
+        if(response.getStatus().equals("SUCCESS")) {
+          double newBalance = (Double) response.getData();
+
+          currentUser.setBalance(newBalance);
+          SessionManager.getInstance()
+                  .notifyBalanceChanged(); // Báo cho các giao diện tự update số
+          balanceLabel.setText(String.format("$%.2f", newBalance));
+
+          showAlert(
+                  Alert.AlertType.INFORMATION,
+                  "Thành công",
+                  "Đã rút thành công $" + amount + "!");
+        } else {
+          showAlert(Alert.AlertType.ERROR, "Lỗi Server", (String) response.getData());
+        }
+      } catch(NumberFormatException e) {
+        showAlert(
+                Alert.AlertType.ERROR,
+                "Lỗi nhập liệu",
+                "Vui lòng chỉ nhập số (Ví dụ: 100 hoặc 50.5)");
+      }
+    });
+  }
+
+  @FXML
+  public void handleChangeBalance(ActionEvent event) {
+    User currentUser = SessionManager.getInstance().getCurrentUser();
+
+    if (currentUser == null) {
+      showAlert(Alert.AlertType.ERROR, "Lỗi xác thực", "Bạn cần đăng nhập để " + ((currentUser instanceof Bidder) ? "nạp" : "rút") + " tiền!");
+      return;
+    }
+
+    TextInputDialog dialog = new TextInputDialog("");
+    dialog.setTitle((currentUser instanceof Bidder) ? "Nạp tiền vào ví" : "Rút tiền");
+    dialog.setHeaderText("Số dư hiện tại: " + String.format("$%.2f", currentUser.getBalance()));
+    dialog.setContentText("Vui lòng nhập số tiền muốn " + ((currentUser instanceof Bidder) ? "nạp" : "rút") + " ($):");
 
     Optional<String> result = dialog.showAndWait();
 
@@ -81,12 +130,12 @@ public class ProfileController {
             double amount = Double.parseDouble(amountStr);
 
             if (amount <= 0) {
-              showAlert(Alert.AlertType.WARNING, "Lỗi nhập liệu", "Số tiền nạp phải lớn hơn 0!");
+              showAlert(Alert.AlertType.WARNING, "Lỗi nhập liệu", "Số tiền " + ((currentUser instanceof Bidder) ? "nạp" : "rút") + " phải lớn hơn 0!");
               return;
             }
 
             Object[] topUpData = {currentUser.getUserId(), amount};
-            Message request = new Message("TOP_UP", topUpData);
+            Message request = new Message("CHANGE_BALANCE", topUpData);
 
             // Awaiting response from Server after sending a request
             Message response = SocketClient.sendRequest(request);
@@ -103,7 +152,7 @@ public class ProfileController {
               showAlert(
                   Alert.AlertType.INFORMATION,
                   "Thành công",
-                  "Đã nạp thành công $" + amount + " vào ví!");
+                  "Đã " + ((currentUser instanceof Bidder) ? "nạp" : "rút") + " thành công $" + amount + " !");
             } else {
               showAlert(Alert.AlertType.ERROR, "Lỗi Server", (String) response.getData());
             }

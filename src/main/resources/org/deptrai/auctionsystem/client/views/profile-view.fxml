@@ -81,7 +81,7 @@
                   </font>
                 </Label>
                 <Region VBox.vgrow="ALWAYS" prefHeight="20.0"/>
-                <Button maxWidth="Infinity" onAction="#handleTopUpWallet" styleClass="btn-success" text="➕ NẠP TIỀN VÀO VÍ" fx:id="topUpButton" />
+                <Button maxWidth="Infinity" onAction="#handleChangeBalance" styleClass="btn-success" text="➕ NẠP TIỀN VÀO VÍ" fx:id="topUpButton" />
               </children>
             </VBox>
           </children>

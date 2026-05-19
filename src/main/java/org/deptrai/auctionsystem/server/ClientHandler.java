@@ -54,8 +54,8 @@ public class  ClientHandler implements Runnable {
           case "REGISTER":
             handleRegister(request);
             break;
-          case "TOP_UP":
-            handleTopUp(request);
+          case "CHANGE_BALANCE":
+            handleChangeBalance(request);
             break;
           case "GET_ALL_AUCTIONS":
             handleGetAllAuctions(request);
@@ -194,7 +194,7 @@ public class  ClientHandler implements Runnable {
   }
 
   // For top-up buttons (Dùng cho mấy nút nạp tiền ấy)
-  private void handleTopUp(Message request) {
+  private void handleChangeBalance(Message request) {
     // Dữ liệu Client gửi sang sẽ gồm: [userId, amount]
     Object[] data = (Object[]) request.getData();
     String userId = (String) data[0];
@@ -203,9 +203,21 @@ public class  ClientHandler implements Runnable {
     User user = userDAO.getUserById(userId);
     if (user != null) {
       double newBalance = user.getBalance() + amount;
+      if(user instanceof Seller) {
+        newBalance = user.getBalance() - amount;
+        if(newBalance < 0) {
+          try {
+            out.writeObject(new Message("FAIL", "CHANGE_BALANCE", "số tiền rút phải nhỏ hơn số dư!"));
+            out.flush();
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+          return ;
+        }
+      }
       if (userDAO.updateBalance(userId, newBalance)) {
         try {
-          out.writeObject(new Message("SUCCESS", "TOP_UP", newBalance));
+          out.writeObject(new Message("SUCCESS", "CHANGE_BALANCE", newBalance));
           out.flush();
         } catch (IOException e) {
           throw new RuntimeException(e);
@@ -214,7 +226,7 @@ public class  ClientHandler implements Runnable {
       }
     }
     try {
-      out.writeObject(new Message("FAIL", "TOP_UP", "Lỗi cập nhật số dư."));
+      out.writeObject(new Message("FAIL", "CHANGE_BALANCE", "Lỗi cập nhật số dư."));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
