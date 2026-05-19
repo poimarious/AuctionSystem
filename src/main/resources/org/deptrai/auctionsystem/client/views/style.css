@@ -186,3 +186,51 @@
 .modern-table .table-row-cell {
     -fx-text-fill: white;
 }
+
+.context-menu {
+    -fx-background-color: #282a36; /* Nền đen nhám Dracula */
+    -fx-border-color: #6272a4; /* Viền xám tím */
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+}
+
+.menu-item {
+    -fx-padding: 10 20;
+}
+
+/* Đổi màu khi lướt chuột qua các dòng Menu */
+.menu-item:hover, .menu-item:focused {
+    -fx-background-color: #44475a;
+}
+
+/* Ép màu chữ trong Menu thành trắng ngà */
+.menu-item .label {
+    -fx-text-fill: #f8f8f2;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Làm đẹp cho nút Menu Icon người dùng */
+.user-menu-button,
+.user-menu-button:focused,
+.user-menu-button:showing {
+    -fx-background-color: transparent; /* Ép trong suốt ở mọi trạng thái */
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+}
+
+/* Tạo hiệu ứng sáng nền nhẹ (như kính) khi di chuột vào cho xịn xò */
+.user-menu-button:hover {
+    -fx-background-color: #44475a;
+    -fx-background-radius: 8;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+/* Ẩn mũi tên mặc định của MenuButton */
+.user-menu-button > .arrow-button {
+    -fx-padding: 0;
+}
+.user-menu-button > .arrow-button > .arrow {
+    -fx-background-color: transparent;
+}
