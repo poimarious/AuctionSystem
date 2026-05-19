@@ -17,6 +17,7 @@ import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
+import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 
 import java.io.IOException;
@@ -95,8 +96,8 @@ public class AuctionFloorController {
     // Gửi yêu cầu qua Socket
     Object currentUser = SessionManager.getInstance().getCurrentUser();
     String userId = null;
-    if (currentUser instanceof Bidder bidder) {
-      userId = bidder.getUserId();
+    if (currentUser instanceof User user) {
+      userId = user.getUserId();
     }
     Message request = new Message("GET_ALL_AUCTIONS", userId);
 
