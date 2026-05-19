@@ -162,8 +162,8 @@ public class MainController {
 
     Object currentUser = SessionManager.getInstance().getCurrentUser();
     String userId = null;
-    if (currentUser instanceof Bidder bidder) {
-      userId = bidder.getUserId();
+    if (currentUser instanceof User user) {
+      userId = user.getUserId();
     }
     Message request = new Message("GET_ALL_AUCTIONS", userId);
     Message response = SocketClient.sendRequest(request);

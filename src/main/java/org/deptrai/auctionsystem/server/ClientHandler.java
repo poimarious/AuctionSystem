@@ -239,7 +239,7 @@ public class  ClientHandler implements Runnable {
         boolean isWonByMe = false;
         if (userId != null && (auction.getStatus() == AuctionStatus.FINISHED || auction.getStatus() == AuctionStatus.PAID)) {
           Bidder winner = auction.getWinner();
-          if (winner != null && winner.getUserId().equals(userId)) {
+          if (winner != null && winner.getUserId().equals(userId) || auction.getItem().getSeller().getUserId().equals(userId)) {
             isWonByMe = true;
           }
         }
@@ -897,6 +897,32 @@ public class  ClientHandler implements Runnable {
 
           // Phát loa thông báo cho TẤT CẢ các Client cập nhật lại UI (Đổi nhãn thành Đã thanh toán)
           ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
+          ServerThreadPool.submitTask(() -> {
+            NotificationDAO notiDAO = new NotificationDAO();
+            String timeStampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+            String itemName = auction.getItem().getName();
+
+            HashMap<String,String> usersMessage = new HashMap<>();
+            usersMessage.put(sellerId,"Phiên đấu giá " + itemName + " của bạn đã được thanh toán bởi " + dbWinner.getUsername() + " với số tiền: " + finalPrice + "$.");
+            usersMessage.put(dbWinner.getUserId(),"Bạn đã thanh toán thành công số tiền " + finalPrice + "$ cho phiên đấu giá " + itemName + ".");
+
+            for(Map.Entry<String,String> users : usersMessage.entrySet()) {
+              String targetUserId = users.getKey();
+              String targetMessage = users.getValue();
+              Boolean isOnline = false;
+
+              for (ClientHandler client : ServerMain.activeClients) {
+                if (client.getAuthenticatedUser() != null && client.getAuthenticatedUser().getUserId().equals(targetUserId)) {
+                  client.sendMessage(new Message("SUCCESS", "PUSH_NOTIFICATION_BELL", targetMessage));
+                  isOnline = true;
+                  break;
+                }
+              }
+              if(!isOnline) {
+                notiDAO.insertNotification(targetUserId,targetMessage);
+              }
+            }
+          });
 
           out.writeObject(new Message("SUCCESS", "CHECKOUT", "Thanh toán thành công!"));
         } else {
