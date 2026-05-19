@@ -8,12 +8,14 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+
 <VBox xmlns:fx="http://javafx.com/fxml/1"
-      style="-fx-background-color: #282a36;"
+      style="-fx-background-color: #151226;"
       spacing="20.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25"
       fx:controller="org.deptrai.auctionsystem.client.controllers.InventoryController">
   <children>
-    <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ " style="-fx-text-fill: #f8f8f2;">
+
+    <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ QUAY LẠI">
       <padding>
         <Insets bottom="8.0" left="12.0" right="15.0" top="8.0"/>
       </padding>
@@ -21,12 +23,12 @@
 
     <HBox alignment="CENTER_LEFT" spacing="20.0">
       <children>
-        <Label style="-fx-font-size: 22; -fx-font-weight: bold;" text="KHO HÀNG CỦA TÔI"
+        <Label style="-fx-font-size: 22; -fx-font-weight: bold;" text="📦 KHO HÀNG CỦA TÔI"
                textFill="#bd93f9"/>
 
         <Region HBox.hgrow="ALWAYS"/>
 
-        <Button onAction="#handleAddNewProduct" styleClass="btn-bid" text="+ ĐĂNG SẢN PHẨM MỚI" style="-fx-background-color: #50fa7b; -fx-text-fill: #282a36; -fx-font-weight: bold;"/>
+        <Button onAction="#handleAddNewProduct" styleClass="btn-success" text="➕ ĐĂNG SẢN PHẨM MỚI" />
       </children>
     </HBox>
 

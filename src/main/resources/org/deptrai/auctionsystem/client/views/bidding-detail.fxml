@@ -10,7 +10,7 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.LineChart?>
 
-<VBox prefHeight="750.0" prefWidth="1100.0" spacing="20.0" style="-fx-background-color: #282a36;"
+<VBox prefHeight="750.0" prefWidth="1100.0" spacing="20.0" style="-fx-background-color: #151226;"
       stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.deptrai.auctionsystem.client.controllers.BiddingDetailController">
 
@@ -20,51 +20,51 @@
 
   <HBox alignment="CENTER_LEFT" spacing="15.0">
     <children>
-      <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ QUAY LẠI" style="-fx-text-fill: #f8f8f2;">
+      <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ QUAY LẠI">
         <padding>
           <Insets bottom="8.0" left="15.0" right="15.0" top="8.0" />
         </padding>
       </Button>
-      <Label text="CHI TIẾT ĐẤU GIÁ" textFill="#bd93f9" style="-fx-font-weight: bold; -fx-font-size: 20;"/>
+      <Label text="🔨 CHI TIẾT PHIÊN ĐẤU GIÁ" textFill="#bd93f9" style="-fx-font-weight: bold; -fx-font-size: 20;"/>
     </children>
   </HBox>
 
   <HBox spacing="25.0" VBox.vgrow="ALWAYS">
     <children>
       <VBox maxWidth="400.0" prefWidth="400.0" spacing="15.0"
-            style="-fx-background-color: #44475a; -fx-background-radius: 15; -fx-padding: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 4);">
+            style="-fx-background-color: #1e1936; -fx-background-radius: 15; -fx-padding: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 4); -fx-border-color: #2b244d; -fx-border-radius: 15; -fx-border-width: 1.5;">
         <children>
-          <StackPane style="-fx-background-color: #282a36; -fx-background-radius: 10;">
+          <StackPane style="-fx-background-color: #151226; -fx-background-radius: 10;">
             <children>
               <ImageView fx:id="productImageView" fitHeight="260.0" fitWidth="360.0" pickOnBounds="true" preserveRatio="true" />
             </children>
           </StackPane>
 
-          <Label fx:id="nameLabel" styleClass="product-title" text="Tên sản phẩm" wrapText="true" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #f8f8f2;" />
+          <Label fx:id="nameLabel" styleClass="product-title" text="Tên sản phẩm" wrapText="true" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #ffffff;" />
 
           <HBox spacing="20.0">
             <children>
               <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                 <children>
-                  <Label text="GIÁ HIỆN TẠI" textFill="#6272a4" style="-fx-font-size: 13;"/>
-                  <Label fx:id="currentPriceLabel" styleClass="price-label" text="\$0.00" style="-fx-font-size: 22; -fx-text-fill: #50fa7b; -fx-font-weight: bold;" />
+                  <Label text="GIÁ HIỆN TẠI" textFill="#8c88a8" style="-fx-font-size: 13; -fx-font-weight: bold;"/>
+                  <Label fx:id="currentPriceLabel" styleClass="price-label" text="\$0.00" style="-fx-font-size: 22; -fx-text-fill: #39ff14; -fx-font-weight: bold;" />
                 </children>
               </VBox>
-              <VBox spacing="5.0" alignment="CENTER_RIGHT" style="-fx-background-color: #282a36; -fx-border-color: #ff5555; -fx-padding: 8 15; -fx-background-radius: 8; -fx-border-radius: 8;">
+              <VBox spacing="5.0" alignment="CENTER_RIGHT" style="-fx-background-color: #151226; -fx-border-color: #ff003c; -fx-padding: 8 15; -fx-background-radius: 8; -fx-border-radius: 8;">
                 <children>
-                  <Label text="THỜI GIAN CÒN LẠI" textFill="#ff5555" style="-fx-font-size: 12; -fx-font-weight: bold;"/>
-                  <Label fx:id="expiryTimerLabel" styleClass="timer-label" text="00:00:00" style="-fx-font-size: 16; -fx-text-fill: #ff5555; -fx-font-weight: bold;" />
+                  <Label text="⏳ CÒN LẠI" textFill="#ff003c" style="-fx-font-size: 12; -fx-font-weight: bold;"/>
+                  <Label fx:id="expiryTimerLabel" styleClass="timer-label" text="00:00:00" style="-fx-font-size: 16; -fx-text-fill: #ff003c; -fx-font-weight: bold;" />
                 </children>
               </VBox>
             </children>
           </HBox>
 
-          <Separator />
+          <Separator opacity="0.3"/>
 
-          <Label style="-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: #8be9fd;" text="Mô tả sản phẩm:" />
+          <Label style="-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: #00f3ff;" text="📝 Mô tả sản phẩm:" />
           <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
             <content>
-              <Label fx:id="descriptionLabel" text="..." wrapText="true" style="-fx-font-size: 14; -fx-text-fill: #f8f8f2;" />
+              <Label fx:id="descriptionLabel" text="..." wrapText="true" style="-fx-font-size: 14; -fx-text-fill: #e2e8f0;" />
             </content>
           </ScrollPane>
         </children>
@@ -73,9 +73,9 @@
       <VBox spacing="15.0" HBox.hgrow="ALWAYS">
         <children>
 
-          <VBox spacing="10.0" VBox.vgrow="ALWAYS" styleClass="item-card" style="-fx-padding: 15; -fx-background-color: #44475a; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 5, 0, 0, 2);">
+          <VBox spacing="10.0" VBox.vgrow="ALWAYS" styleClass="item-card" style="-fx-padding: 15; -fx-background-color: #1e1936; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 5, 0, 0, 2); -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1.5;">
             <children>
-              <Label style="-fx-font-weight: bold; -fx-font-size: 15; -fx-text-fill: #bd93f9;" text="📜 LỊCH SỬ &amp; BIẾN ĐỘNG GIÁ" />
+              <Label style="-fx-font-weight: bold; -fx-font-size: 15; -fx-text-fill: #bd93f9;" text="📜 LỊCH SỬ &amp; BIẾN ĐỘNG GIÁ TRÊN SÀN" />
 
               <TableView fx:id="bidHistoryTable" prefHeight="220.0" VBox.vgrow="SOMETIMES">
                 <columns>
@@ -105,24 +105,24 @@
           <HBox spacing="15.0" minHeight="130.0">
             <children>
 
-              <VBox spacing="10.0" styleClass="item-card" style="-fx-padding: 15; -fx-background-color: #44475a; -fx-background-radius: 10; -fx-border-color: #50fa7b; -fx-border-radius: 10; -fx-border-width: 2;" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+              <VBox spacing="10.0" styleClass="item-card" style="-fx-padding: 15; -fx-background-color: #1e1936; -fx-background-radius: 10; -fx-border-color: #39ff14; -fx-border-radius: 10; -fx-border-width: 2;" HBox.hgrow="ALWAYS" maxWidth="Infinity">
                 <children>
-                  <Label text="ĐẶT GIÁ THỦ CÔNG" style="-fx-font-weight: bold; -fx-text-fill: #50fa7b;"/>
-                  <TextField fx:id="bidAmountField" promptText="Nhập số tiền ($)..." styleClass="text-field" prefHeight="38.0" VBox.vgrow="ALWAYS"/>
-                  <Button onAction="#handlePlaceBid" styleClass="btn-bid" text="XÁC NHẬN ĐẶT GIÁ" prefHeight="40.0" maxWidth="Infinity" style="-fx-font-weight: bold; -fx-font-size: 13; -fx-background-color: #50fa7b; -fx-text-fill: #282a36;"/>
+                  <Label text="⚡ ĐẶT GIÁ THỦ CÔNG" style="-fx-font-weight: bold; -fx-text-fill: #39ff14;"/>
+                  <TextField fx:id="bidAmountField" promptText="💵 Nhập số tiền đặt giá ($)..." styleClass="text-field" prefHeight="38.0" VBox.vgrow="ALWAYS"/>
+                  <Button onAction="#handlePlaceBid" styleClass="btn-success" text="🤝 XÁC NHẬN ĐẶT GIÁ" prefHeight="40.0" maxWidth="Infinity" />
                 </children>
               </VBox>
 
-              <VBox spacing="10.0" styleClass="item-card" style="-fx-padding: 15; -fx-background-color: #44475a; -fx-background-radius: 10; -fx-border-color: #8be9fd; -fx-border-radius: 10; -fx-border-width: 2;" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+              <VBox spacing="10.0" styleClass="item-card" style="-fx-padding: 15; -fx-background-color: #1e1936; -fx-background-radius: 10; -fx-border-color: #00f3ff; -fx-border-radius: 10; -fx-border-width: 2;" HBox.hgrow="ALWAYS" maxWidth="Infinity">
                 <children>
-                  <Label text="TỰ ĐỘNG ĐẤU GIÁ (AUTO-BID)" style="-fx-font-weight: bold; -fx-text-fill: #8be9fd;"/>
+                  <Label text="🤖 TỰ ĐỘNG ĐẤU GIÁ (AUTO-BID)" style="-fx-font-weight: bold; -fx-text-fill: #00f3ff;"/>
                   <HBox spacing="10.0" VBox.vgrow="ALWAYS">
                     <children>
-                      <TextField fx:id="maxBidField" promptText="Giới hạn Max ($)" prefHeight="38.0" HBox.hgrow="ALWAYS"/>
-                      <TextField fx:id="incrementField" promptText="Bước nhảy ($)" prefHeight="38.0" HBox.hgrow="ALWAYS"/>
+                      <TextField fx:id="maxBidField" promptText="🚀 Giới hạn Max ($)" prefHeight="38.0" styleClass="text-field" HBox.hgrow="ALWAYS"/>
+                      <TextField fx:id="incrementField" promptText="📈 Bước nhảy ($)" prefHeight="38.0" styleClass="text-field" HBox.hgrow="ALWAYS"/>
                     </children>
                   </HBox>
-                  <Button maxWidth="Infinity" style="-fx-background-color: #8be9fd; -fx-text-fill: #282a36; -fx-font-weight: bold; -fx-font-size: 13; -fx-cursor: hand;" text="KÍCH HOẠT AUTO-BID" prefHeight="40.0"/>
+                  <Button maxWidth="Infinity" styleClass="btn-primary" text="⚙️ KÍCH HOẠT AUTO-BID" prefHeight="40.0"/>
                 </children>
               </VBox>
 

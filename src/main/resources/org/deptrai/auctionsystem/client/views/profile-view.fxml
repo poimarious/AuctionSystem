@@ -14,55 +14,55 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
+
 <ScrollPane xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: transparent;"
             fitToWidth="true"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12"
             fx:controller="org.deptrai.auctionsystem.client.controllers.ProfileController">
   <content>
-    <VBox style="-fx-padding: 40 60 40 60; -fx-background-color: #282a36;" spacing="30.0">
+    <VBox style="-fx-padding: 40 60 40 60; -fx-background-color: #151226;" spacing="30.0">
       <children>
 
         <VBox spacing="10.0">
           <children>
-            <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ QUAY LẠI" style="-fx-text-fill: #f8f8f2;">
+            <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ QUAY LẠI">
               <padding>
                 <Insets bottom="8.0" left="12.0" right="15.0" top="8.0"/>
               </padding>
             </Button>
-            <Label text="HỒ SƠ CÁ NHÂN" textFill="#bd93f9">
+            <Label text="👤 HỒ SƠ CÁ NHÂN" textFill="#bd93f9">
               <font>
                 <Font name="System Bold" size="28.0"/>
               </font>
             </Label>
-            <Separator/>
+            <Separator opacity="0.3"/>
           </children>
         </VBox>
 
         <HBox spacing="30.0">
           <children>
-            <VBox style="-fx-padding: 25; -fx-background-color: #44475a; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);"
-                  prefWidth="400.0" spacing="20.0" styleClass="item-card">
+            <VBox style="-fx-padding: 25;" prefWidth="400.0" spacing="20.0" styleClass="card">
               <children>
                 <HBox alignment="CENTER_LEFT" spacing="20.0">
                   <children>
-                    <Circle fill="#bd93f9" radius="35.0" stroke="#282a36" strokeType="INSIDE" strokeWidth="2.0"/>
+                    <Circle fill="#bd93f9" radius="35.0" stroke="#151226" strokeType="INSIDE" strokeWidth="2.0"/>
                     <VBox spacing="5.0">
                       <children>
-                        <Label style="-fx-font-weight: bold; -fx-font-size: 20; -fx-text-fill: #f8f8f2;"
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 20; -fx-text-fill: #ffffff;"
                                text="Tên tài khoản" fx:id="profileNameLabel"/>
-                        <Label text="Người dùng hệ thống" textFill="#8be9fd"
+                        <Label text="Người dùng hệ thống" textFill="#00f3ff" style="-fx-font-weight: bold;"
                                fx:id="profileRoleLabel"/>
                       </children>
                     </VBox>
                   </children>
                 </HBox>
 
-                <Separator/>
+                <Separator opacity="0.3"/>
 
                 <GridPane vgap="10.0">
                   <children>
-                    <Label text="Email:" textFill="#6272a4"/>
-                    <Label GridPane.columnIndex="1" text="............" fx:id="profileEmailLabel" style="-fx-text-fill: #f8f8f2;"/>
+                    <Label text="📧 Email liên hệ:" textFill="#8c88a8" style="-fx-font-weight: bold;"/>
+                    <Label GridPane.columnIndex="1" text="............" fx:id="profileEmailLabel" style="-fx-text-fill: #00f3ff; -fx-font-weight: bold;"/>
                   </children>
                   <columnConstraints>
                     <ColumnConstraints prefWidth="120.0"/>
@@ -72,50 +72,46 @@
               </children>
             </VBox>
 
-            <VBox style="-fx-background-color: #44475a; -fx-background-radius: 12; -fx-padding: 25; -fx-border-color: #50fa7b; -fx-border-radius: 12;"
-                  prefWidth="350.0"
-                  spacing="10.0">
+            <VBox style="-fx-padding: 25; -fx-border-color: #39ff14;" prefWidth="350.0" spacing="10.0" styleClass="card">
               <children>
-                <Label style="-fx-font-weight: bold;" text="SỐ DƯ VÍ (WALLET)" textFill="#50fa7b"/>
-                <Label text="\$15,000" textFill="#f8f8f2" fx:id="balanceLabel">
+                <Label style="-fx-font-weight: bold;" text="💰 SỐ DƯ VÍ (WALLET ENGINE)" textFill="#39ff14"/>
+                <Label text="\$15,000" textFill="#ffffff" fx:id="balanceLabel" style="-fx-effect: dropshadow(gaussian, rgba(57, 255, 20, 0.4), 8, 0, 0, 0);">
                   <font>
                     <Font name="System Bold" size="36.0"/>
                   </font>
                 </Label>
                 <Region VBox.vgrow="ALWAYS" prefHeight="20.0"/>
-                <Button maxWidth="Infinity" onAction="#handleTopUpWallet" styleClass="btn-bid"
-                        text="➕ NẠP TIỀN VÀO VÍ" style="-fx-background-color: #50fa7b; -fx-text-fill: #282a36; -fx-font-weight: bold;"/>
+                <Button maxWidth="Infinity" onAction="#handleTopUpWallet" styleClass="btn-success" text="➕ NẠP TIỀN VÀO VÍ" />
               </children>
             </VBox>
           </children>
         </HBox>
 
-        <VBox style="-fx-padding: 30; -fx-background-color: #44475a; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);" spacing="20.0" styleClass="item-card">
+        <VBox style="-fx-padding: 30;" spacing="20.0" styleClass="card">
           <children>
-            <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #8be9fd;" text="Cài đặt bảo mật"/>
-            <Separator/>
+            <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #00f3ff;" text="🛡️ Cài đặt bảo mật" />
+            <Separator opacity="0.3"/>
             <VBox maxWidth="500.0" spacing="15.0">
               <children>
                 <VBox spacing="5.0">
                   <children>
-                    <Label text="Mật khẩu hiện tại" style="-fx-text-fill: #f8f8f2;"/>
-                    <PasswordField fx:id="currentPassField"/>
+                    <Label text="🔒 Mật khẩu hiện tại" style="-fx-text-fill: #8c88a8; -fx-font-weight: bold;"/>
+                    <PasswordField fx:id="currentPassField" styleClass="password-field"/>
                   </children>
                 </VBox>
                 <VBox spacing="5.0">
                   <children>
-                    <Label text="Mật khẩu mới" style="-fx-text-fill: #f8f8f2;"/>
-                    <PasswordField fx:id="newPassField"/>
+                    <Label text="🔑 Mật khẩu mới" style="-fx-text-fill: #8c88a8; -fx-font-weight: bold;"/>
+                    <PasswordField fx:id="newPassField" styleClass="password-field"/>
                   </children>
                 </VBox>
                 <VBox spacing="5.0">
                   <children>
-                    <Label text="Xác nhận mật khẩu mới" style="-fx-text-fill: #f8f8f2;"/>
-                    <PasswordField fx:id="confirmNewPassField"/>
+                    <Label text="🔐 Xác nhận mật khẩu mới" style="-fx-text-fill: #8c88a8; -fx-font-weight: bold;"/>
+                    <PasswordField fx:id="confirmNewPassField" styleClass="password-field"/>
                   </children>
                 </VBox>
-                <Button style="-fx-text-fill: #f8f8f2; -fx-border-color: #bd93f9; -fx-background-color: transparent; -fx-font-weight: bold; -fx-border-radius: 5;"
-                        onAction="#handleUpdatePassword" styleClass="btn-login" text="CẬP NHẬT MẬT KHẨU"/>
+                <Button onAction="#handleUpdatePassword" styleClass="btn-primary" text="🔄 CẬP NHẬT MẬT KHẨU"/>
               </children>
             </VBox>
           </children>
@@ -123,10 +119,7 @@
 
         <HBox alignment="CENTER_RIGHT">
           <children>
-            <Button
-                    style="-fx-background-color: #ff5555; -fx-text-fill: #f8f8f2; -fx-font-weight: bold; -fx-background-radius: 8;"
-                    onAction="#handleLogout"
-                    styleClass="btn-bid" text="🚪 ĐĂNG XUẤT">
+            <Button mnemonicParsing="false" onAction="#handleLogout" styleClass="btn-accent" text="🚪 ĐĂNG XUẤT">
               <padding>
                 <Insets bottom="12.0" left="25.0" right="25.0" top="12.0"/>
               </padding>

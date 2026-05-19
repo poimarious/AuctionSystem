@@ -60,7 +60,7 @@ public class LoginController {
             "Thành công",
             "Chào mừng Admin " + loggedInUser.getUsername());
         SceneManager.getInstance()
-            .switchScene("/org/deptrai/auctionsystem/client/views/admin.fxml", "Admin Panel");
+            .switchScene("/org/deptrai/auctionsystem/client/views/home-view.fxml", "Admin Panel");
 
       } else if (loggedInUser instanceof Bidder) {
         showAlert(

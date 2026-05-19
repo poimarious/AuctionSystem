@@ -15,29 +15,29 @@
       fx:controller="org.deptrai.auctionsystem.client.controllers.AdminController">
   <children>
 
-    <VBox prefWidth="260.0" spacing="15.0" styleClass="header-bar">
+    <VBox prefWidth="260.0" spacing="15.0" style="-fx-background-color: #1a162e; -fx-border-color: transparent #2b244d transparent transparent; -fx-border-width: 0 2px 0 0;">
       <children>
-        <Label style="-fx-font-size: 20; -fx-font-weight: bold;" text="ADMIN PANEL" textFill="WHITE"/>
+        <Label style="-fx-font-size: 20; -fx-font-weight: bold;" text="⚙️ ADMIN PANEL" textFill="#bd93f9"/>
         <Separator opacity="0.3"/>
 
-        <Button maxWidth="Infinity" styleClass="btn-login" text="👥 Quản lý người dùng"/>
-        <Button maxWidth="Infinity" styleClass="btn-login" text="⚖️ Duyệt đấu giá"/>
-        <Button maxWidth="Infinity" styleClass="btn-login" text="📜 Nhật ký hệ thống"/>
-        <Button maxWidth="Infinity" styleClass="btn-login" text="📊 Báo cáo doanh thu"/>
+        <Button maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: #8c88a8; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;" text="👥 Quản lý người dùng"/>
+        <Button maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: #8c88a8; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;" text="⚖️ Duyệt đấu giá"/>
+        <Button maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: #8c88a8; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;" text="📜 Nhật ký hệ thống"/>
+        <Button maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: #8c88a8; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;" text="📊 Báo cáo doanh thu"/>
 
         <Region VBox.vgrow="ALWAYS"/>
-        <Button style="-fx-background-color: #e74c3c;" maxWidth="Infinity" styleClass="btn-bid" text="🚪 Đăng xuất"/>
+        <Button style="-fx-background-color: #ff3b5c; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 8;" maxWidth="Infinity" styleClass="btn-bid" text="🚪 Đăng xuất"/>
       </children>
       <padding>
         <Insets bottom="20.0" left="15.0" right="15.0" top="30.0"/>
       </padding>
     </VBox>
 
-    <VBox style="-fx-background-color: #f0f2f5;" HBox.hgrow="ALWAYS" spacing="25.0">
+    <VBox style="-fx-background-color: #151226;" HBox.hgrow="ALWAYS" spacing="25.0">
       <children>
 
         <HBox>
-          <Button mnemonicParsing="false" styleClass="btn-back" text="⬅ ">
+          <Button mnemonicParsing="false" styleClass="btn-back" text="⬅ QUAY LẠI" style="-fx-text-fill: #8c88a8; -fx-background-color: transparent; -fx-font-weight: bold; -fx-cursor: hand;">
             <padding>
               <Insets bottom="8.0" left="12.0" right="15.0" top="8.0"/>
             </padding>
@@ -46,22 +46,23 @@
 
         <HBox spacing="20.0">
           <children>
-            <VBox style="-fx-padding: 20;" prefWidth="250.0" styleClass="item-card">
+            <VBox style="-fx-padding: 20; -fx-background-color: #1e1936; -fx-background-radius: 12; -fx-border-color: #2b244d; -fx-border-radius: 12;" prefWidth="250.0" styleClass="item-card">
               <children>
-                <Label text="Yêu cầu mới" textFill="#7f8c8d"/>
-                <Label style="-fx-font-size: 32; -fx-font-weight: bold;" text="12" textFill="#2c3e50"/>
+                <Label text="🔥 Yêu cầu mới" textFill="#8c88a8" style="-fx-font-weight: bold;"/>
+                <Label style="-fx-font-size: 32; -fx-font-weight: bold;" text="12" textFill="#00f3ff"/>
               </children>
             </VBox>
-            <VBox style="-fx-padding: 20;" prefWidth="250.0" styleClass="item-card">
+
+            <VBox style="-fx-padding: 20; -fx-background-color: #1e1936; -fx-background-radius: 12; -fx-border-color: #2b244d; -fx-border-radius: 12;" prefWidth="250.0" styleClass="item-card">
               <children>
-                <Label text="Tổng thành viên" textFill="#7f8c8d"/>
-                <Label style="-fx-font-size: 32; -fx-font-weight: bold;" text="1,042" textFill="#27ae60"/>
+                <Label text="🌐 Tổng thành viên" textFill="#8c88a8" style="-fx-font-weight: bold;"/>
+                <Label style="-fx-font-size: 32; -fx-font-weight: bold;" text="1,042" textFill="#39ff14"/>
               </children>
             </VBox>
           </children>
         </HBox>
 
-        <Label style="-fx-font-size: 28; -fx-font-weight: bold;" text="Danh sách phiên đấu giá chờ duyệt" textFill="#2c3e50"/>
+        <Label style="-fx-font-size: 28; -fx-font-weight: bold;" text="📋 Danh sách phiên đấu giá chờ duyệt" textFill="#bd93f9"/>
 
         <TableView VBox.vgrow="ALWAYS">
           <columnResizePolicy>

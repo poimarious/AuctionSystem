@@ -8,30 +8,34 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: #282a36;"
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: #151226;"
       prefHeight="600.0" prefWidth="800.0"
       spacing="20.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25"
       fx:controller="org.deptrai.auctionsystem.client.controllers.AuctionFloorController">
   <children>
-    <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ " style="-fx-text-fill: #f8f8f2;">
+
+    <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ QUAY LẠI">
       <padding>
         <Insets bottom="8.0" left="12.0" right="15.0" top="8.0"/>
       </padding>
     </Button>
 
     <HBox
-            style="-fx-background-color: #44475a; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5); -fx-padding: 15; -fx-background-radius: 10; -fx-border-color: #6272a4; -fx-border-radius: 10;"
+            style="-fx-background-color: #1e1936; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5); -fx-padding: 15; -fx-background-radius: 12; -fx-border-color: #2b244d; -fx-border-radius: 12; -fx-border-width: 1.5;"
             alignment="CENTER_LEFT"
             spacing="15.0">
       <VBox.margin>
         <Insets left="20.0" right="20.0" top="10.0"/>
       </VBox.margin>
       <children>
-        <ComboBox prefWidth="150.0" promptText="Tất cả danh mục" fx:id="categoryCombo"/>
-        <ComboBox prefWidth="150.0" promptText="Trạng thái" fx:id="statusCombo"/>
-        <TextField style="-fx-background-radius: 20; -fx-background-color: #282a36; -fx-border-color: #6272a4; -fx-border-radius: 20; -fx-text-fill: #f8f8f2;"
+        <ComboBox prefWidth="150.0" promptText="📁 Tất cả danh mục" fx:id="categoryCombo" styleClass="combo-box"/>
+
+        <ComboBox prefWidth="150.0" promptText="⚡ Trạng thái" fx:id="statusCombo" styleClass="combo-box"/>
+
+        <TextField styleClass="text-field"
                    prefWidth="350.0"
-                   promptText="Tìm tên sản phẩm, nghệ sĩ, hãng xe..." fx:id="searchField"/>
+                   promptText="🔍 Tìm tên sản phẩm, nghệ sĩ, hãng xe..." fx:id="searchField"/>
       </children>
       <padding>
         <Insets bottom="10.0" left="20.0" right="20.0" top="10.0"/>
