@@ -405,7 +405,7 @@ public class  ClientHandler implements Runnable {
 
       // 2. Lấy toàn bộ danh sách từ RAM
       List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
-      List<Auction> sellerAuctions = new java.util.ArrayList<>();
+      List<Auction> sellerAuctions = new ArrayList<>();
 
       // 3. Lọc ra những phiên đấu giá có chứa Item do Seller này đăng bán
       for (Auction auction : allAuctions) {

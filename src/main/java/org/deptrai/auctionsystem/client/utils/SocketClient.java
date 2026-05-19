@@ -93,6 +93,7 @@ public class SocketClient {
   public static void disconnect() {
     try {
       if (socket != null) socket.close();
+      clientExecutor.shutdown();
     } catch (IOException e) {
       e.printStackTrace();
     }

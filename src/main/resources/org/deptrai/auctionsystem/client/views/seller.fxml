@@ -68,19 +68,19 @@
                 <VBox style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
                       HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="100.0" spacing="10.0">
                   <Label text="💰 Tổng Doanh Thu" textFill="#50fa7b" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
-                  <Label text="0.00 $" textFill="WHITE" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+                  <Label textFill="WHITE" style="-fx-font-size: 24; -fx-font-weight: bold;" fx:id = "balanceLabel"/>
                 </VBox>
 
                 <VBox style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
                       HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="100.0" spacing="10.0">
                   <Label text="🔥 Đang Đấu Giá" textFill="#ffb86c" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
-                  <Label text="0 Sản phẩm" textFill="WHITE" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+                  <Label textFill="WHITE" style="-fx-font-size: 24; -fx-font-weight: bold;" fx:id="ongoingCountLabel"/>
                 </VBox>
 
                 <VBox style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
                       HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="100.0" spacing="10.0">
                   <Label text="✅ Đã Bán Thành Công" textFill="#8be9fd" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
-                  <Label text="0 Sản phẩm" textFill="WHITE" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+                  <Label textFill="WHITE" style="-fx-font-size: 24; -fx-font-weight: bold;" fx:id="successCountLabel"/>
                 </VBox>
               </HBox>
 

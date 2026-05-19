@@ -15,6 +15,7 @@ import org.deptrai.auctionsystem.client.utils.SearchEngine;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
@@ -202,6 +203,7 @@ public class MainController {
       int limit = Math.min(auctionsToDisplay.size(), 6);
 
       for (int i = 0; i < limit; i++) {
+        if(auctionsToDisplay.get(i).getStatus() == AuctionStatus.PAID) continue;
         try {
           FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/deptrai/auctionsystem/client/views/item-card.fxml"));
           Node itemCard = loader.load();
@@ -244,7 +246,6 @@ public class MainController {
           javafx.application.Platform.runLater(() -> listView.getSelectionModel().clearSelection());
         }
       });
-      listView.setStyle("-fx-background-insets: 0;");
       listView.setFocusTraversable(false);
 
       listView.setPrefWidth(300);

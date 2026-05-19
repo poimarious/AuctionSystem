@@ -234,3 +234,57 @@
 .user-menu-button > .arrow-button > .arrow {
     -fx-background-color: transparent;
 }
+
+/* =========================================
+   FIX TRIỆT ĐỂ CHUÔNG THÔNG BÁO (NOTIFICATION POPUP)
+   ========================================= */
+
+/* Nhuộm vỏ ngoài của ListView bên trong chuông thông báo */
+.context-menu .list-view {
+    -fx-background-color: #282a36;
+    -fx-background-insets: 0;
+}
+
+/* Nhuộm từng dòng ruột bên trong (ListCell) */
+.context-menu .list-view .list-cell {
+    -fx-background-color: #282a36; /* Đồng bộ nền đen nhám */
+    -fx-text-fill: #f8f8f2;        /* Chữ trắng ngà Dracula */
+    -fx-border-color: transparent transparent #44475a transparent; /* Vạch phân cách mờ giữa các thông báo */
+}
+
+/* Khi lướt chuột qua một thông báo, đổi sang màu nền phụ xịn xò */
+.context-menu .list-view .list-cell:hover {
+    -fx-background-color: #44475a;
+    -fx-text-fill: #8be9fd; /* Chữ chuyển sang màu Cyan khi hover */
+}
+
+.context-menu .list-view .scroll-bar:vertical {
+    -fx-opacity: 0;
+    -fx-padding: 0;
+    -fx-pref-width: 0;
+    -fx-max-width: 0;
+}
+
+.context-menu .list-view .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-padding: 0;
+    -fx-pref-width: 0;
+    -fx-max-width: 0;
+}
+
+/* Ẩn luôn cả các nút bấm hoặc khoảng trống của thanh cuộn nếu có */
+.context-menu .list-view .scroll-bar:vertical .thumb,
+.context-menu .list-view .scroll-bar:vertical .track,
+.context-menu .list-view .scroll-bar:vertical .increment-button,
+.context-menu .list-view .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.context-menu .list-view .scroll-bar:horizontal .thumb,
+.context-menu .list-view .scroll-bar:horizontal .track,
+.context-menu .list-view .scroll-bar:horizontal .increment-button,
+.context-menu .list-view .scroll-bar:horizontal .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}

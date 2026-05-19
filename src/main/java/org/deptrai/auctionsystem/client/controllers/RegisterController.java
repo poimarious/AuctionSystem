@@ -25,15 +25,13 @@ public class RegisterController {
 
   @FXML
   public void handleRegisterAction(ActionEvent event) {
-    String fullName = fullNameField.getText(); // Lấy thêm fullName
     String username = usernameField.getText();
     String email = emailField.getText();
     String password = passwordField.getText();
     String confirmPassword = confirmPasswordField.getText();
 
     // 1. Kiểm tra không được để trống (Cập nhật check thêm fullName)
-    if (fullName.isEmpty()
-        || username.isEmpty()
+    if (username.isEmpty()
         || email.isEmpty()
         || password.isEmpty()
         || confirmPassword.isEmpty()) {

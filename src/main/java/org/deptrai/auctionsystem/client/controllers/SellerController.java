@@ -3,95 +3,79 @@ package org.deptrai.auctionsystem.client.controllers;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.control.*;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 
-import java.io.IOException;
 import java.util.List;
 
 public class SellerController {
 
-  @FXML private FlowPane productsContainer;
   @FXML private TextField searchField;
   @FXML private Label welcomeLabel;
+  @FXML private Label balanceLabel;
+
+  @FXML private Label ongoingCountLabel;
+  @FXML private Label successCountLabel;
+
+  User currentUser;
+
+  int ongoingCount;
+  int successCount;
+
+  private List<Auction> sellerAuctions;
 
   @FXML
   public void initialize() {
     System.out.println("--- Seller Center Initialized ---");
 
-    // 1. Hiển thị thông tin cá nhân
-    User currentUser = SessionManager.getInstance().getCurrentUser();
+
+    currentUser = SessionManager.getInstance().getCurrentUser();
     if (currentUser != null && welcomeLabel != null) {
       welcomeLabel.setText("Chào mừng, " + currentUser.getUsername() + "!");
     }
 
-    // 2. Tự động nạp danh sách sản phẩm từ Server
-    loadSellerProducts();
+    loadSellerAuctions();
+
+    loadSellerStatistics();
   }
 
-  /**
-   * Gửi yêu cầu lấy danh sách đấu giá của riêng người bán này
-   */
-  private void loadSellerProducts() {
-    User currentUser = SessionManager.getInstance().getCurrentUser();
-    if (currentUser == null) return;
+  private void loadSellerAuctions() {
+    SocketClient.runAsync(() -> {
+      Message request = new Message("GET_SELLER_AUCTIONS", currentUser.getUserId());
+      Message response = SocketClient.sendRequest(request);
 
-    // Tạo yêu cầu với Command mà Server đã hỗ trợ (GET_SELLER_AUCTIONS)
-    Message request = new Message("REQUEST", "GET_SELLER_AUCTIONS", currentUser.getUserId());
+      if(response != null && "SUCCESS".equals(response.getStatus())) {
+        sellerAuctions = (List<Auction>) response.getData();
 
-    // Chạy trong Thread riêng để không làm đơ giao diện khi chờ mạng
-    new Thread(() -> {
-      try {
-        Message response = SocketClient.sendRequest(request);
 
-        if (response != null && "SUCCESS".equals(response.getStatus())) {
-          List<AuctionSummary> sellerAuctions = (List<AuctionSummary>) response.getData();
-
-          // Quay lại luồng UI chính để cập nhật giao diện
-          Platform.runLater(() -> displayAuctions(sellerAuctions));
-        } else {
-          Platform.runLater(() -> System.err.println("Lỗi: Không thể lấy dữ liệu từ Server"));
+        // Đếm các auction đang đấu giá và đã đấu giá thành công của seller
+        ongoingCount = 0;
+        successCount = 0;
+        for (Auction auction : sellerAuctions) {
+          if(auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING) {
+            this.ongoingCount++;
+          } else if(auction.getStatus() == AuctionStatus.PAID) {
+            this.successCount++;
+          }
         }
-      } catch (Exception e) {
-        e.printStackTrace();
       }
-    }).start();
+    });
   }
 
-  /**
-   * Hàm quan trọng: Biến List dữ liệu thành các thẻ ItemCard FXML
-   */
-  private void displayAuctions(List<AuctionSummary> auctions) {
-    if (productsContainer == null) return;
-
-    productsContainer.getChildren().clear(); // Xóa các thẻ cũ (nếu có)
-
-    for (AuctionSummary auction : auctions) {
-      try {
-        // Nạp file FXML của thẻ sản phẩm
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/deptrai/auctionsystem/client/views/item-card.fxml"));
-        Parent card = loader.load();
-
-        // Lấy controller của thẻ và đổ dữ liệu vào
-        ItemCardController cardController = loader.getController();
-        cardController.setData(auction);
-
-        // Thêm thẻ vào FlowPane
-        productsContainer.getChildren().add(card);
-
-      } catch (IOException e) {
-        System.err.println("Lỗi nạp ItemCard: " + e.getMessage());
-      }
-    }
+  private void loadSellerStatistics() {
+    Platform.runLater(() -> {
+      balanceLabel.setText(String.format("%.2f$", currentUser.getBalance()));
+      ongoingCountLabel.setText(String.format("%d sản phẩm", ongoingCount));
+      successCountLabel.setText(String.format("%d sản phẩm", successCount));
+    });
   }
 
   // --- CÁC HÀM ĐIỀU HƯỚNG ---
