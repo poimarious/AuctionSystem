@@ -2,6 +2,7 @@ package org.deptrai.auctionsystem.server.utils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.DatabaseMetaData;
@@ -23,8 +24,10 @@ public class DatabaseConnection {
             + "password TEXT NOT NULL, "
             + "email TEXT, "
             + "role TEXT NOT NULL,"
-            + "adminLevel INTEGER, "
-            + "balance REAL DEFAULT 0.0"
+            + "adminLevel INTEGER DEFAULT 0, "
+            + "balance REAL DEFAULT 0.0, "
+            + "isBanned INTEGER DEFAULT 0, "
+            + "banReason TEXT"
             + ");";
 
     String sqlCreateItems =
@@ -89,6 +92,9 @@ public class DatabaseConnection {
       // 2. Kiểm tra và nâng cấp Schema (Migration)
       updateSchema(conn);
 
+      // Gieo hạt tài khoản Admin nếu cần
+      seedDefaultAdmins(conn);
+
       System.out.println("Cơ sở dữ liệu đã sẵn sàng");
 
     } catch (SQLException e) {
@@ -118,8 +124,65 @@ public class DatabaseConnection {
               System.out.println("[SCHEMA UPDATE] Đã tự động thêm cột 'imageUrl' vào bảng Items.");
           }
       }
+
+      // Kiểm tra cột adminLevel, isBanned, banReason
+      if (!metaData.getColumns(null, null, "Users", "adminLevel").next()) {
+        try (Statement stmt = conn.createStatement()) {
+          stmt.execute("ALTER TABLE Users ADD COLUMN adminLevel INTEGER DEFAULT 0;");
+          stmt.execute("ALTER TABLE Users ADD COLUMN isBanned INTEGER DEFAULT 0;");
+          stmt.execute("ALTER TABLE Users ADD COLUMN banReason TEXT;");
+          System.out.println("[SCHEMA UPDATE] Thêm cột 'adminLevel', 'isBanned', 'banReason'.");
+        }
+      }
     } catch (SQLException e) {
       System.out.println("[LỖI SCHEMA] Không thể cập nhật cấu trúc DB: " + e.getMessage());
+    }
+  }
+
+  // ự động tạo dữ liệu mẫu nếu DB trống
+  private static void seedDefaultAdmins(Connection conn) {
+    String checkSql = "SELECT count(*) FROM Users WHERE role = 'ADMIN'";
+    try (Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(checkSql)) {
+
+      // Nếu đếm số lượng Admin == 0, tiến hành tạo mới
+      if (rs.next() && rs.getInt(1) == 0) {
+        String insertSql = "INSERT INTO Users (userId, username, password, email, role, adminLevel, balance, isBanned) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
+          // ==========================================
+          // 1. TẠO ADMIN LEVEL 2 (Quyền tối cao)
+          // ==========================================
+          pstmt.setString(1, java.util.UUID.randomUUID().toString());
+          pstmt.setString(2, "admin2");
+          pstmt.setString(3, "Admin2@123");
+          pstmt.setString(4, "admin2@uet.edu.vn");
+          pstmt.setString(5, "ADMIN");
+          pstmt.setInt(6, 2); // Level 2
+          pstmt.setDouble(7, 0.0);
+          pstmt.setInt(8, 0);
+          pstmt.addBatch();
+
+          // ==========================================
+          // 2. TẠO ADMIN LEVEL 1 (Mod kiểm duyệt)
+          // ==========================================
+          pstmt.setString(1, java.util.UUID.randomUUID().toString());
+          pstmt.setString(2, "admin1");
+          pstmt.setString(3, "Admin1@123");
+          pstmt.setString(4, "admin1@uet.edu.vn");
+          pstmt.setString(5, "ADMIN");
+          pstmt.setInt(6, 1); // Level 1
+          pstmt.setDouble(7, 0.0);
+          pstmt.setInt(8, 0);
+          pstmt.addBatch(); //
+
+          // Thực thi Insert cả 2 tài khoản cùng lúc
+          pstmt.executeBatch();
+          System.out.println("[SEEDING] Đã tạo tự động 2 tài khoản Admin mặc định (admin1 và admin2)!");
+        }
+      }
+    } catch (SQLException e) {
+      System.out.println("Lỗi tạo Admin mặc định: " + e.getMessage());
     }
   }
 }

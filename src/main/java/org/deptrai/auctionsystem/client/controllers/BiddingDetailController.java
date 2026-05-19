@@ -20,6 +20,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import org.deptrai.auctionsystem.client.utils.AuctionUpdateListener;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
@@ -46,6 +47,15 @@ public class BiddingDetailController implements AuctionUpdateListener {
   @FXML private TextField bidAmountField;
 
   @FXML private LineChart<String, Number> bidChart;
+
+  @FXML private RadioButton radioQuick;
+  @FXML private RadioButton radioCustom;
+  @FXML private ToggleGroup bidModeGroup;
+  @FXML private HBox quickBidBox;
+  @FXML private Label quickBidLabel;
+
+  private double currentIntendedBid = 0.0;
+
   private XYChart.Series<String, Number> priceSeries;
 
   private Auction currentAuction;
@@ -53,8 +63,6 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
   @FXML
   public void initialize() {
-
-
     // Cấu hình bảng
     amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
     timeColumn.setCellValueFactory(cellData -> {
@@ -77,6 +85,19 @@ public class BiddingDetailController implements AuctionUpdateListener {
     if (bidChart != null) {
       bidChart.getData().add(priceSeries);
     }
+
+    // Lắng nghe sự kiện chuyển đổi Mode đặt bid
+    bidModeGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
+      if (radioQuick.isSelected()) {
+        quickBidBox.setVisible(true);
+        bidAmountField.setVisible(false);
+      } else {
+        quickBidBox.setVisible(false);
+        bidAmountField.setVisible(true);
+        // Tự điền giá định đặt vào ô nhập tay cho tiện
+        bidAmountField.setText(String.valueOf(currentIntendedBid));
+      }
+    });
 
     // Tự động load dữ liệu từ Session khi vừa vào trang
     String selectedId = SessionManager.getInstance().getSelectedAuctionId();
@@ -107,6 +128,9 @@ public class BiddingDetailController implements AuctionUpdateListener {
     nameLabel.setText(auction.getItem().getName());
     descriptionLabel.setText(auction.getItem().getDescription());
     currentPriceLabel.setText(String.format("$%.2f", auction.getCurrentPrice()));
+    double current = auction.getCurrentPrice();
+    currentIntendedBid = current + getIncrementStep(current);
+    quickBidLabel.setText(String.format("$%.2f", currentIntendedBid));
 
     String imagePath = auction.getItem().getImageUrl();
     if(imagePath != null && !imagePath.isEmpty()) {
@@ -178,7 +202,20 @@ public class BiddingDetailController implements AuctionUpdateListener {
   @FXML
   private void handlePlaceBid() {
     try {
-      double amount = Double.parseDouble(bidAmountField.getText());
+      double amount;
+      // KIỂM TRA XEM NGƯỜI DÙNG ĐANG DÙNG MODE NÀO
+      if (radioQuick.isSelected()) {
+        amount = currentIntendedBid;
+      } else {
+        amount = Double.parseDouble(bidAmountField.getText());
+
+        amount = Math.round(amount * 100.0) / 100.0; // Ép làm tròn khoảng cách 0.01
+      }
+      if (amount < currentAuction.getCurrentPrice() + 0.01) {
+        showError("Giá đặt phải lớn hơn giá hiện tại ít nhất $0.01!");
+        return;
+      }
+
       User currentUser = SessionManager.getInstance().getCurrentUser();
 
       Message bidReq = new Message("PLACE_BID", new Object[]{currentAuction.getAuctionId(), currentUser.getUserId(), amount});
@@ -212,12 +249,34 @@ public class BiddingDetailController implements AuctionUpdateListener {
     }
   }
 
-  // Hàm vẽ lại biểu đồ với thuật toán Downsampling (Tối đa 15 điểm)
+  @FXML
+  private void handleIncreaseBid() {
+    // Tăng lên 1 khoảng step dựa theo giá dự định hiện tại
+    currentIntendedBid += getIncrementStep(currentIntendedBid);
+    quickBidLabel.setText(String.format("$%.2f", currentIntendedBid));
+  }
+
+  @FXML
+  private void handleDecreaseBid() {
+    double current = currentAuction.getCurrentPrice();
+    double step = getIncrementStep(currentIntendedBid);
+
+    // Chỉ cho phép giảm nếu giá sau khi giảm vẫn cao hơn giá hiện tại của phiên
+    if (currentIntendedBid - step > current) {
+      currentIntendedBid -= step;
+    } else {
+      // Ép về mức giá hợp lệ thấp nhất
+      currentIntendedBid = current + getIncrementStep(current);
+    }
+    quickBidLabel.setText(String.format("$%.2f", currentIntendedBid));
+  }
+
+  // Hàm vẽ lại biểu đồ
   private void refreshChart(List<Bid> allBids) {
     priceSeries.getData().clear(); // Xóa khung vẽ cũ
     if (allBids == null || allBids.isEmpty()) return;
 
-    int MAX_POINTS = 10;
+    int MAX_POINTS = 10; // Set số lượng điểm trên biểu đồ
     List<Bid> displayBids = new ArrayList<>();
 
     // Nếu số lượng ít thì lấy hết
@@ -246,6 +305,17 @@ public class BiddingDetailController implements AuctionUpdateListener {
     }
   }
 
+  private double getIncrementStep(double price) {
+    if (price < 10) return 0.5;
+    if (price < 100) return 1.0;
+    if (price < 500) return 5.0;
+    if (price < 1000) return 10.0;
+    if (price < 5000) return 50.0;
+    if (price < 10000) return 100.0;
+    if (price < 50000) return 500.0;
+    return 1000.0;
+  }
+
   @Override
   public void onAuctionUpdated(Auction updatedAuction) {
     // Nếu màn hình này đang xem đúng cái sản phẩm vừa được ai đó đặt giá
@@ -266,6 +336,14 @@ public class BiddingDetailController implements AuctionUpdateListener {
         // 3. Cuộn xuống cái cuối cùng
         if (!sortedBids.isEmpty()) {
           bidHistoryTable.scrollTo(sortedBids.size() - 1);
+        }
+
+        double newPrice = updatedAuction.getCurrentPrice();
+        // Nếu iá định đặt của mình đang BÉ HƠN HOẶC BẰNG giá của thằng vừa đặt
+        if (currentIntendedBid <= newPrice) {
+          // Tự động đẩy giá định đặt của mình lên một mức hợp lệ mới
+          currentIntendedBid = newPrice + getIncrementStep(newPrice);
+          quickBidLabel.setText(String.format("$%.2f", currentIntendedBid));
         }
 
         refreshChart(sortedBids);

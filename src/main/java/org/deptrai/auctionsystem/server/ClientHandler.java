@@ -17,6 +17,7 @@ import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.items.Item;
+import org.deptrai.auctionsystem.shared.models.users.Admin;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
@@ -34,9 +35,17 @@ public class  ClientHandler implements Runnable {
     return authenticatedUser;
   }
 
+  public void setAuthenticatedUser(User authenticatedUser) {
+    this.authenticatedUser = authenticatedUser;
+  }
+
   public ClientHandler(Socket socket) {
     this.socket = socket;
     this.userDAO = new UserDAO();
+  }
+
+  public Socket getSocket() {
+    return socket;
   }
 
   @Override
@@ -93,6 +102,18 @@ public class  ClientHandler implements Runnable {
           case "CHECKOUT":
             handleCheckout(request);
             break;
+          case "GET_ALL_USERS":
+            handleGetAllUsers(request);
+            break;
+          case "GET_ALL_AUCTIONS_ADMIN":
+            handleGetAllAuctionsAdmin(request);
+            break;
+          case "BAN_USER":
+            handleBanUser(request);
+            break;
+          case "UNBAN_USER":
+            handleUnbanUser(request);
+            break;
           default:
             out.writeObject(
                 new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
@@ -133,6 +154,12 @@ public class  ClientHandler implements Runnable {
 
     try {
       if (user != null && user.getPassword().equals(password)) {
+        if (user.isBanned()) {
+          out.reset();
+          out.writeObject(new Message("FAIL", "LOGIN", "Tài khoản của bạn đã bị cấm!\nLý do: " + user.getBanReason()));
+          out.flush();
+          return;
+        }
         this.authenticatedUser = user;
         out.writeObject(new Message("SUCCESS", "LOGIN", user));
       } else {
@@ -953,6 +980,95 @@ public class  ClientHandler implements Runnable {
       } catch (IOException ex) {
         ex.printStackTrace();
       }
+    }
+  }
+
+  private void handleBanUser(Message request) {
+    // Payload: Object[]{ AdminUser, TargetUserId, BanReason }
+    Object[] data = (Object[]) request.getData();
+    User requester = (User) data[0];
+    String targetUserId = (String) data[1];
+    String banReason = (String) data[2];
+
+    // Phân quyền: Kiểm tra đúng Admin cấp 2 không
+    if (!(requester instanceof Admin) || ((Admin) requester).getAdminLevel() < 2) {
+      try {
+        out.writeObject(new Message("FAIL", "BAN_USER", "Bạn không có quyền Ban người dùng!"));
+        out.flush();
+      } catch (Exception e) {}
+      return;
+    }
+
+    boolean success = userDAO.banUser(targetUserId, banReason);
+
+    if (success) {
+      // Ban người dùng nếu họ đang online
+      ClientHandler onlineTarget = ServerMain.getClientByUserId(targetUserId);
+      if (onlineTarget != null) {
+        // Gửi lệnh FORCE_LOGOUT thẳng xuống luồng ngầm của người bị ban
+        onlineTarget.sendMessage(new Message("UPDATE", "FORCE_LOGOUT", "Tài khoản của bạn vừa bị cấm bởi Admin!\nLý do: " + banReason));
+
+        onlineTarget.setAuthenticatedUser(null);
+      }
+
+      try {
+        out.reset();
+        out.writeObject(new Message("SUCCESS", "BAN_USER", "Đã ban người dùng thành công!"));
+        out.flush();
+      } catch (Exception e) {}
+    }
+  }
+
+  private void handleUnbanUser(Message request) {
+    try {
+      // Payload: Object[]{ AdminUser, TargetUserId }
+      Object[] data = (Object[]) request.getData();
+      User requester = (User) data[0];
+      String targetUserId = (String) data[1];
+
+      // Kiểm tra đúng Admin cấp 2 mới được Gỡ Ban
+      if (!(requester instanceof Admin) || ((Admin) requester).getAdminLevel() < 2) {
+        out.writeObject(new Message("FAIL", "UNBAN_USER", "Bạn không có quyền Gỡ cấm người dùng!"));
+        out.flush();
+        return;
+      }
+
+      boolean success = userDAO.unbanUser(targetUserId);
+
+      if (success) {
+        out.writeObject(new Message("SUCCESS", "UNBAN_USER", "Đã gỡ cấm thành công!"));
+      } else {
+        out.writeObject(new Message("FAIL", "UNBAN_USER", "Lỗi CSDL khi gỡ cấm."));
+      }
+      out.flush();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void handleGetAllUsers(Message request) {
+    try {
+      List<User> users = userDAO.getAllUsers();
+
+      out.reset();
+      out.writeObject(new Message("SUCCESS", "GET_ALL_USERS", users));
+      out.flush();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void handleGetAllAuctionsAdmin(Message request) {
+    try {
+      // Lấy danh sách full hd không che dành riêng cho Admin
+      List<Auction> auctions = AuctionManager.getInstance().getAllAuctions();
+
+      out.reset();
+      out.writeObject(new org.deptrai.auctionsystem.shared.network.Message("SUCCESS", "GET_ALL_AUCTIONS_ADMIN", auctions));
+      out.flush();
+    } catch (Exception e) {
+      System.out.println("Lỗi gửi danh sách cho Admin: " + e.getMessage());
     }
   }
 }

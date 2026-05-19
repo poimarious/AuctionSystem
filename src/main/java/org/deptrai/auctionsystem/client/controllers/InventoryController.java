@@ -33,7 +33,7 @@ public class InventoryController {
   @FXML private TableColumn<Auction, String> nameColumn;
   @FXML private TableColumn<Auction, String> priceColumn; // Đổi sang String để format có dấu $
   @FXML private TableColumn<Auction, String> statusColumn;
-  @FXML private TableColumn<Auction, Void> actionColumn;
+//  @FXML private TableColumn<Auction, String> actionColumn;
 
   @FXML
   public void handleAddNewProduct(ActionEvent event) {
@@ -109,68 +109,65 @@ public class InventoryController {
         new SimpleStringProperty(cellData.getValue().getStatus().toString())
     );
 
-    // BỔ SUNG: Gọi hàm thiết lập cột thao tác (chứa nút Xóa)
-    setupActionColumn();
-
     // 5. Nạp dữ liệu từ Server sau khi đã setup xong các cột
     loadMyAuctions();
   }
 
-  // =========================================================
-  // PHẦN CODE BỔ SUNG CHO TÍNH NĂNG XÓA SẢN PHẨM
-  // =========================================================
-
-  private void setupActionColumn() {
-    actionColumn.setCellFactory(param -> new TableCell<>() {
-      private final Button deleteBtn = new Button("Xóa");
-
-      {
-        deleteBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
-        deleteBtn.setOnAction(event -> {
-          Auction auction = getTableView().getItems().get(getIndex());
-          handleDeleteAuction(auction);
-        });
-      }
-
-      @Override
-      protected void updateItem(Void item, boolean empty) {
-        super.updateItem(item, empty);
-        if (empty) {
-          setGraphic(null);
-        } else {
-          setGraphic(deleteBtn);
-          setAlignment(Pos.CENTER);
-        }
-      }
-    });
-  }
-
-  private void handleDeleteAuction(Auction auction) {
-    Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-    confirmAlert.setTitle("Xác nhận xóa");
-    confirmAlert.setHeaderText("Xóa phiên đấu giá: " + auction.getItem().getName());
-    confirmAlert.setContentText("Bạn có chắc chắn muốn xóa không? Hành động này không thể hoàn tác.");
-
-    Optional<ButtonType> result = confirmAlert.showAndWait();
-    if (result.isPresent() && result.get() == ButtonType.OK) {
-
-      SocketClient.runAsync(() -> {
-        Message request = new Message("REQUEST", "DELETE_AUCTION", auction.getAuctionId());
-        Message response = SocketClient.sendRequest(request);
-
-        Platform.runLater(() -> {
-          if (response != null && "SUCCESS".equals(response.getStatus())) {
-            inventoryTable.getItems().remove(auction);
-            Alert successAlert = new Alert(Alert.AlertType.INFORMATION, "Đã xóa sản phẩm thành công!");
-            successAlert.show();
-          } else {
-            String errorMsg = (response != null && response.getData() instanceof String)
-                    ? (String) response.getData() : "Lỗi Server";
-            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Không thể xóa: " + errorMsg);
-            errorAlert.show();
-          }
-        });
-      });
-    }
-  }
+//  // =========================================================
+//  // PHẦN CODE BỔ SUNG CHO TÍNH NĂNG XÓA SẢN PHẨM
+//  // =========================================================
+//
+//  private void setupActionColumn() {
+//    actionColumn.setCellFactory(param -> new TableCell<>() {
+//      private final Button deleteBtn = new Button("Xóa");
+//
+//      {
+//        deleteBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
+//        deleteBtn.setOnAction(event -> {
+//          Auction auction = getTableView().getItems().get(getIndex());
+//          handleDeleteAuction(auction);
+//        });
+//      }
+//
+//      @Override
+//      protected void updateItem(Void item, boolean empty) {
+//        super.updateItem(item, empty);
+//        if (empty) {
+//          setGraphic(null);
+//        } else {
+//          setGraphic(deleteBtn);
+//          setAlignment(Pos.CENTER);
+//        }
+//      }
+//    });
+//  }
+//
+//  private void handleDeleteAuction(Auction auction) {
+//    Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+//    confirmAlert.setTitle("Xác nhận xóa");
+//    confirmAlert.setHeaderText("Xóa phiên đấu giá: " + auction.getItem().getName());
+//    confirmAlert.setContentText("Bạn có chắc chắn muốn xóa không? Hành động này không thể hoàn tác.");
+//
+//    Optional<ButtonType> result = confirmAlert.showAndWait();
+//    if (result.isPresent() && result.get() == ButtonType.OK) {
+//
+//      SocketClient.runAsync(() -> {
+//        Message request = new Message("REQUEST", "DELETE_AUCTION", auction.getAuctionId());
+//        Message response = SocketClient.sendRequest(request);
+//
+//        Platform.runLater(() -> {
+//          if (response != null && "SUCCESS".equals(response.getStatus())) {
+//            inventoryTable.getItems().remove(auction);
+//            Alert successAlert = new Alert(Alert.AlertType.INFORMATION, "Đã xóa sản phẩm thành công!");
+//            successAlert.show();
+//          } else {
+//            String errorMsg = (response != null && response.getData() instanceof String)
+//                    ? (String) response.getData() : "Lỗi Server";
+//            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Không thể xóa: " + errorMsg);
+//            errorAlert.show();
+//          }
+//        });
+//      });
+//    }
+//  }
 }

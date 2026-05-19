@@ -8,6 +8,8 @@ public abstract class User implements Serializable {
   private String password;
   private String email;
   private double balance = 0.0;
+  private boolean isBanned = false;
+  private String banReason = "";
 
   public User(String username, String password, String email) {
     this.username = username;
@@ -50,6 +52,14 @@ public abstract class User implements Serializable {
     return password;
   }
 
+  public boolean isBanned() {
+    return isBanned;
+  }
+
+  public String getBanReason() {
+    return banReason;
+  }
+
   // endregion
 
   public void setPassword(String password) {
@@ -71,5 +81,14 @@ public abstract class User implements Serializable {
   public void setBalance(double balance) {
     this.balance = balance;
   }
+
+  public void setBanned(boolean banned) {
+    this.isBanned = banned;
+  }
+
+  public void setBanReason(String banReason) {
+    this.banReason = banReason;
+  }
+
   // endregion
 }

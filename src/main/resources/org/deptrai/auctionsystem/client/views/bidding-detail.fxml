@@ -107,9 +107,28 @@
 
               <VBox spacing="10.0" styleClass="item-card" style="-fx-padding: 15; -fx-background-color: #1e1936; -fx-background-radius: 10; -fx-border-color: #39ff14; -fx-border-radius: 10; -fx-border-width: 2;" HBox.hgrow="ALWAYS" maxWidth="Infinity">
                 <children>
-                  <Label text="⚡ ĐẶT GIÁ THỦ CÔNG" style="-fx-font-weight: bold; -fx-text-fill: #39ff14;"/>
-                  <TextField fx:id="bidAmountField" promptText="💵 Nhập số tiền đặt giá ($)..." styleClass="text-field" prefHeight="38.0" VBox.vgrow="ALWAYS"/>
-                  <Button onAction="#handlePlaceBid" styleClass="btn-success" text="🤝 XÁC NHẬN ĐẶT GIÁ" prefHeight="40.0" maxWidth="Infinity" />
+                  <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="⚡ CHẾ ĐỘ ĐẶT GIÁ" style="-fx-font-weight: bold; -fx-text-fill: #39ff14;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <RadioButton fx:id="radioQuick" text="Nhanh" selected="true" style="-fx-font-size: 11; -fx-text-fill: #e2e8f0;">
+                      <toggleGroup>
+                        <ToggleGroup fx:id="bidModeGroup"/>
+                      </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="radioCustom" text="Cụ thể" toggleGroup="$bidModeGroup" style="-fx-font-size: 11; -fx-text-fill: #e2e8f0;"/>
+                  </HBox>
+
+                  <StackPane VBox.vgrow="ALWAYS">
+                    <HBox fx:id="quickBidBox" spacing="10" alignment="CENTER">
+                      <Button text="-" onAction="#handleDecreaseBid" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-background-color: #2b244d; -fx-text-fill: #ff003c; -fx-pref-width: 40;" />
+                      <Label fx:id="quickBidLabel" text="\$0.00" style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #39ff14;" HBox.hgrow="ALWAYS" alignment="CENTER" maxWidth="Infinity"/>
+                      <Button text="+" onAction="#handleIncreaseBid" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-background-color: #2b244d; -fx-text-fill: #39ff14; -fx-pref-width: 40;" />
+                    </HBox>
+
+                    <TextField fx:id="bidAmountField" promptText="Nhập số tiền ($)..." style="-fx-background-color: #151226; -fx-text-fill: #39ff14; -fx-prompt-text-fill: #8c88a8; -fx-border-color: #2b244d; -fx-border-radius: 5;" prefHeight="38.0" visible="false"/>
+                  </StackPane>
+
+                  <Button onAction="#handlePlaceBid" styleClass="btn-bid" text="✅ XÁC NHẬN ĐẶT GIÁ" prefHeight="40.0" maxWidth="Infinity" style="-fx-background-color: #39ff14; -fx-text-fill: #151226; -fx-font-weight: bold; -fx-font-size: 13; -fx-cursor: hand;"/>
                 </children>
               </VBox>
 

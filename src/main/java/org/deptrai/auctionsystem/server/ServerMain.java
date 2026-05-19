@@ -54,4 +54,13 @@ public class ServerMain {
       client.sendMessage(msg);
     }
   }
+
+  public static ClientHandler getClientByUserId(String userId) {
+    for (ClientHandler client : activeClients) {
+      if (client.getAuthenticatedUser().getUserId() != null && client.getAuthenticatedUser().getUserId().equals(userId)) {
+        return client;
+      }
+    }
+    return null;
+  }
 }

@@ -106,12 +106,13 @@ public class AddProductController {
     double basePrice;
     try {
       basePrice = Double.parseDouble(priceStr);
+      basePrice = Math.round(basePrice * 100.0) / 100.0; // Ép làm tròn khoảng cách 0.01
       if (basePrice <= 0) {
-        showAlert(Alert.AlertType.WARNING, "Lỗi giá trị", "Giá khởi điểm phải lớn hơn 0!");
+        showAlert(Alert.AlertType.WARNING, "Lỗi giá trị", "Giá khởi điểm phải từ $0.01 trở lên!");
         return;
       }
     } catch (NumberFormatException e) {
-      showAlert(Alert.AlertType.ERROR, "Lỗi định dạng", "Giá phải là một con số!");
+      showAlert(Alert.AlertType.ERROR, "Lỗi định dạng", "Giá phải là một con số hợp lệ!");
       return;
     }
 

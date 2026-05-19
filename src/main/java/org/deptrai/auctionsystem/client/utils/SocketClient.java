@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.users.User;
@@ -44,31 +46,46 @@ public class SocketClient {
       System.out.println("Đã kết nối tới Server thành công!");
 
       // Listening at all time
-      Thread listenerThread = new Thread(() -> {
-        try {
-          Message msg;
-          while ((msg = (Message) in.readObject()) != null) {
-            if(msg.getCommand().equals("PUSH_NOTIFICATION_BELL")) {
-              String msgText = (String) msg.getData();
-              SessionManager.getInstance().addNotification(msgText);
-            }
-            else if (msg.getCommand().equals("AUCTION_UPDATE")) {
-              // Nhận được Broadcast -> Báo cho giao diện cập nhật ngay lập tức
-              Auction updatedAuction = (Auction) msg.getData();
+      Thread listenerThread =
+          new Thread(
+              () -> {
+                try {
+                  Message msg;
+                  while ((msg = (Message) in.readObject()) != null) {
+                    if (msg.getCommand().equals("PUSH_NOTIFICATION_BELL")) {
+                      String msgText = (String) msg.getData();
+                      SessionManager.getInstance().addNotification(msgText);
+                    } else if (msg.getCommand().equals("AUCTION_UPDATE")) {
+                      // Nhận được Broadcast -> Báo cho giao diện cập nhật ngay lập tức
+                      Auction updatedAuction = (Auction) msg.getData();
 
-              for (AuctionUpdateListener listener : listeners) {
-                Platform.runLater(() -> listener.onAuctionUpdated(updatedAuction));
-              }
-            }
-            else {
-              // Tin nhắn trả lời bình thường -> Nhét vào hàng đợi cho hàm sendRequest lấy
-              responseQueue.put(msg);
-            }
-          }
-        } catch (Exception e) {
-          System.out.println("Luồng lắng nghe ngắt kết nối.");
-        }
-      });
+                      for (AuctionUpdateListener listener : listeners) {
+                        Platform.runLater(() -> listener.onAuctionUpdated(updatedAuction));
+                      }
+                    } else if (msg.getCommand().equals("FORCE_LOGOUT")) {
+                      String banMessage = (String) msg.getData();
+
+                      Platform.runLater(
+                          () -> {
+                            SessionManager.getInstance().logout();
+                            SceneManager.getInstance().clearHistory();
+                            SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
+
+                            Alert alert = new Alert(AlertType.ERROR);
+                            alert.setTitle("TÀI KHOẢN BỊ CẤM");
+                            alert.setHeaderText("Bạn đã bị buộc đăng xuất!");
+                            alert.setContentText(banMessage);
+                            alert.show();
+                          });
+                    } else {
+                      // Tin nhắn trả lời bình thường -> Nhét vào hàng đợi cho hàm sendRequest lấy
+                      responseQueue.put(msg);
+                    }
+                  }
+                } catch (Exception e) {
+                  System.out.println("Luồng lắng nghe ngắt kết nối.");
+                }
+              });
       listenerThread.setDaemon(true); // Tự động chết khi tắt App
       listenerThread.start();
 

@@ -59,8 +59,7 @@ public class LoginController {
             Alert.AlertType.INFORMATION,
             "Thành công",
             "Chào mừng Admin " + loggedInUser.getUsername());
-        SceneManager.getInstance()
-            .switchScene("/org/deptrai/auctionsystem/client/views/home-view.fxml", "Admin Panel");
+        SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/admin-dashboard.fxml", "Admin Dashboard");
 
       } else if (loggedInUser instanceof Bidder) {
         showAlert(

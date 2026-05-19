@@ -318,6 +318,4 @@ public class MainController {
     // Gọi lại hàm lấy dữ liệu (hàm này đã có sẵn logic sắp xếp ID mới nhất lên đầu)
     loadFeaturedAuctions();
   }
-
-
 }

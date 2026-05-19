@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
@@ -17,7 +18,7 @@ public class UserDAO {
 
   public boolean insertUser(User user, String role) {
     String sql =
-        "INSERT INTO Users (userId, username, password, email, role, adminLevel, balance) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO Users (userId, username, password, email, role, adminLevel, balance, isBanned, banReason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     try (Connection conn = DatabaseConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -35,9 +36,11 @@ public class UserDAO {
       if (user instanceof Admin) {
         pstmt.setInt(6, ((Admin) user).getAdminLevel());
       } else {
-        pstmt.setObject(6, null); // Setting non-admin users to null adminLevel
+        pstmt.setObject(6, 0); // Setting non-admin users to 0
       }
       pstmt.setDouble(7, user.getBalance()); // Everyone has a balance
+      pstmt.setInt(8, user.isBanned() ? 1 : 0); // SQLite lưu boolean bằng 0 và 1
+      pstmt.setString(9, user.getBanReason());
 
       pstmt.executeUpdate();
       return true;
@@ -45,6 +48,43 @@ public class UserDAO {
       System.out.println("Lỗi lưu User: " + e.getMessage());
       return false;
     }
+  }
+
+  private User mapResultSetToUser(ResultSet rs) throws SQLException {
+    String userId = rs.getString("userId");
+    String username = rs.getString("username");
+    String pass = rs.getString("password");
+    String email = rs.getString("email");
+    String role = rs.getString("role");
+    double balance = rs.getDouble("balance");
+    int adminLevel = rs.getInt("adminLevel");
+
+    // Lấy trạng thái Ban từ Database
+    boolean isBanned = rs.getInt("isBanned") == 1;
+    String banReason = rs.getString("banReason");
+
+    User mappedUser = null;
+
+    switch (role) {
+      case "BIDDER":
+        mappedUser = new Bidder(userId, username, pass, email, new CopyOnWriteArrayList<>());
+        break;
+      case "SELLER":
+        Seller seller = new Seller(userId, username, pass, email);
+        seller.setListedItems(new ArrayList<>());
+        mappedUser = seller;
+        break;
+      case "ADMIN":
+        mappedUser = new Admin(userId, username, pass, email, adminLevel);
+        break;
+    }
+
+    if (mappedUser != null) {
+      mappedUser.setBalance(balance);
+      mappedUser.setBanned(isBanned);
+      mappedUser.setBanReason(banReason);
+    }
+    return mappedUser;
   }
 
   public User getUserById(String userId) {
@@ -56,36 +96,7 @@ public class UserDAO {
       pstmt.setString(1, userId);
       ResultSet rs = pstmt.executeQuery();
 
-      if (rs.next()) {
-        String role = rs.getString("role");
-        String username = rs.getString("username");
-        String pass = rs.getString("password");
-        String email = rs.getString("email");
-        double balance = rs.getDouble("balance");
-
-        int adminLevel = rs.getInt("adminLevel"); // Currently null if not Admin
-
-        switch (role) {
-          case "BIDDER":
-            Bidder bidder = new Bidder(userId, username, pass, email, new CopyOnWriteArrayList<>());
-            bidder.setBalance(balance);
-            return bidder;
-
-          case "SELLER":
-            Seller seller = new Seller(userId, username, pass, email);
-            seller.setListedItems(new ArrayList<>());
-            seller.setBalance(balance);
-            return seller;
-
-          case "ADMIN":
-            Admin admin = new Admin(userId, username, pass, email, adminLevel);
-            admin.setBalance(balance);
-            return admin;
-
-          default:
-            return null;
-        }
-      }
+      if (rs.next()) return mapResultSetToUser(rs);
     } catch (SQLException e) {
       System.out.println("Lỗi tìm User theo ID: " + e.getMessage());
     }
@@ -101,41 +112,40 @@ public class UserDAO {
 
       pstmt.setString(1, username);
       ResultSet rs = pstmt.executeQuery();
-
-      if (rs.next()) {
-        String role = rs.getString("role");
-        String userId = rs.getString("userId");
-        String pass = rs.getString("password");
-        String email = rs.getString("email");
-        double balance = rs.getDouble("balance");
-
-        int adminLevel = rs.getInt("adminLevel"); // Currently null if not Admin
-
-        switch (role) {
-          case "BIDDER":
-            Bidder bidder = new Bidder(userId, username, pass, email, new CopyOnWriteArrayList<>());
-            bidder.setBalance(balance);
-            return bidder;
-
-          case "SELLER":
-            Seller seller = new Seller(userId, username, pass, email);
-            seller.setListedItems(new ArrayList<>());
-            seller.setBalance(balance);
-            return seller;
-
-          case "ADMIN":
-            Admin admin = new Admin(userId, username, pass, email, adminLevel);
-            admin.setBalance(balance);
-            return admin;
-
-          default:
-            return null;
-        }
-      }
+      if (rs.next()) return mapResultSetToUser(rs);
     } catch (SQLException e) {
       System.out.println("Lỗi tìm User theo Username: " + e.getMessage());
     }
     return null;
+  }
+
+  public boolean banUser(String userId, String reason) {
+    // isBanned = 1 nghĩa là đã bị khóa
+    String sql = "UPDATE Users SET isBanned = 1, banReason = ? WHERE userId = ?";
+    try (Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+      pstmt.setString(1, reason);
+      pstmt.setString(2, userId);
+
+      int rowsAffected = pstmt.executeUpdate();
+      return rowsAffected > 0;
+
+    } catch (SQLException e) {
+      System.out.println("Lỗi Ban User trong DB: " + e.getMessage());
+      return false;
+    }
+  }
+
+  public boolean unbanUser(String userId) {
+    String sql = "UPDATE Users SET isBanned = 0, banReason = NULL WHERE userId = ?";
+    try (Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+      pstmt.setString(1, userId);
+      return pstmt.executeUpdate() > 0;
+    } catch (SQLException e) {
+      return false;
+    }
   }
 
   public boolean isUsernameTaken(String username) {
@@ -205,5 +215,25 @@ public class UserDAO {
       System.out.println("Lỗi cập nhật mật khẩu DB: " + e.getMessage());
       return false;
     }
+  }
+
+  public List<User> getAllUsers() {
+    List<User> users = new ArrayList<>();
+    String sql = "SELECT * FROM Users";
+
+    try (Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery()) {
+
+      while (rs.next()) {
+        User user = mapResultSetToUser(rs);
+        if (user != null) {
+          users.add(user);
+        }
+      }
+    } catch (SQLException e) {
+      System.out.println("Lỗi lấy danh sách toàn bộ User: " + e.getMessage());
+    }
+    return users;
   }
 }
