@@ -498,87 +498,94 @@ public class  ClientHandler implements Runnable {
         out.flush();
         return;
       }
-      Bid newBid = new Bid(bidder, auction, bidAmount, LocalDateTime.now());
+      synchronized (auction) {
+        if (auction.getStatus() == AuctionStatus.FINISHED || auction.getStatus() == AuctionStatus.PAID || auction.getStatus() == AuctionStatus.CANCELED) {
+          out.writeObject(new Message("FAIL", "PLACE_BID", "Phiên đấu giá đã kết thúc, không thể đặt giá!"));
+          out.flush();
+          return;
+        }//Check for invalid when auction status is finished or not
+        Bid newBid = new Bid(bidder, auction, bidAmount, LocalDateTime.now());
 
-      // 5. Bid validate check
-      try {
-        newBid.validate();
-      } catch (Exception validationException) {
-        // Bắt thông báo lỗi từ Exception và gửi thẳng về cho Client hiển thị
-        out.writeObject(new Message("FAIL", "PLACE_BID", validationException.getMessage()));
-        out.flush();
-        return;
-      }
+        // 5. Bid validate check
+        try {
+          newBid.validate();
+        } catch (Exception validationException) {
+          // Bắt thông báo lỗi từ Exception và gửi thẳng về cho Client hiển thị
+          out.writeObject(new Message("FAIL", "PLACE_BID", validationException.getMessage()));
+          out.flush();
+          return;
+        }
 
-      // ================= KIỂM TRA SỐ DƯ ĐỘNG TRÊN RAM (ON-THE-FLY BALANCE CHECK) =================
-      double lockedBalance = 0.0;
-      List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
+        // ================= KIỂM TRA SỐ DƯ ĐỘNG TRÊN RAM (ON-THE-FLY BALANCE CHECK) =================
+        double lockedBalance = 0.0;
+        List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
 
-      for (Auction a : allAuctions) {
-        if (a.getStatus() == AuctionStatus.OPEN || a.getStatus() == AuctionStatus.RUNNING) {
-          Bidder topBidder = a.getWinner();
-          // Nếu User hiện tại đang là người dẫn đầu ở một phiên đấu giá
-          if (topBidder != null && topBidder.getUserId().equals(bidder.getUserId())) {
-            // Chỉ cộng tiền giam nếu đó là một phiên đấu giá KHÁC.
-            // Nếu là phiên hiện tại, ta bỏ qua để lát nữa tính bằng mức giá mới (bidAmount)
-            if (!a.getAuctionId().equals(auctionId)) {
-              lockedBalance += a.getCurrentPrice();
+        for (Auction a : allAuctions) {
+          if (a.getStatus() == AuctionStatus.OPEN || a.getStatus() == AuctionStatus.RUNNING) {
+            Bidder topBidder = a.getWinner();
+            // Nếu User hiện tại đang là người dẫn đầu ở một phiên đấu giá
+            if (topBidder != null && topBidder.getUserId().equals(bidder.getUserId())) {
+              // Chỉ cộng tiền giam nếu đó là một phiên đấu giá KHÁC.
+              // Nếu là phiên hiện tại, ta bỏ qua để lát nữa tính bằng mức giá mới (bidAmount)
+              if (!a.getAuctionId().equals(auctionId)) {
+                lockedBalance += a.getCurrentPrice();
+              }
             }
           }
         }
-      }
 
-      double totalRequiredBalance = lockedBalance + bidAmount;
+        double totalRequiredBalance = lockedBalance + bidAmount;
 
-      if (totalRequiredBalance > bidder.getBalance()) {
-        out.writeObject(new Message("FAIL", "PLACE_BID",
-                String.format("Số dư không đủ! Bạn đã đặt giá tổng cộng $%.2f ở các phiên khác.", lockedBalance)));
+        if (totalRequiredBalance > bidder.getBalance()) {
+          out.writeObject(new Message("FAIL", "PLACE_BID",
+                  String.format("Số dư không đủ! Bạn đã đặt giá tổng cộng $%.2f ở các phiên khác.", lockedBalance)));
+          out.flush();
+          return;
+        }
+        // =========================================================================================
+        // 6. Save data to database
+        BidDAO bidDAO = new BidDAO();
+        boolean isBidSaved = bidDAO.insertBid(newBid); // Gọi đúng 1 tham số
+  //      userDAO.updateBalance(bidder.getUserId(), bidder.getBalance() - bidAmount); DO NOT change balance yet
+
+        if (!isBidSaved) {
+          out.writeObject(new Message("FAIL", "PLACE_BID", "Lỗi Database khi lưu lịch sử đặt giá."));
+          out.flush();
+          return;
+        }
+
+        // ================= TÍNH NĂNG ANTI-SNIPER (GIA HẠN THỜI GIAN) =================
+        // x = 30 giây (Thời gian chót), y = 60 giây (Thời gian được cộng thêm)
+        long THRESHOLD_SECONDS = 30;
+        long EXTEND_SECONDS = 60;
+
+        java.time.Duration remainingTime = java.time.Duration.between(LocalDateTime.now(), auction.getEndTime());
+
+        // Nếu thời gian còn lại nhỏ hơn hoặc bằng 30 giây (và phiên chưa kết thúc)
+        if (!remainingTime.isNegative() && remainingTime.getSeconds() <= THRESHOLD_SECONDS) {
+          // Cộng thêm 60s vào thời gian kết thúc
+          auction.setEndTime(auction.getEndTime().plusSeconds(EXTEND_SECONDS));
+          System.out.println(" Phiên [" + auction.getItem().getName() + "] được gia hạn thêm " + EXTEND_SECONDS + "s");
+        }
+        // =============================================================================
+
+        // update new price on price board
+        auction.setCurrentPrice(bidAmount);
+        if (auction.getStatus() == AuctionStatus.OPEN) {
+          auction.setStatus(AuctionStatus.RUNNING);
+        }
+
+        // Lúc này hàm updateAuctionState sẽ tự động lưu cả giá mới, trạng thái mới và endTime mới
+        AuctionDAO auctionDAO = new AuctionDAO();
+        boolean isAuctionUpdated = auctionDAO.updateAuctionState(auction);
+
+        // Update RAM data
+        auction.getBids().add(newBid);
+        out.reset();
+        out.writeObject(new Message("SUCCESS", "PLACE_BID", newBid));
         out.flush();
-        return;
-      }
-      // =========================================================================================
-      // 6. Save data to database
-      BidDAO bidDAO = new BidDAO();
-      boolean isBidSaved = bidDAO.insertBid(newBid); // Gọi đúng 1 tham số
-//      userDAO.updateBalance(bidder.getUserId(), bidder.getBalance() - bidAmount); DO NOT change balance yet
-
-      if (!isBidSaved) {
-        out.writeObject(new Message("FAIL", "PLACE_BID", "Lỗi Database khi lưu lịch sử đặt giá."));
-        out.flush();
-        return;
       }
 
-      // ================= TÍNH NĂNG ANTI-SNIPER (GIA HẠN THỜI GIAN) =================
-      // x = 30 giây (Thời gian chót), y = 60 giây (Thời gian được cộng thêm)
-      long THRESHOLD_SECONDS = 30;
-      long EXTEND_SECONDS = 60;
-
-      java.time.Duration remainingTime = java.time.Duration.between(LocalDateTime.now(), auction.getEndTime());
-
-      // Nếu thời gian còn lại nhỏ hơn hoặc bằng 30 giây (và phiên chưa kết thúc)
-      if (!remainingTime.isNegative() && remainingTime.getSeconds() <= THRESHOLD_SECONDS) {
-        // Cộng thêm 60s vào thời gian kết thúc
-        auction.setEndTime(auction.getEndTime().plusSeconds(EXTEND_SECONDS));
-        System.out.println(" Phiên [" + auction.getItem().getName() + "] được gia hạn thêm " + EXTEND_SECONDS + "s");
-      }
-      // =============================================================================
-
-      // update new price on price board
-      auction.setCurrentPrice(bidAmount);
-      if (auction.getStatus() == AuctionStatus.OPEN) {
-        auction.setStatus(AuctionStatus.RUNNING);
-      }
-
-      // Lúc này hàm updateAuctionState sẽ tự động lưu cả giá mới, trạng thái mới và endTime mới
-      AuctionDAO auctionDAO = new AuctionDAO();
-      boolean isAuctionUpdated = auctionDAO.updateAuctionState(auction);
-
-      // Update RAM data
-      auction.getBids().add(newBid);
-
-      out.reset();
-      out.writeObject(new Message("SUCCESS", "PLACE_BID", newBid));
-      out.flush();
 
       // Khi Broadcast được gửi đi, gói bưu kiện 'auction' này đã mang theo endTime mới!
       ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
@@ -764,100 +771,106 @@ public class  ClientHandler implements Runnable {
       String auctionId = (String) request.getData();
       Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
 
-      // CHẶN SPAM: Chỉ xử lý nếu phiên đấu giá đang ở trạng thái OPEN hoặc RUNNING
-      if (auction != null && (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING)) {
+      if (auction == null) {
+        out.writeObject(new Message("FAIL", "FINISH_AUCTION", "Không tìm thấy phiên đấu giá."));
+        out.flush();
+        return;
+      }
 
-        // KIỂM TRA BẢO MẬT: Đảm bảo thời gian hiện tại trên Server thực sự đã vượt qua endTime
-        if (!LocalDateTime.now().isBefore(auction.getEndTime())) {
+      // ================= VÙNG AN TOÀN ĐA LUỒNG (THREAD-SAFE) =================
+      // Ổ khóa chặn đứng 99 request spam và ngăn chặn xung đột với lệnh Đặt giá (Place Bid)
+      synchronized (auction) {
+        // CHẶN SPAM: Chỉ xử lý nếu phiên đấu giá đang ở trạng thái OPEN hoặc RUNNING
+        if (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING) {
 
-          // ĐÃ SỬA: Dù có lượt đặt giá hay không, khi hết giờ trạng thái luôn là FINISHED
-          auction.setStatus(AuctionStatus.FINISHED);
+          // KIỂM TRA BẢO MẬT: Đảm bảo thời gian hiện tại trên Server thực sự đã vượt qua endTime
+          if (!LocalDateTime.now().isBefore(auction.getEndTime())) {
 
-          // 2. Lưu trạng thái FINISHED mới này xuống Database
-          AuctionDAO auctionDAO = new AuctionDAO();
-          boolean isUpdated = auctionDAO.updateAuctionState(auction);
+            // ĐÃ SỬA: Dù có lượt đặt giá hay không, khi hết giờ trạng thái luôn là FINISHED
+            auction.setStatus(AuctionStatus.FINISHED);
 
-          if (isUpdated) {
-            System.out.println("Phiên đấu giá [" + auction.getItem().getName() + "] đã KẾT THÚC.");
+            // 2. Lưu trạng thái FINISHED mới này xuống Database
+            AuctionDAO auctionDAO = new AuctionDAO();
+            boolean isUpdated = auctionDAO.updateAuctionState(auction);
 
-            // 3. Phát Broadcast cho toàn bộ Client đang online để cập nhật lại giao diện thẻ sản phẩm công khai
-            ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
+            if (isUpdated) {
+              System.out.println("Phiên đấu giá [" + auction.getItem().getName() + "] đã KẾT THÚC.");
 
-            // ==================== XỬ LÝ HỆ THỐNG THÔNG BÁO (ONLINE/OFFLINE) ====================
-            ServerThreadPool.submitTask(() -> {
-              NotificationDAO notiDAO = new NotificationDAO();
-              String timeStampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-              String itemName = auction.getItem().getName();
+              // 3. Phát Broadcast cho toàn bộ Client đang online để cập nhật lại giao diện thẻ sản phẩm công khai
+              ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
 
-              String sellerId = null;
-              if (auction.getItem() != null && auction.getItem().getSeller() != null) {
-                sellerId = auction.getItem().getSeller().getUserId();
-              }
+              // ==================== XỬ LÝ HỆ THỐNG THÔNG BÁO (ONLINE/OFFLINE) ====================
+              ServerThreadPool.submitTask(() -> {
+                NotificationDAO notiDAO = new NotificationDAO();
+                String timeStampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+                String itemName = auction.getItem().getName();
 
-              // Dùng Map để định danh [ID Người nhận -> Nội dung thông báo tương ứng]
-              Map<String, String> targetUsers = new HashMap<>();
-
-              // Lấy thông tin người thắng cuộc từ danh sách bid trên RAM
-              Bidder winner = auction.getWinner();
-              String winnerId = (winner != null) ? winner.getUserId() : null;
-              double finalPrice = auction.getCurrentPrice();
-
-              // 1. Phân loại thông báo gửi cho Người Bán (Seller)
-              if (sellerId != null) {
-                if (winner == null) {
-                  // Trường hợp phiên đấu giá kết thúc thành công nhưng không có ai tham gia đặt giá
-                  targetUsers.put(sellerId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC nhưng không có người đặt giá.");
-                } else {
-                  // Trường hợp kết thúc thành công và có người mua chốt hạ
-                  targetUsers.put(sellerId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC và được bán thành công với mức giá $" + finalPrice + ".");
-                }
-              }
-
-              // 2. Phân loại thông báo gửi cho những Người Mua (Bidders) đã từng tham gia đặt giá
-              if (winner != null) {
-                Set<String> participantIds = new HashSet<>();
-                for (Bid bid : auction.getBids()) {
-                  if (bid.getBidder() != null) {
-                    participantIds.add(bid.getBidder().getUserId());
-                  }
+                String sellerId = null;
+                if (auction.getItem() != null && auction.getItem().getSeller() != null) {
+                  sellerId = auction.getItem().getSeller().getUserId();
                 }
 
-                // Quét qua danh sách để phân định rạch ròi ai Thắng - ai Thua
-                for (String pId : participantIds) {
-                  if (pId.equals(winnerId)) {
-                    targetUsers.put(pId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC. Chúc mừng, bạn đã THẮNG với mức giá $" + finalPrice + "!");
+                // Dùng Map để định danh [ID Người nhận -> Nội dung thông báo tương ứng]
+                Map<String, String> targetUsers = new HashMap<>();
+
+                // Lấy thông tin người thắng cuộc từ danh sách bid trên RAM
+                Bidder winner = auction.getWinner();
+                String winnerId = (winner != null) ? winner.getUserId() : null;
+                double finalPrice = auction.getCurrentPrice();
+
+                // 1. Phân loại thông báo gửi cho Người Bán (Seller)
+                if (sellerId != null) {
+                  if (winner == null) {
+                    targetUsers.put(sellerId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC nhưng không có người đặt giá.");
                   } else {
-                    targetUsers.put(pId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC. Rất tiếc, bạn đã THUA người ra giá cao nhất.");
-                  }
-                }
-              }
-
-              // 3. Tiến hành phân phối thông báo đến đích (Online đẩy qua Socket, Offline găm vào DB)
-              for (java.util.Map.Entry<String, String> entry : targetUsers.entrySet()) {
-                String targetUserId = entry.getKey();
-                String msgText = entry.getValue();
-                boolean isOnline = false;
-
-                // Quét nhanh danh sách kết nối đang hoạt động trên Server
-                for (ClientHandler client : ServerMain.activeClients) {
-                  if (client.getAuthenticatedUser() != null && client.getAuthenticatedUser().getUserId().equals(targetUserId)) {
-                    client.sendMessage(new Message("SUCCESS", "PUSH_NOTIFICATION_BELL", msgText));
-                    isOnline = true;
-                    break;
+                    targetUsers.put(sellerId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC và được bán thành công với mức giá $" + finalPrice + ".");
                   }
                 }
 
-                // Nếu người dùng không online, lưu thông báo này vào bảng lưu trữ để hiển thị sau
-                if (!isOnline) {
-                  notiDAO.insertNotification(targetUserId, msgText);
-                }
-              }
-            });
-            // ==================== KẾT THÚC XỬ LÝ HỆ THỐNG THÔNG BÁO ====================
+                // 2. Phân loại thông báo gửi cho những Người Mua (Bidders) đã từng tham gia đặt giá
+                if (winner != null) {
+                  Set<String> participantIds = new HashSet<>();
+                  for (Bid bid : auction.getBids()) {
+                    if (bid.getBidder() != null) {
+                      participantIds.add(bid.getBidder().getUserId());
+                    }
+                  }
 
+                  // Quét qua danh sách để phân định rạch ròi ai Thắng - ai Thua
+                  for (String pId : participantIds) {
+                    if (pId.equals(winnerId)) {
+                      targetUsers.put(pId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC. Chúc mừng, bạn đã THẮNG với mức giá $" + finalPrice + "!");
+                    } else {
+                      targetUsers.put(pId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC. Rất tiếc, bạn đã THUA người ra giá cao nhất.");
+                    }
+                  }
+                }
+
+                // 3. Tiến hành phân phối thông báo đến đích (Online đẩy qua Socket, Offline găm vào DB)
+                for (java.util.Map.Entry<String, String> entry : targetUsers.entrySet()) {
+                  String targetUserId = entry.getKey();
+                  String msgText = entry.getValue();
+                  boolean isOnline = false;
+
+                  for (ClientHandler client : ServerMain.activeClients) {
+                    if (client.getAuthenticatedUser() != null && client.getAuthenticatedUser().getUserId().equals(targetUserId)) {
+                      client.sendMessage(new Message("SUCCESS", "PUSH_NOTIFICATION_BELL", msgText));
+                      isOnline = true;
+                      break;
+                    }
+                  }
+
+                  if (!isOnline) {
+                    notiDAO.insertNotification(targetUserId, msgText);
+                  }
+                }
+              });
+
+            }
           }
         }
       }
+
       out.writeObject(new Message("SUCCESS", "FINISH_AUCTION", "Đã xử lý xong"));
       out.flush();
     } catch (Exception e) {
