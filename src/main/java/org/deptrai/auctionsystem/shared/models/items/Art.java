@@ -15,11 +15,10 @@ public class Art extends Item {
       String name,
       String description,
       double startingPrice,
-      double currentPrice,
       Seller seller,
       String artist,
       int yearCreated) {
-    super(itemId, name, description, startingPrice, currentPrice, seller);
+    super(itemId, name, description, startingPrice, seller);
     this.artist = artist;
     this.yearCreated = yearCreated;
   }

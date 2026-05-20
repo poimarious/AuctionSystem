@@ -15,11 +15,10 @@ public class Vehicle extends Item {
       String name,
       String description,
       double startingPrice,
-      double currentPrice,
       Seller seller,
       String make,
       int mileage) {
-    super(itemId, name, description, startingPrice, currentPrice, seller);
+    super(itemId, name, description, startingPrice, seller);
     this.make = make;
     this.mileage = mileage;
   }

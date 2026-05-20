@@ -15,11 +15,10 @@ public class Electronics extends Item {
       String name,
       String description,
       double startingPrice,
-      double currentPrice,
       Seller seller,
       String brand,
       int warrantyMonths) {
-    super(itemId, name, description, startingPrice, currentPrice, seller);
+    super(itemId, name, description, startingPrice, seller);
     this.brand = brand;
     this.warrantyMonths = warrantyMonths;
   }
