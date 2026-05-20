@@ -5,18 +5,27 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.List;
+
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.server.ClientHandler;
+import org.deptrai.auctionsystem.server.dao.AuctionDAO;
+import org.deptrai.auctionsystem.server.dao.ItemDAO;
 import org.deptrai.auctionsystem.server.dao.UserDAO;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
+import org.deptrai.auctionsystem.shared.models.items.ElectronicsFactory;
+import org.deptrai.auctionsystem.shared.models.items.Item;
+import org.deptrai.auctionsystem.shared.models.items.ItemFactory;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
+import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
-
-
 import org.deptrai.auctionsystem.shared.network.Message;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -33,13 +42,45 @@ public class AuctionAndTopUpTest {
     private static User testUser;
     private static UserDAO userDAO;
 
-    // Biến tạm để lấy mẫu ID thật từ Database phục vụ cho bài test sau
-    private static String sampleAuctionId = null;
-    private static String sampleSellerId = null;
+    // Biến mẫu lưu ID phục vụ cho Test 7 và 9
+    private static String sampleAuctionId;
+    private static String sampleSellerId;
 
     @BeforeAll
     static void setUp() throws Exception {
         DatabaseConnection.initializeDatabase();
+        userDAO = new UserDAO();
+
+        // ========================================================
+        // TẠO DỮ LIỆU MẪU ĐỂ TEST 7 VÀ 9 LUÔN ĐƯỢC CHẠY
+        // ========================================================
+
+
+        // 1. Tạo một Seller
+        String sellerName = "seller_" + System.currentTimeMillis();
+        // SỬA: Dùng luôn sellerName làm email để đảm bảo không bao giờ bị trùng
+        Seller dummySeller = new Seller(null, sellerName, "Test1234!", sellerName + "@gmail.com");
+        userDAO.insertUser(dummySeller, "SELLER");
+        dummySeller = (Seller) userDAO.getUserByUsername(sellerName);
+        sampleSellerId = dummySeller.getUserId();
+
+        // 2. Tạo một Item cho Seller đó
+        ItemFactory factory = new ElectronicsFactory();
+        Item dummyItem = factory.createItem("Laptop Test", "Máy tính thử nghiệm", 500.0, dummySeller);
+        ItemDAO itemDAO = new ItemDAO();
+        itemDAO.insertItem(dummyItem);
+
+        // 3. Tạo một Auction và lưu thẳng xuống DB
+        Auction dummyAuction = new Auction(dummyItem, LocalDateTime.now().plusDays(2));
+        dummyAuction.setAuctionId(java.util.UUID.randomUUID().toString());
+        dummyAuction.setStatus(AuctionStatus.OPEN);
+        AuctionDAO auctionDAO = new AuctionDAO();
+        auctionDAO.insertAuction(dummyAuction);
+
+        sampleAuctionId = dummyAuction.getAuctionId();
+
+        // ========================================================
+
         AuctionManager.getInstance().loadAuctionsFromDatabase();
 
         // Chạy Server ảo trên cổng 5006
@@ -59,10 +100,10 @@ public class AuctionAndTopUpTest {
 
         SocketClient.connect("localhost", 5006);
 
-        // Tạo user để test Top Up và Update Password
-        userDAO = new UserDAO();
+        // Tạo user để test Change Balance và Update Password
         String username = "testUser_" + System.currentTimeMillis();
-        testUser = new Bidder(null, username, "Test1234!", "testuser@gmail.com", new java.util.concurrent.CopyOnWriteArrayList<>());
+        // SỬA: Dùng luôn username làm email
+        testUser = new Bidder(null, username, "Test1234!", username + "@gmail.com", new java.util.concurrent.CopyOnWriteArrayList<>());
         userDAO.insertUser(testUser, "BIDDER");
         testUser = userDAO.getUserByUsername(username);
     }
@@ -79,13 +120,13 @@ public class AuctionAndTopUpTest {
     }
 
     // ==========================================
-    // TESTS CHO METHOD: handleTopUp
+    // TESTS CHO METHOD: handleChangeBalance (Cũ: handleTopUp)
     // ==========================================
     @Test
     @Order(1)
-    void testTopUp_ValidUser_ShouldIncreaseBalance() {
+    void testChangeBalance_ValidUser_ShouldIncreaseBalance() {
         Object[] topUpData = {testUser.getUserId(), 50.5};
-        Message request = new Message("TOP_UP", topUpData);
+        Message request = new Message("CHANGE_BALANCE", topUpData); // Lệnh đã đổi tên
         Message response = SocketClient.sendRequest(request);
 
         assertEquals("SUCCESS", response.getStatus());
@@ -94,9 +135,9 @@ public class AuctionAndTopUpTest {
 
     @Test
     @Order(2)
-    void testTopUp_InvalidUser_ShouldFail() {
+    void testChangeBalance_InvalidUser_ShouldFail() {
         Object[] topUpData = {"Fake_User_ID_123", 100.0};
-        Message request = new Message("TOP_UP", topUpData);
+        Message request = new Message("CHANGE_BALANCE", topUpData);
         Message response = SocketClient.sendRequest(request);
 
         assertEquals("FAIL", response.getStatus());
@@ -108,7 +149,6 @@ public class AuctionAndTopUpTest {
     @Test
     @Order(3)
     void testUpdatePassword_InvalidFormat_ShouldFail() {
-        // Mật khẩu mới không có ký tự đặc biệt
         String[] payload = {testUser.getUserId(), "Test1234!", "weakpass123"};
         Message request = new Message("UPDATE_PASSWORD", payload);
         Message response = SocketClient.sendRequest(request);
@@ -120,7 +160,6 @@ public class AuctionAndTopUpTest {
     @Test
     @Order(4)
     void testUpdatePassword_WrongCurrentPassword_ShouldFail() {
-        // Cố tình nhập sai mật khẩu cũ
         String[] payload = {testUser.getUserId(), "WrongPass!", "NewPass123!@#"};
         Message request = new Message("UPDATE_PASSWORD", payload);
         Message response = SocketClient.sendRequest(request);
@@ -132,7 +171,6 @@ public class AuctionAndTopUpTest {
     @Test
     @Order(5)
     void testUpdatePassword_ValidData_ShouldSucceed() {
-        // Đổi mật khẩu thành công
         String[] payload = {testUser.getUserId(), "Test1234!", "NewPass123!@#"};
         Message request = new Message("UPDATE_PASSWORD", payload);
         Message response = SocketClient.sendRequest(request);
@@ -140,7 +178,6 @@ public class AuctionAndTopUpTest {
         assertEquals("SUCCESS", response.getStatus());
         assertEquals("Cập nhật mật khẩu thành công!", response.getData());
 
-        // Test lại DB xem đã lưu thật chưa
         User dbUser = userDAO.getUserById(testUser.getUserId());
         assertEquals("NewPass123!@#", dbUser.getPassword());
     }
@@ -151,24 +188,17 @@ public class AuctionAndTopUpTest {
     @Test
     @Order(6)
     void testGetAllAuctions_ShouldReturnList() {
-        Message request = new Message("GET_ALL_AUCTIONS", null);
+        // Truyền lên userId để cover trường hợp lấy cả món đồ Đã thắng
+        Message request = new Message("GET_ALL_AUCTIONS", testUser.getUserId());
         Message response = SocketClient.sendRequest(request);
 
         assertEquals("SUCCESS", response.getStatus());
 
+        // Đã đổi kiểu ép (Cast) thành List<AuctionSummary> thay vì List<Auction>
         @SuppressWarnings("unchecked")
-        List<Auction> returnedAuctions = (List<Auction>) response.getData();
+        List<AuctionSummary> returnedAuctions = (List<AuctionSummary>) response.getData();
         assertNotNull(returnedAuctions);
-
-        // Nếu có dữ liệu trong DB, bóc tách ID ra để chạy 2 bài Test phía dưới
-        if (!returnedAuctions.isEmpty()) {
-            Auction firstAuction = returnedAuctions.get(0);
-            sampleAuctionId = firstAuction.getAuctionId();
-
-            if (firstAuction.getItem() != null && firstAuction.getItem().getSeller() != null) {
-                sampleSellerId = firstAuction.getItem().getSeller().getUserId();
-            }
-        }
+        assertTrue(returnedAuctions.size() > 0, "Danh sách phải có ít nhất 1 phiên đấu giá mẫu vừa tạo");
     }
 
     // ==========================================
@@ -177,14 +207,11 @@ public class AuctionAndTopUpTest {
     @Test
     @Order(7)
     void testGetAuctionById_ValidId_ShouldReturnAuction() {
-        // Bỏ qua test nếu Database trắng tinh
-        if (sampleAuctionId == null) return;
-
         Message request = new Message("GET_AUCTION_BY_ID", sampleAuctionId);
         Message response = SocketClient.sendRequest(request);
 
         assertEquals("SUCCESS", response.getStatus());
-        Auction auction = (Auction) response.getData();
+        Auction auction = (Auction) response.getData(); // Vẫn là Auction đầy đủ
         assertNotNull(auction);
         assertEquals(sampleAuctionId, auction.getAuctionId(), "ID trả về phải khớp với ID yêu cầu");
     }
@@ -205,9 +232,6 @@ public class AuctionAndTopUpTest {
     @Test
     @Order(9)
     void testGetSellerAuctions_ValidSeller_ShouldReturnList() {
-        // Bỏ qua test nếu không có seller mẫu
-        if (sampleSellerId == null) return;
-
         Message request = new Message("GET_SELLER_AUCTIONS", sampleSellerId);
         Message response = SocketClient.sendRequest(request);
 
@@ -224,7 +248,6 @@ public class AuctionAndTopUpTest {
         Message request = new Message("GET_SELLER_AUCTIONS", "Fake_Seller_Id_999");
         Message response = SocketClient.sendRequest(request);
 
-        // Dù Seller không tồn tại, Server vẫn trả về SUCCESS nhưng list rỗng (không có lỗi hệ thống)
         assertEquals("SUCCESS", response.getStatus());
         @SuppressWarnings("unchecked")
         List<Auction> sellerAuctions = (List<Auction>) response.getData();
