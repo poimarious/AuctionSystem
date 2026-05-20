@@ -101,6 +101,11 @@ public class AdminDashboardController {
 
   @FXML
   public void handleLogout(ActionEvent event) {
+    new Thread(() -> {
+      Message logoutReq = new Message("REQUEST", "LOGOUT", null);
+      SocketClient.sendRequest(logoutReq);
+    }).start();
+
     SessionManager.getInstance().logout();
     SceneManager.getInstance().clearHistory();
     SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");

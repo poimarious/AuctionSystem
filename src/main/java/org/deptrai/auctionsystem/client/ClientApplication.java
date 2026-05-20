@@ -17,7 +17,7 @@ public class ClientApplication extends Application {
     System.out.println("=== [CLIENT] ĐANG KHỞI CHẠY GIAO DIỆN ===");
 
     // 1. Kết nối tới Server Socket trước khi hiện màn hình
-    SocketClient.connect("localhost", 5000);
+    SocketClient.connect("26.74.145.232", 5000);
     AutoBidManager.getInstance();
 
     // 2. Nạp file FXML từ thư mục resources mới

@@ -63,6 +63,9 @@ public class  ClientHandler implements Runnable {
           case "REGISTER":
             handleRegister(request);
             break;
+          case "LOGOUT":
+            handleLogout(request);
+            break;
           case "CHANGE_BALANCE":
             handleChangeBalance(request);
             break;
@@ -217,6 +220,20 @@ public class  ClientHandler implements Runnable {
 
     } catch (Exception e) {
       e.printStackTrace();
+    }
+  }
+
+  private void handleLogout(Message request) {
+    // Đưa đường truyền Socket này về trạng thái vô danh (Guest)
+    this.setAuthenticatedUser(null);
+
+    try {
+      out.reset();
+      out.writeObject(new Message("SUCCESS", "LOGOUT", "Đã đăng xuất an toàn khỏi Server"));
+      out.flush();
+      System.out.println(">> [SERVER] Một Client đã hủy Session và đăng xuất thành công.");
+    } catch (Exception e) {
+      System.err.println("Lỗi gửi phản hồi đăng xuất: " + e.getMessage());
     }
   }
 
