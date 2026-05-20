@@ -41,7 +41,8 @@
 }
 
 /* --- 3. FORM INPUTS --- */
-.text-field, .password-field, .combo-box {
+/* ĐÃ SỬA: Đổi .combo-box thành .my-combo */
+.text-field, .password-field, .my-combo {
     -fx-background-color: #1a162e;
     -fx-text-fill: #00f3ff;
     -fx-prompt-text-fill: #6d698a;
@@ -51,7 +52,8 @@
     -fx-border-width: 1.5px;
     -fx-padding: 10 14;
 }
-.text-field:focused, .password-field:focused, .combo-box:focused {
+/* ĐÃ SỬA: Đổi .combo-box thành .my-combo */
+.text-field:focused, .password-field:focused, .my-combo:focused {
     -fx-border-color: #00f3ff;
     -fx-effect: dropshadow(gaussian, rgba(0, 243, 255, 0.5), 10, 0, 0, 0);
 }
@@ -287,4 +289,36 @@
 .context-menu .list-view .scroll-bar:horizontal .decrement-button {
     -fx-background-color: transparent;
     -fx-padding: 0;
+}
+/* =========================================
+   FIX MÀU CHỮ CHO COMBOBOX VÀ DATEPICKER
+   ========================================= */
+
+/* 1. Đổi màu chữ hiển thị sau khi đã chọn xong của ComboBox (Danh mục) */
+/* ĐÃ SỬA: Đổi .combo-box thành .my-combo */
+.my-combo > .list-cell {
+    -fx-text-fill: #00f3ff; /* Màu xanh cyan giống các ô khác */
+    -fx-font-weight: bold;
+}
+
+/* 2. Đổi màu chữ hiển thị trong ô nhập của DatePicker (Thời gian) */
+.date-picker > .text-field {
+    -fx-text-fill: #00f3ff; /* Màu xanh cyan */
+    -fx-font-weight: bold;
+}
+
+/* -----------------------------------------
+   TẶNG THÊM: NẾU BẠN MUỐN LÀM ĐẸP LUÔN CÁI BẢNG XỔ XUỐNG
+   (Dropdown menu của ComboBox)
+   ----------------------------------------- */
+/* ĐÃ SỬA: Đổi .combo-box-popup thành .my-combo để nhắm riêng ô Danh mục */
+.my-combo .list-view .list-cell {
+    -fx-text-fill: white; /* Chữ mặc định màu trắng khi xổ xuống */
+    -fx-background-color: #1a162e; /* Nền tối đồng bộ giao diện */
+}
+
+/* Hiệu ứng khi di chuột qua các lựa chọn trong bảng xổ xuống */
+.my-combo .list-view .list-cell:filled:hover {
+    -fx-background-color: #7b58ff; /* Sáng màu tím khi hover */
+    -fx-text-fill: white;
 }

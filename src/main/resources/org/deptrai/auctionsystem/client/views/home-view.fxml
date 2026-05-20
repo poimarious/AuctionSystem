@@ -29,7 +29,7 @@
             <Insets left="40.0" right="40.0" />
           </padding>
           <children>
-            <Label style="-fx-font-weight: bold; -fx-font-size: 26; -fx-letter-spacing: 1;" text="AUCTION SYSTEM" textFill="#ffffff" />
+            <Label style="-fx-font-weight: bold; -fx-font-size: 26; -fx-letter-spacing: 1;" text="AucSys" textFill="#ffffff" />
 
             <ComboBox prefHeight="40.0" prefWidth="140.0" promptText="Danh mục" style="-fx-background-color: #1a162e; -fx-border-color: #2b244d; -fx-border-radius: 5; -fx-background-radius: 5; -fx-text-fill: #00f3ff;" />
 
@@ -136,10 +136,18 @@
             <Insets bottom="60.0" left="60.0" right="60.0" top="40.0" />
           </padding>
           <children>
-            <HBox alignment="BOTTOM_LEFT" spacing="15.0">
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
               <children>
-                <Label style="-fx-font-size: 30; -fx-font-weight: bold;" text="Sản phẩm đang đấu giá" textFill="#ffffff" />
-                <Label style="-fx-font-size: 18;" text="(sản phẩm mới hôm nay)" textFill="#8c88a8" />
+                <Label fx:id="mainTitleLabel" style="-fx-font-size: 30; -fx-font-weight: bold;" text="Sản phẩm đang đấu giá" textFill="#ffffff" />
+                <Label fx:id="subTitleLabel" style="-fx-font-size: 18;" text="(sản phẩm mới hôm nay)" textFill="#8c88a8" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Button fx:id="toggleViewBtn" managed="false" onAction="#handleToggleView" styleClass="btn-accent" text="💳 Cần thanh toán" visible="false">
+                  <padding>
+                    <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+                  </padding>
+                </Button>
               </children>
             </HBox>
 

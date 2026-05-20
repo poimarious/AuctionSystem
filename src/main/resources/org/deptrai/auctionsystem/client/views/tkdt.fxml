@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
-<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -11,8 +10,8 @@
             <children>
                 <VBox>
                     <children>
-                        <Label style="-fx-font-size: 28; -fx-font-weight: bold;" text="📈 Thống kê &amp; Doanh thu" textFill="#bd93f9" />
-                        <Label style="-fx-font-size: 14;" text="Phân tích chi tiết dòng tiền và hiệu quả kinh doanh" textFill="#6272a4" />
+                        <Label style="-fx-font-size: 28; -fx-font-weight: bold;" text="📑 Lịch sử Giao dịch" textFill="#bd93f9" />
+                        <Label style="-fx-font-size: 14;" text="Quản lý danh sách các đơn hàng và trạng thái thanh toán" textFill="#6272a4" />
                     </children>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
@@ -24,66 +23,35 @@
             </children>
         </HBox>
 
-        <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;">
+        <VBox spacing="10.0" style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;" VBox.vgrow="ALWAYS">
             <padding>
-                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
             </padding>
             <children>
-                <Label style="-fx-font-weight: bold;" text="Thời gian:" textFill="WHITE" />
-                <ComboBox prefWidth="150.0" promptText="Tháng này" styleClass="combo-box" />
-                <ComboBox prefWidth="120.0" promptText="Năm" styleClass="combo-box" />
-                <Region HBox.hgrow="ALWAYS" />
-                <Label text="Tổng thực thu (Net):" textFill="#6272a4" />
-                <Label style="-fx-font-size: 20; -fx-font-weight: bold;" text="0.00 $" textFill="#50fa7b" />
-            </children>
-        </HBox>
-
-        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
-            <content>
-                <VBox spacing="25.0">
+                <HBox alignment="CENTER_LEFT">
                     <children>
-                        <VBox prefHeight="350.0" style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;">
-                            <padding>
-                                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                            </padding>
-                            <children>
-                                <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="📊 So sánh doanh thu theo tháng" textFill="WHITE" />
-                                <BarChart fx:id="monthlyRevenueChart" styleClass="dark-chart" VBox.vgrow="ALWAYS">
-                                    <xAxis>
-                                        <CategoryAxis label="Tháng" />
-                                    </xAxis>
-                                    <yAxis>
-                                        <NumberAxis label="Số tiền ($)" />
-                                    </yAxis>
-                                </BarChart>
-                            </children>
-                        </VBox>
-
-                        <VBox spacing="10.0" style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;">
-                            <padding>
-                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                            </padding>
-                            <children>
-                                <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="📑 Danh sách giao dịch hoàn tất" textFill="WHITE" />
-                                <TableView fx:id="revenueTable" prefHeight="400.0" styleClass="modern-table">
-                                    <columns>
-                                        <TableColumn fx:id="colDate" prefWidth="150.0" text="Ngày giao dịch" />
-                                        <TableColumn fx:id="colOrderId" prefWidth="120.0" text="Mã đơn hàng" />
-                                        <TableColumn fx:id="colProduct" prefWidth="250.0" text="Tên sản phẩm" />
-                                        <TableColumn fx:id="colBuyer" prefWidth="150.0" text="Người mua" />
-                                        <TableColumn fx:id="colFinalPrice" prefWidth="120.0" text="Giá chốt ($)" />
-                                        <TableColumn fx:id="colStatus" prefWidth="130.0" text="Trạng thái ví" />
-                                    </columns>
-                                    <columnResizePolicy>
-                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                    </columnResizePolicy>
-                                </TableView>
-                            </children>
-                        </VBox>
+                        <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="Danh sách giao dịch hoàn tất" textFill="WHITE" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label text="Tổng doanh thu: " textFill="#6272a4" />
+                        <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="0.00 $" textFill="#50fa7b" />
                     </children>
-                </VBox>
-            </content>
-        </ScrollPane>
+                </HBox>
+
+                <TableView fx:id="revenueTable" styleClass="modern-table" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colDate" prefWidth="150.0" text="Ngày giao dịch" />
+                        <TableColumn fx:id="colOrderId" prefWidth="120.0" text="Mã đơn hàng" />
+                        <TableColumn fx:id="colProduct" prefWidth="250.0" text="Tên sản phẩm" />
+                        <TableColumn fx:id="colBuyer" prefWidth="150.0" text="Người mua" />
+                        <TableColumn fx:id="colFinalPrice" prefWidth="120.0" text="Giá chốt ($)" />
+                        <TableColumn fx:id="colStatus" prefWidth="130.0" text="Trạng thái ví" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+            </children>
+        </VBox>
     </children>
     <padding>
         <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />

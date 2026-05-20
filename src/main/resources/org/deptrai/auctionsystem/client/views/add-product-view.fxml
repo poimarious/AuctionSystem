@@ -65,7 +65,7 @@
                 <VBox HBox.hgrow="ALWAYS" spacing="5.0">
                   <children>
                     <Label style="-fx-font-weight: bold; -fx-text-fill: #ffffff;" text="📂 Danh mục"/>
-                    <ComboBox maxWidth="Infinity" promptText="Chọn loại hàng..." styleClass="combo-box"
+                    <ComboBox maxWidth="Infinity" promptText="Chọn loại hàng..." styleClass="my-combo"
                               fx:id="categoryCombo"/>
                   </children>
                 </VBox>
@@ -92,14 +92,17 @@
                 <HBox spacing="10.0" alignment="CENTER_LEFT">
                   <children>
                     <DatePicker fx:id="endDatePicker" maxWidth="Infinity" HBox.hgrow="ALWAYS" promptText="Chọn ngày kết thúc..."/>
-                    <ComboBox fx:id="hourCombo" prefWidth="75.0" promptText="Giờ" styleClass="combo-box"/>
+
+                    <ComboBox fx:id="hourCombo" prefWidth="75.0" promptText="Giờ" />
+
                     <Label text=":" style="-fx-font-weight: bold; -fx-text-fill: #00f3ff;"/>
-                    <ComboBox fx:id="minuteCombo" prefWidth="75.0" promptText="Phút" styleClass="combo-box"/>
+
+                    <ComboBox fx:id="minuteCombo" prefWidth="75.0" promptText="Phút" />
+
                   </children>
                 </HBox>
               </children>
             </VBox>
-
             <VBox VBox.vgrow="ALWAYS" spacing="5.0">
               <children>
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #ffffff;" text="📖 Mô tả sản phẩm"/>

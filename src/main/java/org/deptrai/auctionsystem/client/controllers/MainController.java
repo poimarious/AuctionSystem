@@ -50,11 +50,17 @@ public class MainController {
 
   @FXML
   private ScrollPane floorScrollPane;
+  @FXML private Button toggleViewBtn;
+  @FXML private Label mainTitleLabel;
+  @FXML private Label subTitleLabel;
 
   private final int PAGE_SIZE = 12;
   private int currentIndex = 0;
   private List <AuctionSummary> currentFilteredList = new ArrayList<>();
   private List<AuctionSummary> allAuctions = new ArrayList<>();
+  private boolean isShowingPending = false;
+  private List<AuctionSummary> runningAuctions = new ArrayList<>();
+  private List<AuctionSummary> pendingAuctions = new ArrayList<>();
 
 
   @FXML
@@ -117,6 +123,10 @@ public class MainController {
       sellerCenterBtn.setVisible(false);
       sellerCenterBtn.setManaged(false);
     }
+    if (toggleViewBtn != null) {
+      toggleViewBtn.setVisible(false);
+      toggleViewBtn.setManaged(false);
+    }
   }
 
   public void setUpUserView(String username, double balance) {
@@ -128,6 +138,10 @@ public class MainController {
 
     userNameLabel.setText(username);
     walletLabel.setText(String.format("Ví: $%,.2f", balance));
+    if (toggleViewBtn != null) {
+      toggleViewBtn.setVisible(true);
+      toggleViewBtn.setManaged(true);
+    }
 
     User currentUser = SessionManager.getInstance().getCurrentUser();
 
@@ -169,24 +183,53 @@ public class MainController {
     Message request = new Message("GET_ALL_AUCTIONS", userId);
     Message response = SocketClient.sendRequest(request);
 
-    if (response.getStatus().equals("SUCCESS")) {
+    if (response != null && response.getStatus().equals("SUCCESS")) {
       allAuctions = (List<AuctionSummary>) response.getData();
 
-      displayAuctions(allAuctions);
+      // Dọn sạch 2 kho chứa trước khi chia bài
+      runningAuctions.clear();
+      pendingAuctions.clear();
 
-      javafx.application.Platform.runLater(() -> {
-        // Bọc thêm 1 lớp runLater để đảm bảo 100% giao diện đã nạp xong hết các nút bấm
-        javafx.application.Platform.runLater(() -> {
+      for (AuctionSummary auc : allAuctions) {
+        if (auc.getStatus() != null) {
+          AuctionStatus status = auc.getStatus();
+
+          if (status == AuctionStatus.RUNNING || status == AuctionStatus.OPEN) {
+            runningAuctions.add(auc);
+          } else if (status == AuctionStatus.FINISHED) {
+            pendingAuctions.add(auc);
+          }
+        }
+      }
+
+      // Mặc định ép hiển thị kho Đang bán
+      isShowingPending = false;
+      displayAuctions(runningAuctions);
+      boolean isSeller = currentUser instanceof Seller;
+      String defaultBtnText = isSeller ? "📦 Đồ đã hết thời gian" : "💳 Cần thanh toán";
+
+      // Đồng bộ lại Text và Màu nút
+      Platform.runLater(() -> {
+        if (toggleViewBtn != null) {
+          toggleViewBtn.setText(defaultBtnText);
+          toggleViewBtn.getStyleClass().removeAll("btn-primary", "btn-accent");
+          toggleViewBtn.getStyleClass().add("btn-accent");
+        }
+        if (mainTitleLabel != null) mainTitleLabel.setText("Sản phẩm đang đấu giá");
+        if (subTitleLabel != null) subTitleLabel.setText("(sản phẩm mới hôm nay)");
+      });
+
+      Platform.runLater(() -> {
+        Platform.runLater(() -> {
           if (mainScrollPane != null) {
-            mainScrollPane.setVvalue(0.0); // Kéo thanh cuộn lên đỉnh
-            mainScrollPane.requestFocus(); // Đòi lại focus cho ScrollPane, không cho các nút ở dưới giành giật nữa
+            mainScrollPane.setVvalue(0.0);
+            mainScrollPane.requestFocus();
           }
         });
       });
     } else {
       System.err.println("Không thể lấy danh sách đấu giá từ server");
     }
-
   }
 
   private void displayAuctions(List<AuctionSummary> auctionsToDisplay) {
@@ -262,13 +305,13 @@ public class MainController {
   @FXML
   public void handleLogin(ActionEvent event) {
     SceneManager.getInstance()
-            .switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
+        .switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
   }
 
   @FXML
   public void handleRegister(ActionEvent event) {
     SceneManager.getInstance()
-            .switchScene("/org/deptrai/auctionsystem/client/views/register-view.fxml", "Đăng ký");
+        .switchScene("/org/deptrai/auctionsystem/client/views/register-view.fxml", "Đăng ký");
   }
 
   @FXML
@@ -277,33 +320,77 @@ public class MainController {
     SceneManager.getInstance().clearHistory();
     setUpGuestView();
     SceneManager.getInstance()
-            .switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
+        .switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
   }
 
   @FXML
   public void handleShowProfile(ActionEvent event) {
     SceneManager.getInstance()
-            .switchScene("/org/deptrai/auctionsystem/client/views/profile-view.fxml", "Hồ sơ của tôi");
+        .switchScene("/org/deptrai/auctionsystem/client/views/profile-view.fxml", "Hồ sơ của tôi");
   }
 
   @FXML
   public void handleShowBidHistory(ActionEvent event) {
     SceneManager.getInstance()
-            .switchScene(
-                    "/org/deptrai/auctionsystem/client/views/bid-history-view.fxml", "Lịch sử đặt giá");
+        .switchScene(
+            "/org/deptrai/auctionsystem/client/views/bid-history-view.fxml", "Lịch sử đặt giá");
   }
 
   @FXML
   public void handleOpenAuctionFloor(ActionEvent event) {
     SceneManager.getInstance()
-            .switchScene(
-                    "/org/deptrai/auctionsystem/client/views/auction-floor-view.fxml", "Sàn Đấu Giá");
+        .switchScene(
+            "/org/deptrai/auctionsystem/client/views/auction-floor-view.fxml", "Sàn Đấu Giá");
+  }
+  @FXML
+  public void handleToggleView(ActionEvent event) {
+    if (productsContainer == null) return;
+
+    // Kiểm tra xem người dùng hiện tại có phải là Seller không
+    boolean isSeller = SessionManager.getInstance().getCurrentUser() instanceof Seller;
+
+    if (isShowingPending) {
+      // TRỞ LẠI SÀN ĐẤU GIÁ
+      displayAuctions(runningAuctions);
+
+      if (toggleViewBtn != null) {
+        // Nếu là Seller thì hiện nút "Đồ hết thời gian", nếu là người mua thì hiện "Cần thanh toán"
+        toggleViewBtn.setText(isSeller ? "📦 Đồ đã hết thời gian" : "💳 Cần thanh toán");
+        toggleViewBtn.getStyleClass().removeAll("btn-primary", "btn-accent");
+        toggleViewBtn.getStyleClass().add("btn-accent"); // Nút màu hồng
+      }
+
+      if (mainTitleLabel != null) mainTitleLabel.setText("Sản phẩm đang đấu giá");
+      if (subTitleLabel != null) subTitleLabel.setText("(sản phẩm mới hôm nay)");
+
+      isShowingPending = false;
+    } else {
+      // XEM TRANG ĐỒ ĐÃ KẾT THÚC / CẦN THANH TOÁN
+      displayAuctions(pendingAuctions);
+
+      if (toggleViewBtn != null) {
+        toggleViewBtn.setText("⬅ Trở lại Sàn đấu giá");
+        toggleViewBtn.getStyleClass().removeAll("btn-primary", "btn-accent");
+        toggleViewBtn.getStyleClass().add("btn-primary"); // Nút màu tím
+      }
+
+      if (mainTitleLabel != null) {
+        // ĐỔI TIÊU ĐỀ TRANG THEO ROLE
+        mainTitleLabel.setText(isSeller ? "Danh sách đồ hết thời gian" : "Danh sách cần thanh toán");
+      }
+      if (subTitleLabel != null) {
+        // Đổi luôn cả dòng chú thích nhỏ ở dưới cho mượt
+        subTitleLabel.setText(isSeller ? "(Các phiên đấu giá của bạn đã khép lại)" : "(Sản phẩm bạn đã thắng đấu giá)");
+      }
+
+      isShowingPending = true;
+    }
   }
 
   @FXML
   public void handleGoToSellerCenter(ActionEvent event) {
     SceneManager.getInstance()
-            .switchScene("/org/deptrai/auctionsystem/client/views/seller.fxml", "Kênh Người Bán");
+        .switchScene("/org/deptrai/auctionsystem/client/views/seller.fxml", "Kênh Người Bán");
   }
   // Hàm xử lý sự kiện khi ấn nút "Làm mới"
   @FXML

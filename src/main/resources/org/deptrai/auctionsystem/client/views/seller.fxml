@@ -1,30 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.LineChart?>
-<?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="720.0" prefWidth="1280.0"
-      stylesheets="@style.css" xmlns="http://javafx.com/javafx/21"
-      fx:controller="org.deptrai.auctionsystem.client.controllers.SellerController">
+<HBox prefHeight="720.0" prefWidth="1280.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.client.controllers.SellerController">
   <children>
 
-    <VBox style="-fx-background-color: #1a162e; -fx-border-color: transparent #2b244d transparent transparent; -fx-border-width: 0 2px 0 0;"
-          prefWidth="260.0" spacing="15.0"
-          styleClass="sidebar">
+    <VBox prefWidth="260.0" spacing="15.0" style="-fx-background-color: #1a162e; -fx-border-color: transparent #2b244d transparent transparent; -fx-border-width: 0 2px 0 0;" styleClass="sidebar">
       <children>
         <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ QUAY LẠI">
           <padding>
-            <Insets bottom="8.0" left="12.0" right="15.0" top="8.0"/>
+            <Insets bottom="8.0" left="12.0" right="15.0" top="8.0" />
           </padding>
         </Button>
         <Label style="-fx-font-size: 22; -fx-font-weight: bold;" text="🏪 SELLER CENTER" textFill="#bd93f9">
@@ -32,67 +20,62 @@
             <Insets top="10.0" />
           </VBox.margin>
         </Label>
-        <Separator opacity="0.3"/>
-        <Button maxWidth="Infinity" styleClass="btn-sidebar" text="🏠 Tổng quan"/>
-        <Button maxWidth="Infinity" onAction="#handleOpenInventory" styleClass="btn-sidebar" text="📦 Kho hàng của tôi"/>
-        <Button maxWidth="Infinity" styleClass="btn-sidebar" text="📈 Thống kê doanh thu"/>
-        <Separator opacity="0.3"/>
+        <Separator opacity="0.3" />
+        <Button maxWidth="Infinity" onAction="#handleOpenInventory" styleClass="btn-sidebar" text="📦 Kho hàng của tôi" />
+        <Button maxWidth="Infinity" styleClass="btn-sidebar" text="📈 Thống kê doanh thu" />
+        <Separator opacity="0.3" />
         <Button maxWidth="Infinity" onAction="#handleAddNewProduct" styleClass="btn-success" text="➕ Đăng sản phẩm mới" />
-        <Region VBox.vgrow="ALWAYS"/>
-        <Button maxWidth="Infinity" onAction="#handleShowProfile" styleClass="btn-primary" text="👤 Hồ sơ cá nhân"/>
-        <Button maxWidth="Infinity" onAction="#handleLogout" styleClass="btn-accent" text="🚪 ĐĂNG XUẤT"/>
+        <Region VBox.vgrow="ALWAYS" />
+        <Button maxWidth="Infinity" onAction="#handleShowProfile" styleClass="btn-primary" text="👤 Hồ sơ cá nhân" />
+        <Button maxWidth="Infinity" onAction="#handleLogout" styleClass="btn-accent" text="🚪 ĐĂNG XUẤT" />
       </children>
       <padding>
-        <Insets bottom="20.0" left="15.0" right="15.0" top="20.0"/>
+        <Insets bottom="20.0" left="15.0" right="15.0" top="20.0" />
       </padding>
     </VBox>
 
-    <VBox style="-fx-background-color: #151226;" HBox.hgrow="ALWAYS" spacing="25.0">
+    <VBox spacing="25.0" style="-fx-background-color: #151226;" HBox.hgrow="ALWAYS">
       <children>
         <HBox alignment="CENTER_LEFT">
           <children>
-            <Label style="-fx-font-size: 28; -fx-font-weight: bold;" text="📊 Bảng Điều Khiển (Tổng Quan)" textFill="#bd93f9"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <TextField styleClass="text-field" prefHeight="40.0" prefWidth="300.0" promptText="🔍 Tìm kiếm..."/>
+            <Label style="-fx-font-size: 28; -fx-font-weight: bold;" text="📊 Bảng Điều Khiển (Tổng Quan)" textFill="#bd93f9" />
+            <Region HBox.hgrow="ALWAYS" />
+            <TextField prefHeight="40.0" prefWidth="300.0" promptText="🔍 Tìm kiếm..." styleClass="text-field" />
           </children>
         </HBox>
 
-        <ScrollPane style="-fx-background-color: transparent; -fx-background: transparent;" fitToWidth="true" VBox.vgrow="ALWAYS">
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
           <content>
             <VBox spacing="25.0">
               <padding>
-                <Insets bottom="20.0"/>
+                <Insets bottom="20.0" />
               </padding>
 
               <HBox spacing="20.0">
-                <VBox style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
-                      HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="100.0" spacing="10.0">
-                  <Label text="💰 Tổng Doanh Thu" textFill="#50fa7b" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
-                  <Label textFill="WHITE" style="-fx-font-size: 24; -fx-font-weight: bold;" fx:id = "balanceLabel"/>
+                <VBox alignment="CENTER" prefHeight="100.0" spacing="10.0" style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;" HBox.hgrow="ALWAYS">
+                  <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="💰 Tổng Doanh Thu" textFill="#50fa7b" />
+                  <Label fx:id="balanceLabel" style="-fx-font-size: 24; -fx-font-weight: bold;" textFill="WHITE" />
                 </VBox>
 
-                <VBox style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
-                      HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="100.0" spacing="10.0">
-                  <Label text="🔥 Đang Đấu Giá" textFill="#ffb86c" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
-                  <Label textFill="WHITE" style="-fx-font-size: 24; -fx-font-weight: bold;" fx:id="ongoingCountLabel"/>
+                <VBox alignment="CENTER" prefHeight="100.0" spacing="10.0" style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;" HBox.hgrow="ALWAYS">
+                  <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="🔥 Đang Đấu Giá" textFill="#ffb86c" />
+                  <Label fx:id="ongoingCountLabel" style="-fx-font-size: 24; -fx-font-weight: bold;" textFill="WHITE" />
                 </VBox>
 
-                <VBox style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
-                      HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="100.0" spacing="10.0">
-                  <Label text="✅ Đã Bán Thành Công" textFill="#8be9fd" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
-                  <Label textFill="WHITE" style="-fx-font-size: 24; -fx-font-weight: bold;" fx:id="successCountLabel"/>
+                <VBox alignment="CENTER" prefHeight="100.0" spacing="10.0" style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;" HBox.hgrow="ALWAYS">
+                  <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="✅ Đã Bán Thành Công" textFill="#8be9fd" />
+                  <Label fx:id="successCountLabel" style="-fx-font-size: 24; -fx-font-weight: bold;" textFill="WHITE" />
                 </VBox>
               </HBox>
 
               <HBox spacing="20.0" VBox.vgrow="ALWAYS">
-                <VBox style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
-                      HBox.hgrow="ALWAYS" prefWidth="600.0" prefHeight="350.0">
+                <VBox prefHeight="350.0" prefWidth="600.0" style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;" HBox.hgrow="ALWAYS">
                   <padding>
-                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                   </padding>
-                  <Label text="📈 Lượt truy cập / Đặt giá tuần này" textFill="WHITE" style="-fx-font-size: 18; -fx-font-weight: bold;">
+                  <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="📈 Lượt truy cập / Đặt giá tuần này" textFill="WHITE">
                     <padding>
-                      <Insets bottom="15.0"/>
+                      <Insets bottom="15.0" />
                     </padding>
                   </Label>
                   <LineChart fx:id="revenueChart" styleClass="dark-chart" VBox.vgrow="ALWAYS">
@@ -105,19 +88,18 @@
                   </LineChart>
                 </VBox>
 
-                <VBox style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
-                      prefWidth="350.0" prefHeight="350.0">
+                <VBox prefHeight="350.0" prefWidth="350.0" style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;">
                   <HBox style="-fx-background-color: #2b244d; -fx-background-radius: 9 9 0 0;">
                     <padding>
-                      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+                      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                     </padding>
-                    <Label text="🔔 Hoạt động mới nhất" textFill="WHITE" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                    <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="🔔 Hoạt động mới nhất" textFill="WHITE" />
                   </HBox>
                   <VBox spacing="15.0">
                     <padding>
-                      <Insets bottom="20.0" left="15.0" right="15.0" top="20.0"/>
+                      <Insets bottom="20.0" left="15.0" right="15.0" top="20.0" />
                     </padding>
-                    <Label text="Chưa có lượt đặt giá mới nào." textFill="#6272a4" style="-fx-font-style: italic;"/>
+                    <Label style="-fx-font-style: italic;" text="Chưa có lượt đặt giá mới nào." textFill="#6272a4" />
                   </VBox>
                 </VBox>
               </HBox>
@@ -127,7 +109,7 @@
         </ScrollPane>
       </children>
       <padding>
-        <Insets bottom="30.0" left="40.0" right="40.0" top="30.0"/>
+        <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
       </padding>
     </VBox>
   </children>
