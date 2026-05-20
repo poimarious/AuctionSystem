@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.deptrai.auctionsystem.client.utils.AutoBidManager;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 
@@ -17,6 +18,7 @@ public class ClientApplication extends Application {
 
     // 1. Kết nối tới Server Socket trước khi hiện màn hình
     SocketClient.connect("localhost", 5000);
+    AutoBidManager.getInstance();
 
     // 2. Nạp file FXML từ thư mục resources mới
     FXMLLoader fxmlLoader =
@@ -34,6 +36,7 @@ public class ClientApplication extends Application {
     } catch (Exception e) {
       System.err.println("Không thể load logo ứng dụng: " + e.getMessage());
     }
+
 
     stage.setTitle("Hệ thống Đấu giá trực tuyến");
     stage.setScene(scene);

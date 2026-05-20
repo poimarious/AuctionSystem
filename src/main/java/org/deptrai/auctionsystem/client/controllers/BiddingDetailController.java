@@ -1,13 +1,5 @@
 package org.deptrai.auctionsystem.client.controllers;
 
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.Duration;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -21,15 +13,21 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import org.deptrai.auctionsystem.client.utils.AuctionUpdateListener;
-import org.deptrai.auctionsystem.client.utils.SceneManager;
-import org.deptrai.auctionsystem.client.utils.SessionManager;
-import org.deptrai.auctionsystem.client.utils.SocketClient;
+import org.deptrai.auctionsystem.client.utils.*;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
-import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
+
+import java.io.File;
+import java.io.InterruptedIOException;
+import java.net.Socket;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class BiddingDetailController implements AuctionUpdateListener {
 
@@ -54,12 +52,20 @@ public class BiddingDetailController implements AuctionUpdateListener {
   @FXML private HBox quickBidBox;
   @FXML private Label quickBidLabel;
 
+  @FXML private TextField maxBidField;
+  @FXML private TextField incrementField;
+  @FXML private Button btnAutoBid;
+
   private double currentIntendedBid = 0.0;
 
   private XYChart.Series<String, Number> priceSeries;
 
   private Auction currentAuction;
   private Timeline countdownTimeline;
+
+  private boolean isAutoBidActive = false;
+  private double maxAutoBidLimit = 0.0;
+  private double autoBidIncrement = 0.0;
 
   @FXML
   public void initialize() {
@@ -153,6 +159,16 @@ public class BiddingDetailController implements AuctionUpdateListener {
     SocketClient.addListener(this); // New observer
 
     startTimer();
+
+    if(AutoBidManager.getInstance().isAutoBidActive(auction.getAuctionId())) {
+      var config = AutoBidManager.getInstance().getAutoBidConfig(auction.getAuctionId());
+      maxBidField.setText(String.valueOf(config.maxBid));
+      incrementField.setText(String.valueOf(config.increment));
+      maxBidField.setDisable(true);
+      incrementField.setDisable(true);
+      btnAutoBid.setText("🛑 ĐANG CHẠY AUTO-BID (BẤM ĐỂ TẮT)");
+      btnAutoBid.setStyle("-fx-background-color: #ff003c; -fx-text-fill: white; -fx-border-color: transparent;");
+    }
   }
 
   private void startTimer() {
@@ -195,7 +211,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
     // Kiểm tra xem file của bạn là home-view.fxml hay auction-floor.fxml
     SceneManager.getInstance().switchScene(
         "/org/deptrai/auctionsystem/client/views/home-view.fxml",
-        "Trang chủ - Auction.UET"
+        "Trang chủ"
     );
   }
 
@@ -269,6 +285,38 @@ public class BiddingDetailController implements AuctionUpdateListener {
       currentIntendedBid = current + getIncrementStep(current);
     }
     quickBidLabel.setText(String.format("$%.2f", currentIntendedBid));
+  }
+
+  @FXML
+  public void handleActivateAutoBid(ActionEvent event) {
+    String auctionId = currentAuction.getAuctionId();
+
+    if(AutoBidManager.getInstance().isAutoBidActive(auctionId)) {
+      AutoBidManager.getInstance().stopAutoBid(auctionId);
+      btnAutoBid.setText("⚙️ KÍCH HOẠT AUTO-BID");
+      btnAutoBid.setStyle("");
+      maxBidField.setDisable(false);
+      incrementField.setDisable(false);
+      return;
+    }
+
+    try {
+      double maxBid = Double.parseDouble(maxBidField.getText());
+      double increment = Double.parseDouble(incrementField.getText());
+      if(maxBid <= currentAuction.getCurrentPrice()) {
+        showError("Giới hạn Max phải lớn hơn mức giá hiện tại!");
+        return;
+      }
+
+      AutoBidManager.getInstance().startAutoBid(currentAuction, maxBid, increment);
+
+      maxBidField.setDisable(true);
+      incrementField.setDisable(true);
+      btnAutoBid.setText("🛑 ĐANG CHẠY AUTO-BID (BẤM ĐỂ TẮT)");
+      btnAutoBid.setStyle("-fx-background-color: #ff003c; -fx-text-fill: white; -fx-border-color: transparent;");
+    } catch (NumberFormatException e) {
+      showError("Vui lòng nhập số tiền hợp lệ!");
+    }
   }
 
   // Hàm vẽ lại biểu đồ
