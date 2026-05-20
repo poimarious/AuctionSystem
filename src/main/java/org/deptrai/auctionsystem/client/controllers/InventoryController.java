@@ -34,6 +34,7 @@ public class InventoryController {
   @FXML private TableColumn<Auction, String> priceColumn; // Đổi sang String để format có dấu $
   @FXML private TableColumn<Auction, String> statusColumn;
 //  @FXML private TableColumn<Auction, String> actionColumn;
+@FXML private TableColumn<Auction, String> finalPriceColumn;
 
   @FXML
   public void handleAddNewProduct(ActionEvent event) {
@@ -101,6 +102,10 @@ public class InventoryController {
 
     // 3. Cột Giá: Ép kiểu sang chuỗi và format thêm dấu $
     priceColumn.setCellValueFactory(cellData ->
+        new SimpleStringProperty(String.format("$%,.2f", cellData.getValue().getItem().getStartingPrice()))
+    );
+    // Cột Giá cuối cùng: Lấy giá đấu cao nhất hiện tại (currentPrice)
+    finalPriceColumn.setCellValueFactory(cellData ->
         new SimpleStringProperty(String.format("$%,.2f", cellData.getValue().getCurrentPrice()))
     );
 
