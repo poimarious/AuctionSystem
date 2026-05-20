@@ -1,5 +1,6 @@
 package org.deptrai.auctionsystem.client.controllers;
 
+import java.io.ByteArrayInputStream;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -138,18 +139,18 @@ public class BiddingDetailController implements AuctionUpdateListener {
     currentIntendedBid = current + getIncrementStep(current);
     quickBidLabel.setText(String.format("$%.2f", currentIntendedBid));
 
-    String imagePath = auction.getItem().getImageUrl();
-    if(imagePath != null && !imagePath.isEmpty()) {
+    byte[] imageBytes = auction.getItem().getImageBytes();
+    if (imageBytes != null && imageBytes.length > 0) {
       try {
-        File imgfile = new File(imagePath);
-        if(imgfile.exists()) {
-          Image image = new Image(imgfile.toURI().toString());
-          productImageView.setImage(image);
-        }
+        Image image = new Image(new ByteArrayInputStream(imageBytes));
+        productImageView.setImage(image);
       } catch (Exception e) {
-        System.err.println("Không thể load ảnh thật từ đường dẫn: " + imagePath);
+        System.err.println("Lỗi giải mã hình ảnh từ mảng byte mạng: " + e.getMessage());
       }
+    } else {
+      System.out.println("Sản phẩm này không đi kèm dữ liệu ảnh.");
     }
+
     List<Bid> bids = new ArrayList<>(auction.getBids());
     bids.sort(Comparator.comparing(Bid::getTimestamp));
     bidHistoryTable.getItems().setAll(bids);

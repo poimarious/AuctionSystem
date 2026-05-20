@@ -14,10 +14,11 @@ public class AuctionSummary implements Serializable {
   private AuctionStatus status;
   private final LocalDateTime endTime;
   private final String imageUrl;
+  private byte[] imageBytes;
 
   public AuctionSummary(String auctionId, String itemName, String itemDescription,
                         String category, double currentPrice, AuctionStatus status,
-                        LocalDateTime endTime, String imageUrl) {
+                        LocalDateTime endTime, String imageUrl, byte[] imageBytes) {
     this.auctionId = auctionId;
     this.itemName = itemName;
     this.itemDescription = itemDescription;
@@ -26,6 +27,7 @@ public class AuctionSummary implements Serializable {
     this.status = status;
     this.endTime = endTime;
     this.imageUrl = imageUrl;
+    this.imageBytes = imageBytes;
   }
 
   // region Getters & Setters
@@ -39,5 +41,11 @@ public class AuctionSummary implements Serializable {
   public void setStatus(AuctionStatus status) {this.status = status;}
   public LocalDateTime getEndTime() {return endTime;}
   public String getImageUrl() {return imageUrl;}
+  public byte[] getImageBytes() {
+    return imageBytes;
+  }
+  public void setImageBytes(byte[] imageBytes) {
+    this.imageBytes = imageBytes;
+  }
   // endregion
 }

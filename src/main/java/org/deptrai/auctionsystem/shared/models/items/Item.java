@@ -10,6 +10,8 @@ public abstract class Item implements Serializable {
   private double startingPrice;
   private Seller seller;
   private String imageUrl;
+  private byte[] imageBytes;
+
   public Item() {}
 
   public Item(String name, String description, double startingPrice, Seller seller) {
@@ -25,7 +27,6 @@ public abstract class Item implements Serializable {
       String name,
       String description,
       double startingPrice,
-      double currentPrice,
       Seller seller) {
     this.itemId = itemId;
     this.name = name;
@@ -43,34 +44,45 @@ public abstract class Item implements Serializable {
     return itemId;
   }
 
-  // region Setters
-  public Item setItemId(String itemId) {
-    this.itemId = itemId;
-    return this;
-  }
-
   public String getName() {
     return name;
-  }
-
-  public Item setName(String name) {
-    this.name = name;
-    return this;
   }
 
   public String getDescription() {
     return description;
   }
 
+  public double getStartingPrice() {
+    return startingPrice;
+  }
+
+  public Seller getSeller() {
+    return seller;
+  }
+
+  public String getImageUrl() {
+    return imageUrl;
+  }
+
+  public byte[] getImageBytes() { return imageBytes; }
+
   // endregion
+
+  // region Setters
+  public Item setItemId(String itemId) {
+    this.itemId = itemId;
+    return this;
+  }
+
+
+  public Item setName(String name) {
+    this.name = name;
+    return this;
+  }
 
   public Item setDescription(String description) {
     this.description = description;
     return this;
-  }
-
-  public double getStartingPrice() {
-    return startingPrice;
   }
 
   public Item setStartingPrice(double startingPrice) {
@@ -78,22 +90,16 @@ public abstract class Item implements Serializable {
     return this;
   }
 
-  public Seller getSeller() {
-    return seller;
-  }
-
   public Item setSeller(Seller seller) {
     this.seller = seller;
     return this;
   }
 
-  public String getImageUrl() {
-    return imageUrl;
-  }
-
   public void setImageUrl(String imageUrl) {
     this.imageUrl = imageUrl;
   }
-  // endregion\
 
+  public void setImageBytes(byte[] imageBytes) { this.imageBytes = imageBytes; }
+
+  // endregion
 }

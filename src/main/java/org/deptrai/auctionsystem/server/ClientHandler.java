@@ -1,9 +1,12 @@
 package org.deptrai.auctionsystem.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -310,7 +313,8 @@ public class  ClientHandler implements Runnable {
                   auction.getCurrentPrice(),
                   auction.getStatus(),
                   auction.getEndTime(),
-                  auction.getItem().getImageUrl()
+                  auction.getItem().getImageUrl(),
+                  auction.getItem().getImageBytes()
           );
 
           activeAuctionsDTO.add(auctionSummary);
@@ -363,18 +367,19 @@ public class  ClientHandler implements Runnable {
       // --- XỬ LÝ LƯU FILE ẢNH VÀO SERVER ---
       if (imageBytes != null && imageBytes.length > 0) {
         // Tạo thư mục "uploads" trên Server nếu chưa có
-        java.io.File uploadDir = new java.io.File("server_uploads");
+        File uploadDir = new File("server_uploads");
         if (!uploadDir.exists()) {
           uploadDir.mkdir();
         }
 
         // Tạo đường dẫn lưu file (Thêm timestamp để không bị trùng tên)
         String savePath = "server_uploads/" + System.currentTimeMillis() + "_" + fileName;
-        java.nio.file.Files.write(java.nio.file.Paths.get(savePath), imageBytes);
+        Files.write(Paths.get(savePath), imageBytes);
 
         System.out.println("Đã lưu ảnh sản phẩm tại Server: " + savePath);
-        // (Tùy chọn: Bạn có thể thêm thuộc tính 'imagePath' vào class Item và set nó ở đây)
+
         item.setImageUrl(savePath);
+        item.setImageBytes(imageBytes);
       }
       // Bước 1: Lưu Item xuống DB trước
       ItemDAO itemDAO = new ItemDAO();

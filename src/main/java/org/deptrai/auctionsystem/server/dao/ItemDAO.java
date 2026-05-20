@@ -1,5 +1,7 @@
 package org.deptrai.auctionsystem.server.dao;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -112,6 +114,18 @@ public class ItemDAO {
           Item item = factory.createItem(name, description, startingPrice, seller);
           item.setItemId(itemId);
           item.setImageUrl(imageUrl);
+
+          if (imageUrl != null && !imageUrl.isEmpty()) {
+            try {
+              File imgFile = new File(imageUrl);
+              if (imgFile.exists()) {
+                byte[] bytes = Files.readAllBytes(imgFile.toPath());
+                item.setImageBytes(bytes);
+              }
+            } catch (Exception e) {
+              System.out.println("Cảnh báo: Không thể nạp file ảnh vào RAM: " + imageUrl);
+            }
+          }
 
           if (item instanceof Electronics) {
             ((Electronics) item)

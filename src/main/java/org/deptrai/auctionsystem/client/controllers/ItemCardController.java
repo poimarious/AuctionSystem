@@ -42,17 +42,14 @@ public class ItemCardController implements AuctionUpdateListener {
     nameLabel.setText(auction.getItemName());
     priceLabel.setText(String.format("$%.2f", auction.getCurrentPrice()));
 
-    String imagePath = auction.getImageUrl();
-
-    if(imagePath != null && !imagePath.isEmpty()) {
+    byte[] imageBytes = auction.getImageBytes();
+    if (imageBytes != null && imageBytes.length > 0) {
       try {
-        File imgFile = new File(imagePath);
-        if(imgFile.exists()) {
-          Image realImage = new Image(imgFile.toURI().toString(), 250, 250, true, true);
-          itemImageView.setImage(realImage);
-        }
+        // Vẫn giữ thông số 250x250 để Card hiện đều và đẹp
+        Image realImage = new Image(new java.io.ByteArrayInputStream(imageBytes), 250, 250, true, true);
+        itemImageView.setImage(realImage);
       } catch (Exception e) {
-        System.err.println("Không thể load ảnh thật từ đường dẫn: " + imagePath);
+        System.err.println("Lỗi giải mã hình ảnh từ mảng byte mạng: " + e.getMessage());
       }
     }
 
