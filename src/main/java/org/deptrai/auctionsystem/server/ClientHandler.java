@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import javafx.scene.control.PasswordField;
 import org.deptrai.auctionsystem.server.dao.*;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.server.utils.ServerThreadPool;
@@ -188,7 +187,7 @@ public class  ClientHandler implements Runnable {
     String role = data[3];
 
     try {
-      if (!ValidationUtils.isValidPassword(password)) {
+      if (ValidationUtils.isInvalidPassword(password)) {
         out.writeObject(
             new Message(
                 "FAIL",
@@ -566,11 +565,21 @@ public class  ClientHandler implements Runnable {
         Bid newBid = new Bid(bidder, auction, bidAmount, LocalDateTime.now());
 
         // 5. Bid validate check
-        try {
-          newBid.validate();
-        } catch (Exception validationException) {
-          // Bắt thông báo lỗi từ Exception và gửi thẳng về cho Client hiển thị
-          out.writeObject(new Message("FAIL", "PLACE_BID", validationException.getMessage()));
+        if (bidAmount <= 0) {
+          out.writeObject(new Message("FAIL", "PLACE_BID", "Mức giá đặt phải lớn hơn 0!"));
+          out.flush();
+          return;
+        }
+
+        if (bidAmount <= auction.getCurrentPrice()) {
+          out.writeObject(new Message("FAIL", "PLACE_BID", "Mức giá phải lớn hơn giá hiện tại của sản phẩm!"));
+          out.flush();
+          return;
+        }
+
+        if (auction.getItem() != null && auction.getItem().getSeller() != null
+            && currentUserId.equals(auction.getItem().getSeller().getUserId())) {
+          out.writeObject(new Message("FAIL", "PLACE_BID", "Người bán không được phép tự đặt giá cho sản phẩm của mình!"));
           out.flush();
           return;
         }
@@ -706,7 +715,7 @@ public class  ClientHandler implements Runnable {
       String newPassword = data[2];
 
       // 1. Kiểm tra độ mạnh của mật khẩu mới theo chuẩn ValidationUtils
-      if (!ValidationUtils.isValidPassword(newPassword)) {
+      if (ValidationUtils.isInvalidPassword(newPassword)) {
         out.writeObject(
             new Message(
                 "FAIL",

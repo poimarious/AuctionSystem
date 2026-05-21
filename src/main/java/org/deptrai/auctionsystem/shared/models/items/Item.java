@@ -17,10 +17,9 @@ public abstract class Item implements Serializable {
   public Item(String name, String description, double startingPrice, Seller seller) {
     this.name = name;
     this.description = description;
-    this.startingPrice =
-        startingPrice; // currentPrice is the same as startingPrice when starting out
+    this.startingPrice = startingPrice;
     this.seller = seller;
-  } // For creating a new object
+  }
 
   public Item(
       String itemId,
@@ -33,9 +32,7 @@ public abstract class Item implements Serializable {
     this.description = description;
     this.startingPrice = startingPrice;
     this.seller = seller;
-  } // For loading an object
-
-  public abstract void printInfo();
+  }
 
   public abstract String getCategory();
 

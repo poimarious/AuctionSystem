@@ -24,33 +24,11 @@ public class Art extends Item {
   }
 
   @Override
-  public void printInfo() {
-    System.out.println("[ART]");
-    System.out.println("Name :" + super.getName());
-    System.out.println("Description: " + super.getDescription());
-    System.out.println("Starting price: " + super.getStartingPrice() + "$");
-    System.out.println("Seller: " + super.getSeller().getUsername());
-    System.out.println();
-  }
-
-  @Override
   public String getCategory() {
     return "Art";
   }
 
-  // region Getters
-  public String getArtist() {
-    return artist;
-  }
-
-  // region Setters
-  public Art setArtist(String artist) {
-    this.artist = artist;
-    return this;
-  }
-
-  // endregion
-
+  // region Getters and Setters
   public int getYearCreated() {
     return yearCreated;
   }
@@ -59,5 +37,19 @@ public class Art extends Item {
     this.yearCreated = yearCreated;
     return this;
   }
+
+  public String getArtist() {
+    return artist;
+  }
+
+  public Art setArtist(String artist) {
+    this.artist = artist;
+    return this;
+  }
+
   // endregion
+
+
+
+
 }

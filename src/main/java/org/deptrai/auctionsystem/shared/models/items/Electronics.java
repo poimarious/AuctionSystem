@@ -24,32 +24,19 @@ public class Electronics extends Item {
   }
 
   @Override
-  public void printInfo() {
-    System.out.println("[ELECTRONIC]");
-    System.out.println("Name :" + super.getName());
-    System.out.println("Description: " + super.getDescription());
-    System.out.println("Starting price: " + super.getStartingPrice() + "$");
-    System.out.println("Seller: " + super.getSeller().getUsername());
-    System.out.println();
-  }
-
-  @Override
   public String getCategory() {
     return "Electronics";
   }
 
-  // region Getters
+  // region Getters and Setters
   public String getBrand() {
     return brand;
   }
 
-  // region Setters
   public Electronics setBrand(String brand) {
     this.brand = brand;
     return this;
   }
-
-  // endregion
 
   public int getWarrantyMonths() {
     return warrantyMonths;
@@ -59,6 +46,7 @@ public class Electronics extends Item {
     this.warrantyMonths = warrantyMonths;
     return this;
   }
+
   // endregion
 
 }

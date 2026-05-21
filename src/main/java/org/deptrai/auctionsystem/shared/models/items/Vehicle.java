@@ -24,32 +24,19 @@ public class Vehicle extends Item {
   }
 
   @Override
-  public void printInfo() {
-    System.out.println("[VEHICLE]");
-    System.out.println("Name :" + super.getName());
-    System.out.println("Description: " + super.getDescription());
-    System.out.println("Starting price: " + super.getStartingPrice() + "$");
-    System.out.println("Seller: " + super.getSeller().getUsername());
-    System.out.println();
-  }
-
-  @Override
   public String getCategory() {
     return "Vehicle";
   }
 
-  // region Getters
+  // region Getters and Setters
   public String getMake() {
     return make;
   }
 
-  // region Setters
   public Vehicle setMake(String make) {
     this.make = make;
     return this;
   }
-
-  // endregion
 
   public int getMileage() {
     return mileage;
@@ -59,5 +46,6 @@ public class Vehicle extends Item {
     this.mileage = mileage;
     return this;
   }
+
   // endregion
 }

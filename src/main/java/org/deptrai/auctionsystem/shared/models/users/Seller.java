@@ -27,19 +27,6 @@ public class Seller extends User {
     }
   }
 
-  @Override
-  public boolean login() {
-    return false;
-  }
-
-  @Override
-  public void logout() {}
-
-  @Override
-  public String getInfo() {
-    return "";
-  }
-
   // region Getter & Setter
   public List<Item> getListedItems() {
     return listedItems;

@@ -10,19 +10,6 @@ public class Admin extends User {
     this.adminLevel = adminLevel;
   }
 
-  @Override
-  public boolean login() {
-    return false;
-  }
-
-  @Override
-  public void logout() {}
-
-  @Override
-  public String getInfo() {
-    return "";
-  }
-
   // region Getter and Setter
   public int getAdminLevel() {
     return adminLevel;

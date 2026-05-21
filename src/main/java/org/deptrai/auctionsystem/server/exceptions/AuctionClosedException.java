@@ -1,4 +1,4 @@
-package org.deptrai.auctionsystem.shared.exceptions;
+package org.deptrai.auctionsystem.server.exceptions;
 
 public class AuctionClosedException extends RuntimeException {
 
