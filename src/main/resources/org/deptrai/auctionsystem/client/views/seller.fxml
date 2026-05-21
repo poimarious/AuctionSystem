@@ -73,7 +73,7 @@
                   <padding>
                     <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                   </padding>
-                  <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="📈 Lượt truy cập / Đặt giá tuần này" textFill="WHITE">
+                  <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="📈 Lượt đặt giá tuần này" textFill="WHITE">
                     <padding>
                       <Insets bottom="15.0" />
                     </padding>

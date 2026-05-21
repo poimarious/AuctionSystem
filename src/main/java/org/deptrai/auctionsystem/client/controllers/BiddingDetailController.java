@@ -1,6 +1,5 @@
 package org.deptrai.auctionsystem.client.controllers;
 
-import java.io.ByteArrayInputStream;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -20,9 +19,7 @@ import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 
-import java.io.File;
-import java.io.InterruptedIOException;
-import java.net.Socket;
+import java.io.ByteArrayInputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -32,30 +29,49 @@ import java.util.List;
 
 public class BiddingDetailController implements AuctionUpdateListener {
 
-  @FXML private ImageView productImageView;
-  @FXML private Label nameLabel;
-  @FXML private Label descriptionLabel;
-  @FXML private Label currentPriceLabel;
-  @FXML private Label expiryTimerLabel;
+  @FXML
+  private ImageView productImageView;
+  @FXML
+  private Label nameLabel;
+  @FXML
+  private Label descriptionLabel;
+  @FXML
+  private Label currentPriceLabel;
+  @FXML
+  private Label expiryTimerLabel;
 
-  @FXML private TableView<Bid> bidHistoryTable;
-  @FXML private TableColumn<Bid, String> timeColumn;
-  @FXML private TableColumn<Bid, String> bidderColumn;
-  @FXML private TableColumn<Bid, Double> amountColumn;
+  @FXML
+  private TableView<Bid> bidHistoryTable;
+  @FXML
+  private TableColumn<Bid, String> timeColumn;
+  @FXML
+  private TableColumn<Bid, String> bidderColumn;
+  @FXML
+  private TableColumn<Bid, Double> amountColumn;
 
-  @FXML private TextField bidAmountField;
+  @FXML
+  private TextField bidAmountField;
 
-  @FXML private LineChart<String, Number> bidChart;
+  @FXML
+  private LineChart<String, Number> bidChart;
 
-  @FXML private RadioButton radioQuick;
-  @FXML private RadioButton radioCustom;
-  @FXML private ToggleGroup bidModeGroup;
-  @FXML private HBox quickBidBox;
-  @FXML private Label quickBidLabel;
+  @FXML
+  private RadioButton radioQuick;
+  @FXML
+  private RadioButton radioCustom;
+  @FXML
+  private ToggleGroup bidModeGroup;
+  @FXML
+  private HBox quickBidBox;
+  @FXML
+  private Label quickBidLabel;
 
-  @FXML private TextField maxBidField;
-  @FXML private TextField incrementField;
-  @FXML private Button btnAutoBid;
+  @FXML
+  private TextField maxBidField;
+  @FXML
+  private TextField incrementField;
+  @FXML
+  private Button btnAutoBid;
 
   private double currentIntendedBid = 0.0;
 
@@ -63,10 +79,6 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
   private Auction currentAuction;
   private Timeline countdownTimeline;
-
-  private boolean isAutoBidActive = false;
-  private double maxAutoBidLimit = 0.0;
-  private double autoBidIncrement = 0.0;
 
   @FXML
   public void initialize() {
@@ -139,16 +151,27 @@ public class BiddingDetailController implements AuctionUpdateListener {
     currentIntendedBid = current + getIncrementStep(current);
     quickBidLabel.setText(String.format("$%.2f", currentIntendedBid));
 
-    byte[] imageBytes = auction.getItem().getImageBytes();
-    if (imageBytes != null && imageBytes.length > 0) {
-      try {
-        Image image = new Image(new ByteArrayInputStream(imageBytes));
-        productImageView.setImage(image);
-      } catch (Exception e) {
-        System.err.println("Lỗi giải mã hình ảnh từ mảng byte mạng: " + e.getMessage());
-      }
+    //byte[] imageBytes = auction.getItem().getImageBytes();
+    String imagePath =auction.getItem().getImageUrl();
+    if(imagePath != null && !imagePath.isEmpty()) {
+      SocketClient.runAsync(() -> {
+        Message request = new Message("GET_IMAGE", imagePath);
+        Message response = SocketClient.sendRequest(request);
+
+        Platform.runLater(() -> {
+          if("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
+            try {
+              byte[] imageBytes = (byte[]) response.getData();
+              Image image = new Image(new ByteArrayInputStream(imageBytes));
+              productImageView.setImage(image);
+            } catch (Exception e) {}
+          } else {
+            System.out.println("Không tìm thấy file ảnh gốc trên server!");
+          }
+        });
+      });
     } else {
-      System.out.println("Sản phẩm này không đi kèm dữ liệu ảnh.");
+      System.out.println("Sản phẩm không đi kèm ảnh.");
     }
 
     List<Bid> bids = new ArrayList<>(auction.getBids());
@@ -157,11 +180,11 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
     refreshChart(bids);
 
-    SocketClient.addListener(this); // New observer
+    SocketClient.addListener(this);
 
     startTimer();
 
-    if(AutoBidManager.getInstance().isAutoBidActive(auction.getAuctionId())) {
+    if (AutoBidManager.getInstance().isAutoBidActive(auction.getAuctionId())) {
       var config = AutoBidManager.getInstance().getAutoBidConfig(auction.getAuctionId());
       maxBidField.setText(String.valueOf(config.maxBid));
       incrementField.setText(String.valueOf(config.increment));
@@ -198,7 +221,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
       }
     } else {
       expiryTimerLabel.setText(String.format("%02d:%02d:%02d",
-          res.toHours(), res.toMinutesPart(), res.toSecondsPart()));
+              res.toHours(), res.toMinutesPart(), res.toSecondsPart()));
     }
   }
 
@@ -211,8 +234,8 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
     // Kiểm tra xem file của bạn là home-view.fxml hay auction-floor.fxml
     SceneManager.getInstance().switchScene(
-        "/org/deptrai/auctionsystem/client/views/home-view.fxml",
-        "Trang chủ"
+            "/org/deptrai/auctionsystem/client/views/home-view.fxml",
+            "Trang chủ"
     );
   }
 
@@ -292,7 +315,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
   public void handleActivateAutoBid(ActionEvent event) {
     String auctionId = currentAuction.getAuctionId();
 
-    if(AutoBidManager.getInstance().isAutoBidActive(auctionId)) {
+    if (AutoBidManager.getInstance().isAutoBidActive(auctionId)) {
       AutoBidManager.getInstance().stopAutoBid(auctionId);
       btnAutoBid.setText("⚙️ KÍCH HOẠT AUTO-BID");
       btnAutoBid.setStyle("");
@@ -304,7 +327,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
     try {
       double maxBid = Double.parseDouble(maxBidField.getText());
       double increment = Double.parseDouble(incrementField.getText());
-      if(maxBid <= currentAuction.getCurrentPrice()) {
+      if (maxBid <= currentAuction.getCurrentPrice()) {
         showError("Giới hạn Max phải lớn hơn mức giá hiện tại!");
         return;
       }

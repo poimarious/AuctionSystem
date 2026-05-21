@@ -1,20 +1,17 @@
 package org.deptrai.auctionsystem.client.utils;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.concurrent.*;
-
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
-import org.deptrai.auctionsystem.shared.models.bid.Bid;
-import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class SocketClient {
   private static Socket socket;

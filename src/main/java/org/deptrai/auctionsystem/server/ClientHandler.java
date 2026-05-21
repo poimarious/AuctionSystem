@@ -72,6 +72,9 @@ public class  ClientHandler implements Runnable {
           case "CHANGE_BALANCE":
             handleChangeBalance(request);
             break;
+          case "GET_IMAGE":
+            handleGetImage(request);
+            break;
           case "GET_ALL_AUCTIONS":
             handleGetAllAuctions(request);
             break;
@@ -291,6 +294,25 @@ public class  ClientHandler implements Runnable {
       } catch (IOException ioException) {
         ioException.printStackTrace();
       }
+    }
+  }
+
+  private void handleGetImage(Message request) {
+    try {
+      String imagePath = (String) request.getData();
+      File file = new File(imagePath);
+      if(file.exists()) {
+        byte[] imageBytes = Files.readAllBytes(file.toPath());
+
+        out.reset();
+        out.writeObject(new Message("SUCCESS", "GET_IMAGE", imageBytes));
+        out.flush();
+      }
+    } catch(Exception e) {
+      try {
+        out.writeObject(new Message("FAIL", "GET_IMAGE", null));
+        out.flush();
+      } catch(IOException e2) {}
     }
   }
 

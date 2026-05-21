@@ -59,7 +59,6 @@ public class AutoBidManager {
     if(!myId.equals(winnerId)) {
       double nextBidAmount = lastestAuction.getCurrentPrice() + config.increment;
       if(nextBidAmount <= config.maxBid) {
-        System.out.println("bigger");
         new Thread(() -> {
           try {
             Thread.sleep(1000);

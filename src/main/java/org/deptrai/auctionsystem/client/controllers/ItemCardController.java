@@ -1,6 +1,7 @@
 package org.deptrai.auctionsystem.client.controllers;
 
 
+import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -41,17 +42,27 @@ public class ItemCardController implements AuctionUpdateListener {
     this.auction = auction;
     nameLabel.setText(auction.getItemName());
     priceLabel.setText(String.format("$%.2f", auction.getCurrentPrice()));
+    String imagePath = auction.getImageUrl();
 
-    byte[] imageBytes = auction.getImageBytes();
-    if (imageBytes != null && imageBytes.length > 0) {
-      try {
-        // Vẫn giữ thông số 250x250 để Card hiện đều và đẹp
-        Image realImage = new Image(new java.io.ByteArrayInputStream(imageBytes), 250, 250, true, true);
-        itemImageView.setImage(realImage);
-      } catch (Exception e) {
-        System.err.println("Lỗi giải mã hình ảnh từ mảng byte mạng: " + e.getMessage());
-      }
+    if(imagePath != null && !imagePath.isEmpty()) {
+      SocketClient.runAsync(() -> {
+        Message request = new Message("GET_IMAGE", imagePath);
+        Message response = SocketClient.sendRequest(request);
+
+        Platform.runLater(() -> {
+          if("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
+            try {
+              byte[] imageBytes = (byte[]) response.getData();
+              Image image = new Image(new ByteArrayInputStream(imageBytes));
+              itemImageView.setImage(image);
+            } catch(Exception e) {}
+          } else {
+            System.out.println("Không tìm thấy ảnh trên server!");
+          }
+        });
+      });
     }
+
 
     User currentUser = SessionManager.getInstance().getCurrentUser();
     if(currentUser == null) {

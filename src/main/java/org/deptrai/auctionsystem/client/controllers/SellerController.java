@@ -42,6 +42,7 @@ public class SellerController {
 
   int ongoingCount;
   int successCount;
+  double totalRevenue;
 
   private List<Auction> sellerAuctions;
 
@@ -70,11 +71,13 @@ public class SellerController {
         // Đếm các auction đang đấu giá và đã đấu giá thành công của seller
         ongoingCount = 0;
         successCount = 0;
+        totalRevenue = 0;
         for (Auction auction : sellerAuctions) {
           if (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING) {
             this.ongoingCount++;
           } else if (auction.getStatus() == AuctionStatus.PAID) {
             this.successCount++;
+            this.totalRevenue += auction.getCurrentPrice();
           }
         }
 
@@ -84,6 +87,7 @@ public class SellerController {
         }
 
         for (Auction auction : sellerAuctions) {
+          if(auction.getStatus() != AuctionStatus.PAID) continue;
           for (Bid bid : auction.getBids()) {
             if (bid.getTimestamp() != null) {
               DayOfWeek day = bid.getTimestamp().getDayOfWeek();
@@ -93,13 +97,13 @@ public class SellerController {
         }
 
         Platform.runLater(() -> {
-          balanceLabel.setText(String.format("%.2f$", currentUser.getBalance()));
+          balanceLabel.setText(String.format("%.2f$", totalRevenue));
           ongoingCountLabel.setText(String.format("%d sản phẩm", ongoingCount));
           successCountLabel.setText(String.format("%d sản phẩm", successCount));
 
           if (revenueChart != null) {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName("Lượt tương tác / Đặt giá");
+            series.setName("Lượt đặt giá");
             String[] days = {"Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "CN"};
 
             int id = 0;
