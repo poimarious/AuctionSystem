@@ -106,4 +106,13 @@ public class SellerController {
   public void handleShowProfile(ActionEvent event) {
     SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/profile-view.fxml", "Hồ sơ cá nhân");
   }
+  @FXML
+  public void handleShowRevenue(ActionEvent event) {
+    // Chuyển hướng sang file tkdt.fxml (Lịch sử giao dịch)
+    // Lưu ý: Hãy kiểm tra lại đường dẫn thư mục xem tkdt.fxml nằm chính xác ở đâu nhé
+    SceneManager.getInstance().switchScene(
+        "/org/deptrai/auctionsystem/client/views/tkdt.fxml",
+        "Thống kê doanh thu"
+    );
+  }
 }

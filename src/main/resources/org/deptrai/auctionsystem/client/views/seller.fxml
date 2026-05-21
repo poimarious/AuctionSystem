@@ -22,7 +22,7 @@
         </Label>
         <Separator opacity="0.3" />
         <Button maxWidth="Infinity" onAction="#handleOpenInventory" styleClass="btn-sidebar" text="📦 Kho hàng của tôi" />
-        <Button maxWidth="Infinity" styleClass="btn-sidebar" text="📈 Thống kê doanh thu" />
+        <Button maxWidth="Infinity" onAction="#handleShowRevenue" styleClass="btn-sidebar" text="📈 Thống kê doanh thu" />
         <Separator opacity="0.3" />
         <Button maxWidth="Infinity" onAction="#handleAddNewProduct" styleClass="btn-success" text="➕ Đăng sản phẩm mới" />
         <Region VBox.vgrow="ALWAYS" />

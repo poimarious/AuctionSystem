@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="25.0" style="-fx-background-color: #151226;" stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="org.deptrai.auctionsystem.client.controllers.SellerController">
+<VBox spacing="25.0" style="-fx-background-color: #151226;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.client.controllers.TransactionHistoryController">
     <children>
         <HBox alignment="CENTER_LEFT">
             <children>
@@ -15,11 +15,6 @@
                     </children>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
-                <Button prefHeight="40.0" styleClass="btn-success" text="📥 Xuất File Excel (CSV)">
-                    <padding>
-                        <Insets left="20.0" right="20.0" />
-                    </padding>
-                </Button>
             </children>
         </HBox>
 
@@ -32,16 +27,14 @@
                     <children>
                         <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="Danh sách giao dịch hoàn tất" textFill="WHITE" />
                         <Region HBox.hgrow="ALWAYS" />
-                        <Label text="Tổng doanh thu: " textFill="#6272a4" />
-                        <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="0.00 $" textFill="#50fa7b" />
                     </children>
                 </HBox>
 
                 <TableView fx:id="revenueTable" styleClass="modern-table" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colDate" prefWidth="150.0" text="Ngày giao dịch" />
-                        <TableColumn fx:id="colOrderId" prefWidth="120.0" text="Mã đơn hàng" />
-                        <TableColumn fx:id="colProduct" prefWidth="250.0" text="Tên sản phẩm" />
+                        <TableColumn fx:id="colDate" prefWidth="114.39999842643738" text="Ngày giao dịch" />
+                        <TableColumn fx:id="colOrderId" minWidth="0.0" prefWidth="153.6000213623047" text="Mã đơn hàng" />
+                        <TableColumn fx:id="colProduct" prefWidth="140.19998168945312" text="Tên sản phẩm" />
                         <TableColumn fx:id="colBuyer" prefWidth="150.0" text="Người mua" />
                         <TableColumn fx:id="colFinalPrice" prefWidth="120.0" text="Giá chốt ($)" />
                         <TableColumn fx:id="colStatus" prefWidth="130.0" text="Trạng thái ví" />
