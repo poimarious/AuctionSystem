@@ -180,11 +180,32 @@ public class MainController {
     if (currentUser instanceof User user) {
       userId = user.getUserId();
     }
-    Message request = new Message("GET_ALL_AUCTIONS", userId);
+    Message request = new Message("GET_SELLER_AUCTIONS", userId);
     Message response = SocketClient.sendRequest(request);
 
     if (response != null && response.getStatus().equals("SUCCESS")) {
-      allAuctions = (List<AuctionSummary>) response.getData();
+      if (currentUser instanceof Seller) {
+        List<Auction> sellerAuctions = (List<Auction>) response.getData();
+        allAuctions = new ArrayList<>();
+        for (Auction a : sellerAuctions) {
+          if (a.getItem() != null) {
+            allAuctions.add(new AuctionSummary(
+                a.getAuctionId(),
+                a.getItem().getName(),
+                a.getItem().getDescription(),
+                a.getItem().getCategory(),
+                a.getCurrentPrice(),
+                a.getStatus(),
+                a.getEndTime(),
+                a.getItem().getImageUrl(),
+                a.getItem().getImageBytes()
+            ));
+          }
+        }
+      } else {
+        // Đối với Người mua/Khách (vào nhánh else), dòng code cũ giữ nguyên:
+        allAuctions = (List<AuctionSummary>) response.getData();
+      }
 
       // Dọn sạch 2 kho chứa trước khi chia bài
       runningAuctions.clear();
