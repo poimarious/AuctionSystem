@@ -42,6 +42,7 @@ public class ClientApplication extends Application {
     stage.setScene(scene);
     stage.setWidth(1500);
     stage.setHeight(800);
+    stage.setMaximized(true);
     stage.show();
   }
 
