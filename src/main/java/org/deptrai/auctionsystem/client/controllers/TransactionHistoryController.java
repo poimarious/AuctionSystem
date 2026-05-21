@@ -100,4 +100,8 @@ public class TransactionHistoryController {
       }
     });
   }
+  @FXML
+  public void handleGoBack(javafx.event.ActionEvent event) {
+    org.deptrai.auctionsystem.client.utils.SceneManager.getInstance().goBack();
+  }
 }
