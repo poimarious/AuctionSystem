@@ -21,8 +21,12 @@ import org.deptrai.auctionsystem.shared.models.items.*;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AddProductController {
+
+  private static final Logger logger = LoggerFactory.getLogger(AddProductController.class);
 
   private final Map<String, ItemFactory> factoryRegistry = new HashMap<>();
   @FXML private TextField productNameInput;
@@ -41,7 +45,7 @@ public class AddProductController {
     factoryRegistry.put("Nghệ thuật", new ArtFactory());
     factoryRegistry.put("Điện tử", new ElectronicsFactory());
     factoryRegistry.put("Xe cộ", new VehicleFactory());
-    System.out.println("Đã load trang Thêm sản phẩm!");
+    logger.info("Đã load trang Thêm sản phẩm!");
 
     // Nạp danh mục vào ComboBox khi trang vừa mở
     if (categoryCombo != null) {
@@ -172,14 +176,14 @@ public class AddProductController {
           imageBytes = Files.readAllBytes(path);
           fileName = path.getFileName().toString(); // Lấy tên file gốc
         } catch (Exception e) {
-          System.err.println("Lỗi đọc file ảnh để gửi đi: " + e.getMessage());
+          logger.error("Lỗi đọc file ảnh để gửi đi: " + e.getMessage());
         }
       }
 
       Object[] payload = new Object[] {newItem, endDateTime, imageBytes, fileName};
       Message request = new Message("REQUEST", "CREATE_AUCTION", payload);
 
-      System.out.println("Đang gửi yêu cầu và Tải ảnh lên Server...");
+      logger.info("Đang gửi yêu cầu và Tải ảnh lên Server...");
 
       // Gọi SocketClient gửi đi
       Message response = SocketClient.sendRequest(request);

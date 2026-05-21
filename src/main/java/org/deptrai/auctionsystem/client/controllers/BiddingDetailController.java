@@ -18,6 +18,8 @@ import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.time.Duration;
@@ -28,6 +30,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class BiddingDetailController implements AuctionUpdateListener {
+
+  private static final Logger logger = LoggerFactory.getLogger(BiddingDetailController.class);
 
   @FXML
   private ImageView productImageView;
@@ -166,12 +170,12 @@ public class BiddingDetailController implements AuctionUpdateListener {
               productImageView.setImage(image);
             } catch (Exception e) {}
           } else {
-            System.out.println("Không tìm thấy file ảnh gốc trên server!");
+            logger.info("Không tìm thấy file ảnh gốc trên server!");
           }
         });
       });
     } else {
-      System.out.println("Sản phẩm không đi kèm ảnh.");
+      logger.info("Sản phẩm không đi kèm ảnh.");
     }
 
     List<Bid> bids = new ArrayList<>(auction.getBids());
@@ -284,7 +288,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
       });
 
     } catch (Exception e) {
-      System.out.println(e.getMessage());
+      logger.info(e.getMessage());
       showError("Vui lòng nhập giá hợp lệ.");
     }
   }

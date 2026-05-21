@@ -21,6 +21,8 @@ import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +30,8 @@ import java.util.List;
 
 
 public class MainController {
+
+  private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
   @FXML
   private HBox guestBox;
@@ -249,7 +253,7 @@ public class MainController {
         });
       });
     } else {
-      System.err.println("Không thể lấy danh sách đấu giá từ server");
+      logger.error("Không thể lấy danh sách đấu giá từ server");
     }
   }
 
@@ -277,7 +281,7 @@ public class MainController {
           }
           productsContainer.getChildren().add(itemCard);
         } catch (IOException e) {
-          System.err.println("Lỗi nạp item-card: " + e.getMessage());
+          logger.error("Lỗi nạp item-card: " + e.getMessage());
         }
       }
     });
@@ -421,7 +425,7 @@ public class MainController {
   // Hàm xử lý sự kiện khi ấn nút "Làm mới"
   @FXML
   public void handleReload(ActionEvent event) {
-    System.out.println("Đang tải lại danh sách đấu giá mới nhất...");
+    logger.info("Đang tải lại danh sách đấu giá mới nhất...");
 
     // Xóa chữ trong ô tìm kiếm (nếu đang có) để hiển thị lại toàn bộ danh sách
     if (searchField != null) {

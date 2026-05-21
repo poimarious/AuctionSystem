@@ -9,8 +9,12 @@ import javafx.stage.Stage;
 import org.deptrai.auctionsystem.client.utils.AutoBidManager;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClientApplication extends Application {
+
+  private static final Logger logger = LoggerFactory.getLogger(ClientApplication.class);
 
   @Override
   public void start(Stage stage) throws IOException {
@@ -34,7 +38,7 @@ public class ClientApplication extends Application {
       Image appIcon = new Image(getClass().getResourceAsStream("/org/deptrai/auctionsystem/client/views/images/logo.png"));
       stage.getIcons().add(appIcon);
     } catch (Exception e) {
-      System.err.println("Không thể load logo ứng dụng: " + e.getMessage());
+      logger.error("Không thể load logo ứng dụng: " + e.getMessage());
     }
 
 
@@ -49,7 +53,7 @@ public class ClientApplication extends Application {
   @Override
   public void stop() {
     // Ngắt kết nối mạng an toàn khi đóng cửa sổ App
-    System.out.println(">> Đang đóng kết nối Client...");
+    logger.info(">> Đang đóng kết nối Client...");
     SocketClient.disconnect();
   }
 }

@@ -15,6 +15,8 @@ import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.DayOfWeek;
 import java.util.EnumMap;
@@ -22,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SellerController {
-
+  private static final Logger logger = LoggerFactory.getLogger(SellerController.class);
   @FXML
   private TextField searchField;
   @FXML
@@ -48,7 +50,7 @@ public class SellerController {
 
   @FXML
   public void initialize() {
-    System.out.println("--- Seller Center Initialized ---");
+    logger.info("--- Seller Center Initialized ---");
 
 
     currentUser = SessionManager.getInstance().getCurrentUser();

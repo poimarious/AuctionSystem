@@ -3,6 +3,7 @@ module org.deptrai.auctionsystem {
   requires javafx.controls;
   requires javafx.fxml;
   requires java.sql;
+  requires org.slf4j;
 
   // === CẤU HÌNH CHO PHÍA CLIENT (GIAO DIỆN) ===
   // 1. Mở package controllers để JavaFX có quyền "bơm" dữ liệu vào các biến @FXML

@@ -19,9 +19,11 @@ import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.network.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BidHistoryController {
-
+  private static final Logger logger = LoggerFactory.getLogger(BidHistoryController.class);
   @FXML private TableView<Bid> bidHistoryTable;
   @FXML private TableColumn<Bid, String> productNameColumn;
   @FXML private TableColumn<Bid, String> myBidPriceColumn;
@@ -35,7 +37,7 @@ public class BidHistoryController {
 
   @FXML
   public void initialize() {
-    System.out.println("Đã load trang Lịch sử đặt giá!");
+    logger.info("Đã load trang Lịch sử đặt giá!");
 
     // 1. Cột Tên sản phẩm
     productNameColumn.setCellValueFactory(
@@ -117,17 +119,17 @@ public class BidHistoryController {
               filterBids("ALL"); // Mặc định hiển thị tất cả
 
               if (myBids.isEmpty()) {
-                System.out.println("Bạn chưa có lượt đặt giá nào.");
+                logger.info("Bạn chưa có lượt đặt giá nào.");
               } else {
-                System.out.println("Đã tải " + myBids.size() + " lượt đặt giá từ Server.");
+                logger.info("Đã tải " + myBids.size() + " lượt đặt giá từ Server.");
               }
             });
           } else {
             String errorMsg = (response != null) ? (String) response.getData() : "Không có phản hồi từ Server";
-            System.err.println("Lỗi khi tải lịch sử: " + errorMsg);
+            logger.error("Lỗi khi tải lịch sử: " + errorMsg);
           }
         } catch (Exception e) {
-          System.err.println("Lỗi kết nối mạng khi tải lịch sử đặt giá.");
+          logger.error("Lỗi kết nối mạng khi tải lịch sử đặt giá.");
           e.printStackTrace();
         }
       });
@@ -136,7 +138,7 @@ public class BidHistoryController {
       }).start();
 
     } else {
-      System.out.println("Người dùng hiện tại không phải là Bidder.");
+      logger.info("Người dùng hiện tại không phải là Bidder.");
     }
   }
 

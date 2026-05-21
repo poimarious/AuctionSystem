@@ -19,6 +19,8 @@ import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -27,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AuctionFloorController {
+
+  private static final Logger logger = LoggerFactory.getLogger(AuctionFloorController.class);
 
   @FXML
   private FlowPane productsContainer;
@@ -198,7 +202,7 @@ public class AuctionFloorController {
 
           productsContainer.getChildren().add(itemCard);
         } catch (IOException e) {
-          System.err.println("Lỗi nạp item-card: " + e.getMessage());
+          logger.error("Lỗi nạp item-card: " + e.getMessage());
         }
       }
       // Cập nhật lại chỉ số cho lần cuộn tiếp theo

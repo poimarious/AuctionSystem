@@ -22,11 +22,15 @@ import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
 
 public class ItemCardController implements AuctionUpdateListener {
+
+  private static final Logger logger = LoggerFactory.getLogger(ItemCardController.class);
 
   @FXML private ImageView itemImageView;
   @FXML private Label nameLabel;
@@ -46,7 +50,7 @@ public class ItemCardController implements AuctionUpdateListener {
       SocketClient.runAsync(() -> {
         Message request = new Message("GET_IMAGE", imagePath);
         Message response = SocketClient.sendRequest(request);
-        System.out.println(response.getStatus() + " " + response.getData());
+        logger.info(response.getStatus() + " " + response.getData());
         Platform.runLater(() -> {
           if("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
             try {
@@ -54,10 +58,10 @@ public class ItemCardController implements AuctionUpdateListener {
               Image image = new Image(new ByteArrayInputStream(imageBytes));
               itemImageView.setImage(image);
             } catch(Exception e) {
-              System.out.println(e.getMessage());
+              logger.info(e.getMessage());
             }
           } else {
-            System.out.println("Không tìm thấy ảnh trên server!");
+            logger.info("Không tìm thấy ảnh trên server!");
           }
         });
       });
