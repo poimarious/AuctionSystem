@@ -306,6 +306,9 @@ public class  ClientHandler implements Runnable {
         out.reset();
         out.writeObject(new Message("SUCCESS", "GET_IMAGE", imageBytes));
         out.flush();
+      } else {
+        out.writeObject(new Message("FAIL", "GET_IMAGE", null));
+        out.flush();
       }
     } catch(Exception e) {
       try {

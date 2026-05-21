@@ -49,12 +49,7 @@ public class AuctionFloorController {
    * 1. SỬA NÚT QUAY LẠI: Ép về thẳng Home View
    */
   @FXML
-  public void handleGoBack(ActionEvent event) {
-    SceneManager.getInstance().switchScene(
-            "/org/deptrai/auctionsystem/client/views/home-view.fxml",
-            "Trang chủ - Auction.UET"
-    );
-  }
+  public void handleGoBack(ActionEvent event) {SceneManager.getInstance().goBack();}
 
   @FXML
   public void initialize() {

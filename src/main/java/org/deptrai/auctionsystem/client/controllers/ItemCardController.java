@@ -1,8 +1,6 @@
 package org.deptrai.auctionsystem.client.controllers;
 
 
-import java.io.ByteArrayInputStream;
-import java.time.LocalDateTime;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -25,7 +23,8 @@ import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.time.LocalDateTime;
 
 public class ItemCardController implements AuctionUpdateListener {
 
@@ -43,19 +42,20 @@ public class ItemCardController implements AuctionUpdateListener {
     nameLabel.setText(auction.getItemName());
     priceLabel.setText(String.format("$%.2f", auction.getCurrentPrice()));
     String imagePath = auction.getImageUrl();
-
     if(imagePath != null && !imagePath.isEmpty()) {
       SocketClient.runAsync(() -> {
         Message request = new Message("GET_IMAGE", imagePath);
         Message response = SocketClient.sendRequest(request);
-
+        System.out.println(response.getStatus() + " " + response.getData());
         Platform.runLater(() -> {
           if("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
             try {
               byte[] imageBytes = (byte[]) response.getData();
               Image image = new Image(new ByteArrayInputStream(imageBytes));
               itemImageView.setImage(image);
-            } catch(Exception e) {}
+            } catch(Exception e) {
+              System.out.println(e.getMessage());
+            }
           } else {
             System.out.println("Không tìm thấy ảnh trên server!");
           }
