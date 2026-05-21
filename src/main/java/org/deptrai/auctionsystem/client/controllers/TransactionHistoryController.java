@@ -90,7 +90,7 @@ public class TransactionHistoryController {
 
         // LỌC DỮ LIỆU: Chỉ giữ lại những phiên đã KẾT THÚC và CÓ NGƯỜI THẮNG
         List<Auction> completedTransactions = allAuctions.stream()
-            .filter(a -> a.getStatus() == AuctionStatus.FINISHED && a.getWinner() != null)
+            .filter(a -> (a.getStatus() == AuctionStatus.FINISHED || a.getStatus() == AuctionStatus.PAID) && a.getWinner() != null)
             .collect(Collectors.toList());
 
         // Đẩy dữ liệu vào JavaFX Thread để cập nhật giao diện
