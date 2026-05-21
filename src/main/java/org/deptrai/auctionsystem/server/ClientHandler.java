@@ -963,11 +963,12 @@ public class  ClientHandler implements Runnable {
       // Lấy danh sách chưa đọc từ DB lên
       List<String> unreadNotifs = notiDAO.getUnreadNotifications(userId);
 
+      // Đọc xong thì tự động xóa trong DB
+      notiDAO.deleteNotificationsByUserId(userId);
       out.writeObject(new Message("SUCCESS", "GET_NOTIFICATIONS", unreadNotifs));
       out.flush();
 
-      // Đọc xong thì tự động xóa trong DB
-      notiDAO.deleteNotificationsByUserId(userId);
+
     } catch (IOException e) {
       e.printStackTrace();
     }

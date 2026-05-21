@@ -85,7 +85,7 @@ public class RegisterController {
     // Dùng cho nút ⬅ quay lại trang đăng nhập
     SceneManager.getInstance()
         .switchScene(
-            "/org/deptrai/auctionsystem/client/views/home-view.fxml",
+            "/org/deptrai/auctionsystem/client/views/login-view.fxml",
             "Hệ thống Đấu giá - Đăng nhập");
   }
 
