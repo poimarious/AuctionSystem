@@ -15,7 +15,7 @@ public class ServerMain {
   // Giới hạn tối đa 50 client chạy đồng thời, tránh server bị quá tải
   private static final int POOL_SIZE = 50;
 
-  public static final java.util.List<ClientHandler> activeClients = new java.util.concurrent.CopyOnWriteArrayList<>();
+  public static java.util.List<ClientHandler> activeClients = new java.util.concurrent.CopyOnWriteArrayList<>();
 
   static void main(String[] args) {
     System.out.println("=== HỆ THỐNG ĐẤU GIÁ SERVER ===");

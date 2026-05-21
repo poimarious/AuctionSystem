@@ -185,4 +185,91 @@ public class AuctionLifecycleTest {
         Message response = SocketClient.sendRequest(request);
         assertEquals("FAIL", response.getStatus());
     }
+
+    // ==========================================
+    // GIAI ĐOẠN 4: KIỂM THỬ XUNG ĐỘT ĐA LUỒNG (DELETE vs PLACE_BID)
+    // ==========================================
+
+    @Test
+    @Order(6)
+    void testConcurrentDeleteAndBid_ShouldHandleRaceCondition() throws Exception {
+        // 1. TẠO DỮ LIỆU ĐỘC LẬP CHO BÀI TEST
+        UserDAO userDAO = new UserDAO();
+
+        // Tạo một người mua (Bidder)
+        String bidderName = "concurrent_bidder_" + System.currentTimeMillis();
+        org.deptrai.auctionsystem.shared.models.users.Bidder concurrentBidder =
+                new org.deptrai.auctionsystem.shared.models.users.Bidder(null, bidderName, "Pass123!", bidderName + "@gmail.com", new java.util.concurrent.CopyOnWriteArrayList<>());
+        userDAO.insertUser(concurrentBidder, "BIDDER");
+        concurrentBidder = (org.deptrai.auctionsystem.shared.models.users.Bidder) userDAO.getUserByUsername(bidderName);
+        userDAO.updateBalance(concurrentBidder.getUserId(), 1000.0); // Bơm 1000$ để đặt giá
+
+        // Tạo vật phẩm và phiên đấu giá
+        ItemFactory factory = new ElectronicsFactory();
+        Item clashItem = factory.createItem("C4 Explosive", "Món đồ gây nổ luồng", 100.0, testSeller);
+        new org.deptrai.auctionsystem.server.dao.ItemDAO().insertItem(clashItem);
+
+        Auction clashAuction = new Auction(clashItem, LocalDateTime.now().plusDays(1));
+        clashAuction.setAuctionId(java.util.UUID.randomUUID().toString());
+        clashAuction.setStatus(AuctionStatus.OPEN);
+
+        new AuctionDAO().insertAuction(clashAuction);
+        AuctionManager.getInstance().addAuctionToMemory(clashAuction);
+
+        String conflictAuctionId = clashAuction.getAuctionId();
+
+        // 2. CHUẨN BỊ 2 LUỒNG CHẠY ĐUA
+        java.util.concurrent.CountDownLatch readyLatch = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.CountDownLatch doneLatch = new java.util.concurrent.CountDownLatch(2);
+
+        // THREAD 1: Khách hàng điên cuồng đặt giá (500$)
+        org.deptrai.auctionsystem.shared.models.users.Bidder finalConcurrentBidder = concurrentBidder;
+        new Thread(() -> {
+            try (Socket s = new Socket("localhost", 5007);
+                 java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(s.getOutputStream());
+                 java.io.ObjectInputStream in = new java.io.ObjectInputStream(s.getInputStream())) {
+
+                Object[] payload = {conflictAuctionId, finalConcurrentBidder.getUserId(), 500.0};
+                Message req = new Message("PLACE_BID", payload);
+
+                readyLatch.await(); // Nín thở
+                out.writeObject(req); out.flush();
+                in.readObject();
+            } catch (Exception e) {} finally { doneLatch.countDown(); }
+        }).start();
+
+        // THREAD 2: Admin thẳng tay bấm xóa phiên đấu giá
+        new Thread(() -> {
+            try (Socket s = new Socket("localhost", 5007);
+                 java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(s.getOutputStream());
+                 java.io.ObjectInputStream in = new java.io.ObjectInputStream(s.getInputStream())) {
+
+                Message req = new Message("DELETE_AUCTION", conflictAuctionId);
+
+                readyLatch.await(); // Nín thở
+                out.writeObject(req); out.flush();
+                in.readObject();
+            } catch (Exception e) {} finally { doneLatch.countDown(); }
+        }).start();
+
+        Thread.sleep(500); // Đợi Socket khởi tạo
+
+        // 3. PHÁT LỆNH BẮN! Cho 2 request va chạm nhau ở Server
+        readyLatch.countDown();
+
+        boolean isCompleted = doneLatch.await(5, java.util.concurrent.TimeUnit.SECONDS);
+        assertTrue(isCompleted, "LỖI: Server bị Deadlock (treo cứng) khi Xóa và Đặt giá cùng lúc!");
+
+        // 4. KHÁM NGHIỆM HIỆN TRƯỜNG
+        // Bất kể luồng nào vào trước, luồng nào vào sau, kết cục cuối cùng là
+        // Phiên đấu giá này BẮT BUỘC phải bị xóa sạch sẽ, không để lại dấu vết!
+
+        Auction ramAuction = AuctionManager.getInstance().getAuctionById(conflictAuctionId);
+        assertNull(ramAuction, "LỖI: Xóa thất bại, Phiên đấu giá vẫn còn lảng vảng trên RAM!");
+
+        Auction dbAuction = new AuctionDAO().getAuctionById(conflictAuctionId);
+        assertNull(dbAuction, "LỖI: Xóa thất bại, Phiên đấu giá vẫn còn nằm dưới Database!");
+
+        System.out.println(">> [CONCURRENT DELETE] Server xử lý mượt mà, phiên đấu giá đã bốc hơi an toàn khỏi RAM và DB!");
+    }
 }

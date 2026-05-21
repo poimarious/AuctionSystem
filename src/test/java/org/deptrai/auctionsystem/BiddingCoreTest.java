@@ -12,6 +12,7 @@ import java.util.Objects;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.server.ClientHandler;
 import org.deptrai.auctionsystem.server.dao.AuctionDAO;
+import org.deptrai.auctionsystem.server.dao.BidDAO;
 import org.deptrai.auctionsystem.server.dao.ItemDAO;
 import org.deptrai.auctionsystem.server.dao.UserDAO;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
@@ -24,6 +25,7 @@ import org.deptrai.auctionsystem.shared.models.items.Item;
 import org.deptrai.auctionsystem.shared.models.items.ItemFactory;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
+import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -52,7 +54,8 @@ public class BiddingCoreTest {
 
         // 1. Tạo người bán (Seller)
         String sellerName = "bid_seller_" + System.currentTimeMillis();
-        Seller dummySeller = new Seller(null, sellerName, "Test1234!", "bidseller@gmail.com");
+        Seller dummySeller = new Seller(null, sellerName, "Test1234!", sellerName + "@gmail.com");
+        userDAO.insertUser(dummySeller, "SELLER");
         userDAO.insertUser(dummySeller, "SELLER");
         dummySeller = (Seller) userDAO.getUserByUsername(sellerName);
 
@@ -71,7 +74,7 @@ public class BiddingCoreTest {
 
         // 4. Tạo người mua (Bidder) có sẵn số dư 1000.0 để thoải mái đặt giá
         String bidderName = "bid_buyer_" + System.currentTimeMillis();
-        testBidder = new Bidder(null, bidderName, "Test1234!", "bidbuyer@gmail.com", new java.util.concurrent.CopyOnWriteArrayList<>());
+        testBidder = new Bidder(null, bidderName, "Test1234!", bidderName + "@gmail.com", new java.util.concurrent.CopyOnWriteArrayList<>());
         userDAO.insertUser(testBidder, "BIDDER");
         testBidder = (Bidder) userDAO.getUserByUsername(bidderName);
         userDAO.updateBalance(testBidder.getUserId(), 1000.0); // Nạp tiền
@@ -452,5 +455,110 @@ public class BiddingCoreTest {
         } else {
             System.out.println(">> Kết quả: Luồng FINISH_AUCTION đã vào Server trước đóng sổ, PLACE_BID bị văng ra.");
         }
+    }
+
+    // ==========================================
+    // GIAI ĐOẠN 7: KIỂM THỬ ĐA LUỒNG THANH TOÁN (CHECKOUT)
+    // ==========================================
+
+    @Test
+    @Order(9)
+    void testConcurrentCheckout_ShouldPreventDoubleSpending() throws Exception {
+        UserDAO userDAO = new UserDAO();
+
+        // 1. TẠO DỮ LIỆU ĐỘC LẬP CHO BÀI TEST
+        // Tạo người bán (Ví ban đầu: 500$)
+        String sellerName = "checkout_seller_" + System.currentTimeMillis();
+        Seller checkoutSeller = new Seller(null, sellerName, "Pass123!", sellerName + "@gmail.com");
+        userDAO.insertUser(checkoutSeller, "SELLER");
+        checkoutSeller = (Seller) userDAO.getUserByUsername(sellerName);
+        userDAO.updateBalance(checkoutSeller.getUserId(), 500.0);
+
+        // Tạo người mua (Ví ban đầu: 1000$)
+        String buyerName = "checkout_buyer_" + System.currentTimeMillis();
+        Bidder checkoutBuyer = new Bidder(null, buyerName, "Pass123!", buyerName + "@gmail.com", new java.util.concurrent.CopyOnWriteArrayList<>());
+        userDAO.insertUser(checkoutBuyer, "BIDDER");
+        checkoutBuyer = (Bidder) userDAO.getUserByUsername(buyerName);
+        userDAO.updateBalance(checkoutBuyer.getUserId(), 1000.0);
+
+        // Tạo vật phẩm và phiên đấu giá (Trạng thái: FINISHED)
+        ItemFactory factory = new ElectronicsFactory();
+        Item item = factory.createItem("Double Spending Shield", "Khiên chống lỗi", 50.0, checkoutSeller);
+        new ItemDAO().insertItem(item);
+
+        Auction checkoutAuction = new Auction(item, LocalDateTime.now().minusDays(1)); // Cố tình cho hết hạn
+        checkoutAuction.setAuctionId(java.util.UUID.randomUUID().toString());
+        checkoutAuction.setStatus(AuctionStatus.FINISHED);
+
+        // Giả lập người mua này đã thắng với giá 100$
+        double finalPrice = 100.0;
+        Bid winningBid = new Bid(java.util.UUID.randomUUID().toString(), checkoutBuyer, checkoutAuction, finalPrice, LocalDateTime.now().minusMinutes(10));
+        checkoutAuction.getBids().add(winningBid);
+        checkoutAuction.setCurrentPrice(finalPrice);
+
+        // Lưu toàn bộ xuống DB và RAM
+        new AuctionDAO().insertAuction(checkoutAuction);
+        new BidDAO().insertBid(winningBid);
+        AuctionManager.getInstance().addAuctionToMemory(checkoutAuction);
+
+        // 2. CHUẨN BỊ 10 LUỒNG CÙNG SPAM NÚT THANH TOÁN
+        int numberOfThreads = 10;
+        java.util.concurrent.CountDownLatch readyLatch = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.CountDownLatch doneLatch = new java.util.concurrent.CountDownLatch(numberOfThreads);
+
+        // List an toàn đa luồng để hứng kết quả trả về từ Server
+        List<String> responses = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
+
+        for (int i = 0; i < numberOfThreads; i++) {
+            new Thread(() -> {
+                try (Socket s = new Socket("localhost", 5008);
+                     java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(s.getOutputStream());
+                     java.io.ObjectInputStream in = new java.io.ObjectInputStream(s.getInputStream())) {
+
+                    Message req = new Message("CHECKOUT", checkoutAuction.getAuctionId());
+
+                    // Nín thở chờ hiệu lệnh
+                    readyLatch.await();
+                    out.writeObject(req);
+                    out.flush();
+
+                    // Nhận kết quả
+                    Message res = (Message) in.readObject();
+                    responses.add(res.getStatus());
+                } catch (Exception e) {} finally { doneLatch.countDown(); }
+            }).start();
+        }
+
+        Thread.sleep(500); // Đợi các Thread khởi tạo Socket xong
+
+        // 3. PHÁT LỆNH BẮN! 10 request bay vào Server cùng 1 mili-giây
+        readyLatch.countDown();
+
+        // Đợi tối đa 5s để Server xử lý xong
+        boolean isCompleted = doneLatch.await(5, java.util.concurrent.TimeUnit.SECONDS);
+        assertTrue(isCompleted, "Test bị treo do Server bị Deadlock (Khóa chéo) khi thanh toán!");
+
+        // 4. KIỂM KÊ KẾT QUẢ
+        long successCount = responses.stream().filter(r -> r.equals("SUCCESS")).count();
+        long failCount = responses.stream().filter(r -> r.equals("FAIL")).count();
+
+        System.out.println(">> [CONCURRENT CHECKOUT] Số luồng click thanh toán: " + numberOfThreads);
+        System.out.println(">> [CONCURRENT CHECKOUT] Số luồng SUCCESS (Chỉ được phép là 1): " + successCount);
+        System.out.println(">> [CONCURRENT CHECKOUT] Số luồng FAIL (Bị Server chặn): " + failCount);
+
+        // A. Chỉ duy nhất 1 luồng được phép thanh toán thành công
+        assertEquals(1, successCount, "LỖI KINH ĐIỂN: Hệ thống đã cho phép nhiều hơn 1 luồng thanh toán thành công (Double-Spending)!");
+
+        // B. Ví của Buyer: 1000$ trừ đi 100$ = 900$ (Kiểm tra xem có bị trừ 10 lần thành 0$ không)
+        User dbBuyer = userDAO.getUserById(checkoutBuyer.getUserId());
+        assertEquals(900.0, dbBuyer.getBalance(), "LỖI SỐ DƯ: Tiền của người mua bị trừ sai lệch!");
+
+        // C. Ví của Seller: 500$ cộng thêm 100$ = 600$ (Kiểm tra xem có bị cộng 10 lần thành 1500$ không)
+        User dbSeller = userDAO.getUserById(checkoutSeller.getUserId());
+        assertEquals(600.0, dbSeller.getBalance(), "LỖI SỐ DƯ: Tiền của người bán bị cộng sai lệch!");
+
+        // D. Trạng thái cuối cùng trên RAM phải là PAID
+        Auction ramAuction = AuctionManager.getInstance().getAuctionById(checkoutAuction.getAuctionId());
+        assertEquals(AuctionStatus.PAID, ramAuction.getStatus(), "Trạng thái phiên đấu giá phải được chốt là PAID!");
     }
 }

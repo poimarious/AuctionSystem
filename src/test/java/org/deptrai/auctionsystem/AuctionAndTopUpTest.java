@@ -253,4 +253,79 @@ public class AuctionAndTopUpTest {
         List<Auction> sellerAuctions = (List<Auction>) response.getData();
         assertEquals(0, sellerAuctions.size(), "Danh sách phải rỗng đối với người không có món đồ nào");
     }
+
+    // ==========================================
+    // TESTS KIỂM THỬ ĐA LUỒNG (RACE CONDITION / LOST UPDATE)
+    // ==========================================
+
+    @Test
+    @Order(11)
+    void testConcurrentChangeBalance_ShouldPreventLostUpdate() throws Exception {
+        // 1. Tạo một tài khoản riêng biệt để test (Số dư ban đầu: 1000$)
+        String username = "concurrent_user_" + System.currentTimeMillis();
+        Bidder concurrentUser = new Bidder(null, username, "Test1234!", username + "@gmail.com", new java.util.concurrent.CopyOnWriteArrayList<>());
+        userDAO.insertUser(concurrentUser, "BIDDER");
+
+        concurrentUser = (Bidder) userDAO.getUserByUsername(username);
+        final String targetUserId = concurrentUser.getUserId();
+        userDAO.updateBalance(targetUserId, 1000.0);
+
+        // 2. Chuẩn bị 20 luồng (20 request) cùng nạp 50$ ở một thời điểm
+        int numberOfThreads = 20;
+        double topUpAmount = 50.0;
+
+        java.util.concurrent.CountDownLatch readyLatch = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.CountDownLatch doneLatch = new java.util.concurrent.CountDownLatch(numberOfThreads);
+
+        for (int i = 0; i < numberOfThreads; i++) {
+            new Thread(() -> {
+                // LƯU Ý: AuctionAndTopUpTest dùng cổng 5006 (Khác với BiddingCoreTest dùng 5008)
+                try (Socket s = new Socket("localhost", 5006);
+                     java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(s.getOutputStream());
+                     java.io.ObjectInputStream in = new java.io.ObjectInputStream(s.getInputStream())) {
+
+                    Object[] topUpData = {targetUserId, topUpAmount};
+                    Message request = new Message("CHANGE_BALANCE", topUpData);
+
+                    // Nín thở chờ hiệu lệnh
+                    readyLatch.await();
+
+                    // Gửi lệnh lên Server
+                    out.writeObject(request);
+                    out.flush();
+
+                    // Đợi Server phản hồi xong mới tính là hoàn thành
+                    in.readObject();
+                } catch (Exception e) {
+                } finally {
+                    doneLatch.countDown();
+                }
+            }).start();
+        }
+
+        // Chờ nửa giây để 20 Socket khởi tạo xong
+        Thread.sleep(500);
+
+        // 3. PHÁT LỆNH BẮN! 20 luồng lao vào Server cùng 1 mili-giây
+        readyLatch.countDown();
+
+        // Chờ tối đa 5 giây để Server xử lý hết 20 request
+        boolean isCompleted = doneLatch.await(5, java.util.concurrent.TimeUnit.SECONDS);
+        assertTrue(isCompleted, "Server bị treo hoặc crash khi xử lý nạp tiền đa luồng!");
+
+        // 4. KIỂM TRA KẾT QUẢ TỪ DATABASE
+        User dbUser = userDAO.getUserById(targetUserId);
+
+        // Số dư mong đợi = 1000$ (gốc) + (20 lần * 50$) = 2000$
+        double expectedBalance = 1000.0 + (numberOfThreads * topUpAmount);
+
+        System.out.println(">> [CONCURRENT CHANGE BALANCE] Số dư ban đầu: $1000.0");
+        System.out.println(">> [CONCURRENT CHANGE BALANCE] Số lệnh nạp đồng thời: " + numberOfThreads + " lệnh x $" + topUpAmount);
+        System.out.println(">> [CONCURRENT CHANGE BALANCE] Số dư mong đợi: $" + expectedBalance);
+        System.out.println(">> [CONCURRENT CHANGE BALANCE] Số dư thực tế trong DB: $" + dbUser.getBalance());
+
+        // Nếu Server bị Lost Update, số dư thực tế sẽ nhỏ hơn rất nhiều so với 2000$
+        assertEquals(expectedBalance, dbUser.getBalance(),
+                "LỖI KINH ĐIỂN: Server bị Lost Update! Các luồng đã ghi đè số dư lên nhau làm thất thoát tiền của User!");
+    }
 }

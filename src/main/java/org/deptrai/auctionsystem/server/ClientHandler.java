@@ -242,40 +242,55 @@ public class  ClientHandler implements Runnable {
 
   // For top-up buttons (Dùng cho mấy nút nạp tiền ấy)
   private void handleChangeBalance(Message request) {
-    // Dữ liệu Client gửi sang sẽ gồm: [userId, amount]
-    Object[] data = (Object[]) request.getData();
-    String userId = (String) data[0];
-    double amount = (Double) data[1];
-
-    User user = userDAO.getUserById(userId);
-    if (user != null) {
-      double newBalance = user.getBalance() + amount;
-      if(user instanceof Seller) {
-        newBalance = user.getBalance() - amount;
-        if(newBalance < 0) {
-          try {
-            out.writeObject(new Message("FAIL", "CHANGE_BALANCE", "số tiền rút phải nhỏ hơn số dư!"));
-            out.flush();
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
-          return ;
-        }
-      }
-      if (userDAO.updateBalance(userId, newBalance)) {
-        try {
-          out.writeObject(new Message("SUCCESS", "CHANGE_BALANCE", newBalance));
-          out.flush();
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-        return;
-      }
-    }
     try {
-      out.writeObject(new Message("FAIL", "CHANGE_BALANCE", "Lỗi cập nhật số dư."));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+      // Dữ liệu Client gửi sang sẽ gồm: [userId, amount]
+      Object[] data = (Object[]) request.getData();
+      String userId = (String) data[0];
+      double amount = (Double) data[1];
+
+      // CHỐNG LOST UPDATE
+
+      synchronized (userId.intern()) {
+
+
+        User user = userDAO.getUserById(userId);
+
+        if (user != null) {
+          double newBalance = user.getBalance() + amount;
+
+
+          if (user instanceof Seller) {
+            newBalance = user.getBalance() - amount;
+            if (newBalance < 0) {
+              out.writeObject(new Message("FAIL", "CHANGE_BALANCE", "Số tiền rút không được vượt quá số dư hiện tại!"));
+              out.flush();
+              return;
+            }
+          }
+
+          // 2. GHI XUỐNG DATABASE
+          if (userDAO.updateBalance(userId, newBalance)) {
+            out.writeObject(new Message("SUCCESS", "CHANGE_BALANCE", newBalance));
+            out.flush();
+          } else {
+            out.writeObject(new Message("FAIL", "CHANGE_BALANCE", "Lỗi CSDL khi cập nhật số dư."));
+            out.flush();
+          }
+        } else {
+          out.writeObject(new Message("FAIL", "CHANGE_BALANCE", "Tài khoản không tồn tại."));
+          out.flush();
+        }
+      }
+
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      try {
+        out.writeObject(new Message("ERROR", "CHANGE_BALANCE", "Lỗi hệ thống khi xử lý giao dịch."));
+        out.flush();
+      } catch (IOException ioException) {
+        ioException.printStackTrace();
+      }
     }
   }
 
@@ -723,37 +738,46 @@ public class  ClientHandler implements Runnable {
     try {
       String auctionId = (String) request.getData();
 
-      // TỐI ƯU: Lấy thẳng Auction từ RAM để trích xuất itemId
       Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
 
       if (auction == null || auction.getItem() == null) {
         out.writeObject(
-            new Message("FAIL", "DELETE_AUCTION", "Không tìm thấy phiên đấu giá trên hệ thống!"));
+                new Message("FAIL", "DELETE_AUCTION", "Không tìm thấy phiên đấu giá trên hệ thống!"));
         out.flush();
         return;
       }
 
-      String itemId = auction.getItem().getItemId();
-      AuctionDAO auctionDAO = new AuctionDAO();
 
-      // Truyền cả 2 ID xuống để xóa dứt điểm trong 1 giao dịch
-      boolean isDeleted = auctionDAO.deleteAuctionById(auctionId, itemId);
+      synchronized (auction) {
 
-      if (isDeleted) {
-        // ĐỒNG BỘ: Xóa khỏi RAM
-        AuctionManager.getInstance().removeAuctionFromMemory(auctionId);
-        out.writeObject(
-            new Message("SUCCESS", "DELETE_AUCTION", "Xóa triệt để phiên đấu giá thành công!"));
-      } else {
-        out.writeObject(new Message("FAIL", "DELETE_AUCTION", "Lỗi cơ sở dữ liệu khi xóa."));
+        String itemId = auction.getItem().getItemId();
+        AuctionDAO auctionDAO = new AuctionDAO();
+
+
+        boolean isDeleted = auctionDAO.deleteAuctionById(auctionId, itemId);
+
+        if (isDeleted) {
+
+          AuctionManager.getInstance().removeAuctionFromMemory(auctionId);
+
+
+          //Khiến các client k thể đặt giá do bị ẩn khỏi main page
+          auction.setStatus(AuctionStatus.CANCELED);
+
+          out.writeObject(new Message("SUCCESS", "DELETE_AUCTION", "Xóa triệt để phiên đấu giá thành công!"));
+        } else {
+          out.writeObject(new Message("FAIL", "DELETE_AUCTION", "Lỗi cơ sở dữ liệu khi xóa."));
+        }
       }
+
+
       out.flush();
 
     } catch (Exception e) {
       e.printStackTrace();
       try {
         out.writeObject(
-            new Message("ERROR", "DELETE_AUCTION", "Lỗi xử lý yêu cầu xóa tại Server."));
+                new Message("ERROR", "DELETE_AUCTION", "Lỗi xử lý yêu cầu xóa tại Server."));
         out.flush();
       } catch (IOException ioException) {
         ioException.printStackTrace();
@@ -923,88 +947,109 @@ public class  ClientHandler implements Runnable {
       String auctionId = (String) request.getData();
       Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
 
-      // 1. KIỂM TRA TRẠNG THÁI: Chỉ cho phép thanh toán nếu đã FINISHED
-      if (auction == null || auction.getStatus() != AuctionStatus.FINISHED) {
-        out.writeObject(new Message("FAIL", "CHECKOUT", "Phiên đấu giá không hợp lệ hoặc đã được thanh toán."));
+      if (auction == null) {
+        out.writeObject(new Message("FAIL", "CHECKOUT", "Phiên đấu giá không tồn tại."));
         out.flush();
         return;
       }
 
-      Bidder winner = auction.getWinner();
-      if (winner == null) {
-        out.writeObject(new Message("FAIL", "CHECKOUT", "Không có người chiến thắng để thanh toán."));
-        out.flush();
-        return;
-      }
+      // ================= LỚP KHÓA 1: CHỐNG RACE CONDITION (DOUBLE-SPENDING) =================
+      // Đảm bảo không ai có thể spam thanh toán 2 lần cho cùng 1 phiên đấu giá
+      synchronized (auction) {
 
-      UserDAO userDAO = new UserDAO();
-
-
-      // Lấy thông tin cả Người Mua và Người Bán để đảm bảo số dư không bị lệch
-      User dbWinner = userDAO.getUserById(winner.getUserId());
-      String sellerId = auction.getItem().getSeller().getUserId();
-      User dbSeller = userDAO.getUserById(sellerId);
-
-      double finalPrice = auction.getCurrentPrice();
-
-
-      if (dbWinner.getBalance() < finalPrice) {
-        out.writeObject(new Message("FAIL", "CHECKOUT", "Tài khoản không đủ số dư để thanh toán!"));
-        out.flush();
-        return;
-      }
-
-      // 3. THỰC HIỆN CHUYỂN TIỀN (TRANSACTION)
-      // Bước 3.1: Trừ tiền người mua
-      boolean isBuyerDeducted = userDAO.updateBalance(dbWinner.getUserId(), dbWinner.getBalance() - finalPrice);
-
-      if (isBuyerDeducted) {
-        // Bước 3.2: Cộng tiền cho người bán
-        boolean isSellerAdded = userDAO.updateBalance(sellerId, dbSeller.getBalance() + finalPrice);
-
-        if (isSellerAdded) {
-          // 4. CẬP NHẬT TRẠNG THÁI THÀNH PAID
-          auction.setStatus(AuctionStatus.PAID);
-
-          AuctionDAO auctionDAO = new AuctionDAO();
-          auctionDAO.updateAuctionState(auction); // Lưu trạng thái mới xuống DB
-
-          // Phát loa thông báo cho TẤT CẢ các Client cập nhật lại UI (Đổi nhãn thành Đã thanh toán)
-          ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
-          ServerThreadPool.submitTask(() -> {
-            NotificationDAO notiDAO = new NotificationDAO();
-            String timeStampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-            String itemName = auction.getItem().getName();
-
-            HashMap<String,String> usersMessage = new HashMap<>();
-            usersMessage.put(sellerId,"Phiên đấu giá " + itemName + " của bạn đã được thanh toán bởi " + dbWinner.getUsername() + " với số tiền: " + finalPrice + "$.");
-            usersMessage.put(dbWinner.getUserId(),"Bạn đã thanh toán thành công số tiền " + finalPrice + "$ cho phiên đấu giá " + itemName + ".");
-
-            for(Map.Entry<String,String> users : usersMessage.entrySet()) {
-              String targetUserId = users.getKey();
-              String targetMessage = users.getValue();
-              Boolean isOnline = false;
-
-              for (ClientHandler client : ServerMain.activeClients) {
-                if (client.getAuthenticatedUser() != null && client.getAuthenticatedUser().getUserId().equals(targetUserId)) {
-                  client.sendMessage(new Message("SUCCESS", "PUSH_NOTIFICATION_BELL", targetMessage));
-                  isOnline = true;
-                  break;
-                }
-              }
-              if(!isOnline) {
-                notiDAO.insertNotification(targetUserId,targetMessage);
-              }
-            }
-          });
-
-          out.writeObject(new Message("SUCCESS", "CHECKOUT", "Thanh toán thành công!"));
-        } else {
-          out.writeObject(new Message("FAIL", "CHECKOUT", "Lỗi chuyển tiền cho người bán."));
+        // KIỂM TRA TRẠNG THÁI (Phải đặt bên trong ổ khóa)
+        if (auction.getStatus() != AuctionStatus.FINISHED) {
+          out.writeObject(new Message("FAIL", "CHECKOUT", "Phiên đấu giá không hợp lệ hoặc đã được thanh toán."));
+          out.flush();
+          return;
         }
-      } else {
-        out.writeObject(new Message("FAIL", "CHECKOUT", "Lỗi khi trừ tiền người mua."));
-      }
+
+        Bidder winner = auction.getWinner();
+        if (winner == null) {
+          out.writeObject(new Message("FAIL", "CHECKOUT", "Không có người chiến thắng để thanh toán."));
+          out.flush();
+          return;
+        }
+
+        String buyerId = winner.getUserId();
+        String sellerId = auction.getItem().getSeller().getUserId();
+        double finalPrice = auction.getCurrentPrice();
+
+        UserDAO userDAO = new UserDAO();
+
+
+        // Sắp xếp ID theo bảng chữ cái để khóa theo thứ tự cố định (Tránh Deadlock)
+        String firstLock = buyerId.compareTo(sellerId) < 0 ? buyerId : sellerId;
+        String secondLock = buyerId.compareTo(sellerId) < 0 ? sellerId : buyerId;
+
+        // Dùng .intern() để lấy chuẩn 1 Object String duy nhất từ Bộ nhớ Heap của Java
+        synchronized (firstLock.intern()) {
+          synchronized (secondLock.intern()) {
+
+
+            User dbWinner = userDAO.getUserById(buyerId);
+            User dbSeller = userDAO.getUserById(sellerId);
+
+            if (dbWinner.getBalance() < finalPrice) {
+              out.writeObject(new Message("FAIL", "CHECKOUT", "Tài khoản không đủ số dư để thanh toán!"));
+              out.flush();
+              return;
+            }
+
+
+            boolean isBuyerDeducted = userDAO.updateBalance(buyerId, dbWinner.getBalance() - finalPrice);
+
+            if (isBuyerDeducted) {
+              boolean isSellerAdded = userDAO.updateBalance(sellerId, dbSeller.getBalance() + finalPrice);
+
+              if (isSellerAdded) {
+                // CẬP NHẬT TRẠNG THÁI THÀNH PAID
+                auction.setStatus(AuctionStatus.PAID);
+                AuctionDAO auctionDAO = new AuctionDAO();
+                auctionDAO.updateAuctionState(auction);
+
+
+                ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
+
+
+                ServerThreadPool.submitTask(() -> {
+                  NotificationDAO notiDAO = new NotificationDAO();
+                  String timeStampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+                  String itemName = auction.getItem().getName();
+
+                  HashMap<String, String> usersMessage = new HashMap<>();
+                  usersMessage.put(sellerId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã được thanh toán bởi " + dbWinner.getUsername() + " với số tiền: $" + finalPrice);
+                  usersMessage.put(buyerId, timeStampStr + " || Bạn đã thanh toán thành công số tiền $" + finalPrice + " cho món hàng [" + itemName + "].");
+
+                  for (Map.Entry<String, String> users : usersMessage.entrySet()) {
+                    String targetUserId = users.getKey();
+                    String targetMessage = users.getValue();
+                    Boolean isOnline = false;
+
+                    for (ClientHandler client : ServerMain.activeClients) {
+                      if (client.getAuthenticatedUser() != null && client.getAuthenticatedUser().getUserId().equals(targetUserId)) {
+                        client.sendMessage(new Message("SUCCESS", "PUSH_NOTIFICATION_BELL", targetMessage));
+                        isOnline = true;
+                        break;
+                      }
+                    }
+                    if (!isOnline) {
+                      notiDAO.insertNotification(targetUserId, targetMessage);
+                    }
+                  }
+                });
+
+                out.writeObject(new Message("SUCCESS", "CHECKOUT", "Thanh toán thành công!"));
+              } else {
+                out.writeObject(new Message("FAIL", "CHECKOUT", "Lỗi chuyển tiền cho người bán."));
+              }
+            } else {
+              out.writeObject(new Message("FAIL", "CHECKOUT", "Lỗi khi trừ tiền người mua."));
+            }
+          }
+        } // Kết thúc khóa User (Lost Update)
+      } // Kết thúc khóa Auction (Race Condition)
+
       out.flush();
 
     } catch (Exception e) {
@@ -1019,38 +1064,55 @@ public class  ClientHandler implements Runnable {
   }
 
   private void handleBanUser(Message request) {
-    // Payload: Object[]{ AdminUser, TargetUserId, BanReason }
-    Object[] data = (Object[]) request.getData();
-    User requester = (User) data[0];
-    String targetUserId = (String) data[1];
-    String banReason = (String) data[2];
+    try {
+      // Payload: Object[]{ AdminUser, TargetUserId, BanReason }
+      Object[] data = (Object[]) request.getData();
+      User requester = (User) data[0];
+      String targetUserId = (String) data[1];
+      String banReason = (String) data[2];
 
-    // Phân quyền: Kiểm tra đúng Admin cấp 2 không
-    if (!(requester instanceof Admin) || ((Admin) requester).getAdminLevel() < 2) {
-      try {
+      // Phân quyền: Kiểm tra đúng Admin cấp 2 không
+      if (!(requester instanceof Admin) || ((Admin) requester).getAdminLevel() < 2) {
         out.writeObject(new Message("FAIL", "BAN_USER", "Bạn không có quyền Ban người dùng!"));
         out.flush();
-      } catch (Exception e) {}
-      return;
-    }
-
-    boolean success = userDAO.banUser(targetUserId, banReason);
-
-    if (success) {
-      // Ban người dùng nếu họ đang online
-      ClientHandler onlineTarget = ServerMain.getClientByUserId(targetUserId);
-      if (onlineTarget != null) {
-        // Gửi lệnh FORCE_LOGOUT thẳng xuống luồng ngầm của người bị ban
-        onlineTarget.sendMessage(new Message("UPDATE", "FORCE_LOGOUT", "Tài khoản của bạn vừa bị cấm bởi Admin!\nLý do: " + banReason));
-
-        onlineTarget.setAuthenticatedUser(null);
+        return;
       }
 
-      try {
+      boolean success = userDAO.banUser(targetUserId, banReason);
+
+      if (success) {
+        // TRÁNH NULL POINTER EXCEPTION
+        ClientHandler onlineTarget = null;
+        for (ClientHandler client : ServerMain.activeClients) {
+          if (client.getAuthenticatedUser() != null && client.getAuthenticatedUser().getUserId().equals(targetUserId)) {
+            onlineTarget = client;
+            break;
+          }
+        }
+
+        if (onlineTarget != null) {
+          // Gửi lệnh FORCE_LOGOUT thẳng xuống luồng ngầm của người bị ban
+          onlineTarget.sendMessage(new Message("UPDATE", "FORCE_LOGOUT", "Tài khoản của bạn vừa bị cấm bởi Admin!\nLý do: " + banReason));
+          onlineTarget.setAuthenticatedUser(null);
+        }
+
         out.reset();
         out.writeObject(new Message("SUCCESS", "BAN_USER", "Đã ban người dùng thành công!"));
         out.flush();
-      } catch (Exception e) {}
+      } else {
+
+        out.writeObject(new Message("FAIL", "BAN_USER", "Lỗi CSDL không thể cập nhật trạng thái Ban."));
+        out.flush();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      try {
+
+        out.writeObject(new Message("ERROR", "BAN_USER", "Lỗi hệ thống Server khi xử lý Ban."));
+        out.flush();
+      } catch (IOException ex) {
+        ex.printStackTrace();
+      }
     }
   }
 
