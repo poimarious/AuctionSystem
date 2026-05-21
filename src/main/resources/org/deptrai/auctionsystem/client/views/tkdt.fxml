@@ -6,6 +6,12 @@
 
 <VBox spacing="25.0" style="-fx-background-color: #151226;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.client.controllers.TransactionHistoryController">
     <children>
+        <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ QUAY LẠI">
+            <padding>
+                <Insets bottom="8.0" left="12.0" right="15.0" top="8.0" />
+            </padding>
+        </Button>
+
         <HBox alignment="CENTER_LEFT">
             <children>
                 <VBox>
