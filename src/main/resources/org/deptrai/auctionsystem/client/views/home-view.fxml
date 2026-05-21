@@ -36,7 +36,7 @@
             <HBox alignment="CENTER" style="-fx-background-color: #1a162e; -fx-border-color: #2b244d; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 0 10 0 10;">
               <children>
                 <Label text="🔍" textFill="#8c88a8" />
-                <TextField fx:id="searchField" prefHeight="40.0" prefWidth="350.0" promptText="Tìm kiếm sản phẩm, nghệ sĩ..." style="-fx-background-color: transparent; -fx-text-fill: #00f3ff;" />
+                <TextField fx:id="searchField" prefHeight="40.0" prefWidth="350.0" promptText="Tìm kiếm sản phẩm, nghệ sĩ..." style="-fx-background-color: transparent; -fx-text-fill: #00f3ff;" HBox.hgrow="ALWAYS" />
                 <Button onAction="#handleReload" style="-fx-cursor: hand;" styleClass="btn-primary" text="🔄 Làm mới" />
               </children>
             </HBox>
@@ -46,7 +46,7 @@
             <HBox alignment="CENTER" spacing="15.0">
               <children>
 
-                <Button fx:id="sellerCenterBtn" managed="false" mnemonicParsing="false" onAction="#handleGoToSellerCenter" style="-fx-cursor: hand;" styleClass="btn-success" text="🏪 Kênh Người Bán" visible="false">
+                <Button fx:id="sellerCenterBtn" managed="false" mnemonicParsing="false" onAction="#handleGoToSellerCenter" style="-fx-cursor: hand;" styleClass="btn-success" text="🏪 Kênh Người Bán" visible="false" HBox.hgrow="ALWAYS">
                   <HBox.margin>
                     <Insets right="15.0" />
                   </HBox.margin>
@@ -59,9 +59,9 @@
                   </children>
                 </HBox>
 
-                <HBox fx:id="userBox" alignment="CENTER_RIGHT" managed="false" spacing="20.0">
+                <HBox fx:id="userBox" alignment="CENTER_RIGHT" managed="false" spacing="20.0" HBox.hgrow="ALWAYS">
                   <children>
-                    <MenuButton fx:id="userMenu" mnemonicParsing="false" styleClass="user-menu-button" text="👤" textFill="#7b58ff">
+                    <MenuButton fx:id="userMenu" minWidth="-Infinity" mnemonicParsing="false" styleClass="user-menu-button" text="👤" textFill="#7b58ff" HBox.hgrow="ALWAYS">
                       <font><Font size="18.0" /></font>
                       <items>
                         <MenuItem mnemonicParsing="false" onAction="#handleShowProfile" text="👤 Hồ sơ cá nhân" />
@@ -71,7 +71,7 @@
                       </items>
                     </MenuButton>
 
-                    <VBox alignment="CENTER_RIGHT">
+                    <VBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                       <children>
                         <Label fx:id="userNameLabel" style="-fx-font-weight: bold; -fx-font-size: 16;" text="Tên tk" textFill="#ffffff" />
                         <Label fx:id="walletLabel" style="-fx-font-weight: bold; -fx-font-size: 14;" text="Ví: $15,000" textFill="#39ff14" />
@@ -81,7 +81,7 @@
                 </HBox>
 
                 <Separator orientation="VERTICAL" prefHeight="30.0" />
-                <MenuButton fx:id="notificationBell" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-size: 16; -fx-cursor: hand;" text="🔔" textFill="#f1fa8c">
+                <MenuButton fx:id="notificationBell" minWidth="-Infinity" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-size: 16; -fx-cursor: hand;" text="🔔" textFill="#f1fa8c" HBox.hgrow="ALWAYS">
                   <items>
                     <MenuItem mnemonicParsing="false" text="Không có thông báo mới" />
                   </items>
