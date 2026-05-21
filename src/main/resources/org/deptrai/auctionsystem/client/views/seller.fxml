@@ -26,7 +26,6 @@
         <Separator opacity="0.3" />
         <Button maxWidth="Infinity" onAction="#handleAddNewProduct" styleClass="btn-success" text="➕ Đăng sản phẩm mới" />
         <Region VBox.vgrow="ALWAYS" />
-        <Button maxWidth="Infinity" onAction="#handleShowProfile" styleClass="btn-primary" text="👤 Hồ sơ cá nhân" />
         <Button maxWidth="Infinity" onAction="#handleLogout" styleClass="btn-accent" text="🚪 ĐĂNG XUẤT" />
       </children>
       <padding>
