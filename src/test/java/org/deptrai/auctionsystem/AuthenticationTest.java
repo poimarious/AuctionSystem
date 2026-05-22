@@ -80,7 +80,10 @@ public class AuthenticationTest {
     Message response = SocketClient.sendRequest(request);
 
     assertEquals("FAIL", response.getStatus(), "Đăng ký phải thất bại do mật khẩu yếu");
-    assertTrue(((String) response.getData()).contains("Mật khẩu bao gồm"), "Nên trả về câu cảnh báo mật khẩu");
+
+    // SỬA TẠI ĐÂY: Khớp chính xác với câu thông báo lỗi được ném ra từ RegisterCommand
+    String expectedErrorMessage = "Mật khẩu phải chứa chữ thường, in hoa, số và ký tự đặc biệt!";
+    assertEquals(expectedErrorMessage, response.getData(), "Nên trả về câu cảnh báo mật khẩu chính xác");
   }
 
   @Test
