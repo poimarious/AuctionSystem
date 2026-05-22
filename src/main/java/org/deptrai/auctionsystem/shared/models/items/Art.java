@@ -11,13 +11,13 @@ public class Art extends Item {
   }
 
   public Art(
-      String itemId,
-      String name,
-      String description,
-      double startingPrice,
-      Seller seller,
-      String artist,
-      int yearCreated) {
+          String itemId,
+          String name,
+          String description,
+          double startingPrice,
+          Seller seller,
+          String artist,
+          int yearCreated) {
     super(itemId, name, description, startingPrice, seller);
     this.artist = artist;
     this.yearCreated = yearCreated;
@@ -48,8 +48,6 @@ public class Art extends Item {
   }
 
   // endregion
-
-
 
 
 }

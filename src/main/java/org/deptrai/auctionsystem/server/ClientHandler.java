@@ -1,16 +1,5 @@
 package org.deptrai.auctionsystem.server;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-
 import org.deptrai.auctionsystem.server.dao.*;
 import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.server.utils.ServerThreadPool;
@@ -28,7 +17,18 @@ import org.deptrai.auctionsystem.utils.ValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class  ClientHandler implements Runnable {
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+public class ClientHandler implements Runnable {
 
   private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 
@@ -128,7 +128,7 @@ public class  ClientHandler implements Runnable {
             break;
           default:
             out.writeObject(
-                new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
+                    new Message("FAIL", "COMMAND", "Lệnh không hợp lệ hoặc chưa được Server hỗ trợ!"));
             out.flush();
             break;
         }
@@ -193,10 +193,10 @@ public class  ClientHandler implements Runnable {
     try {
       if (ValidationUtils.isInvalidPassword(password)) {
         out.writeObject(
-            new Message(
-                "FAIL",
-                "REGISTER",
-                "Mật khẩu bao gồm chữ cái thường, chữ cái in hoa, số và kí tự đặc biệt!"));
+                new Message(
+                        "FAIL",
+                        "REGISTER",
+                        "Mật khẩu bao gồm chữ cái thường, chữ cái in hoa, số và kí tự đặc biệt!"));
         out.flush();
         return;
       } else if (userDAO.isUsernameTaken(username)) {
@@ -205,7 +205,7 @@ public class  ClientHandler implements Runnable {
         return;
       } else if (userDAO.isEmailTaken(email)) {
         out.writeObject(
-            new Message("FAIL", "REGISTER", "Email này đã được sử dụng cho một tài khoản khác!"));
+                new Message("FAIL", "REGISTER", "Email này đã được sử dụng cho một tài khoản khác!"));
         out.flush();
         return;
       }
@@ -215,8 +215,8 @@ public class  ClientHandler implements Runnable {
         newUser = new Seller(null, username, password, email);
       } else { // role.equals("BIDDER")
         newUser =
-            new Bidder(
-                null, username, password, email, new java.util.concurrent.CopyOnWriteArrayList<>());
+                new Bidder(
+                        null, username, password, email, new java.util.concurrent.CopyOnWriteArrayList<>());
       }
 
       boolean success = userDAO.insertUser(newUser, role);
@@ -304,7 +304,7 @@ public class  ClientHandler implements Runnable {
     try {
       String imagePath = (String) request.getData();
       File file = new File(imagePath);
-      if(file.exists()) {
+      if (file.exists()) {
         byte[] imageBytes = Files.readAllBytes(file.toPath());
 
         out.reset();
@@ -314,11 +314,11 @@ public class  ClientHandler implements Runnable {
         out.writeObject(new Message("FAIL", "GET_IMAGE", null));
         out.flush();
       }
-    } catch(Exception e) {
+    } catch (Exception e) {
       try {
         out.writeObject(new Message("FAIL", "GET_IMAGE", null));
         out.flush();
-      } catch(IOException _) {}
+      } catch (IOException _) {}
     }
   }
 
@@ -389,7 +389,7 @@ public class  ClientHandler implements Runnable {
         out.writeObject(new Message("SUCCESS", "GET_AUCTION_BY_ID", auction));
       } else {
         out.writeObject(
-            new Message("FAIL", "GET_AUCTION_BY_ID", "Không tìm thấy phiên đấu giá này!"));
+                new Message("FAIL", "GET_AUCTION_BY_ID", "Không tìm thấy phiên đấu giá này!"));
       }
       out.flush();
     } catch (IOException e) {
@@ -412,7 +412,7 @@ public class  ClientHandler implements Runnable {
         File uploadDir = new File("server_uploads");
         if (!uploadDir.exists()) {
           boolean isCreated = uploadDir.mkdirs();
-          if(!isCreated){
+          if (!isCreated) {
             logger.warn("WARN: Không thể tạo thư mục server_uploads");
           }
         }
@@ -450,7 +450,7 @@ public class  ClientHandler implements Runnable {
         out.writeObject(new Message("SUCCESS", "CREATE_AUCTION", newAuction));
       } else {
         out.writeObject(
-            new Message("FAIL", "CREATE_AUCTION", "Lỗi Database khi tạo Phiên đấu giá."));
+                new Message("FAIL", "CREATE_AUCTION", "Lỗi Database khi tạo Phiên đấu giá."));
       }
       out.flush();
 
@@ -516,8 +516,8 @@ public class  ClientHandler implements Runnable {
       // 3. Lọc ra những phiên đấu giá có chứa Item do Seller này đăng bán
       for (Auction auction : allAuctions) {
         if (auction.getItem() != null
-            && auction.getItem().getSeller() != null
-            && auction.getItem().getSeller().getUserId().equals(sellerId)) {
+                && auction.getItem().getSeller() != null
+                && auction.getItem().getSeller().getUserId().equals(sellerId)) {
 
           sellerAuctions.add(auction);
         }
@@ -531,7 +531,7 @@ public class  ClientHandler implements Runnable {
       logger.error(e.getMessage());
       try {
         out.writeObject(
-            new Message("FAIL", "GET_SELLER_AUCTIONS", "Lỗi khi tải danh sách kho hàng."));
+                new Message("FAIL", "GET_SELLER_AUCTIONS", "Lỗi khi tải danh sách kho hàng."));
         out.flush();
       } catch (IOException ioException) {
         logger.error(ioException.getMessage());
@@ -552,8 +552,8 @@ public class  ClientHandler implements Runnable {
 
       if (!(currentUser instanceof Bidder bidder)) {
         out.writeObject(
-            new Message(
-                "FAIL", "PLACE_BID", "Chỉ tài khoản Người mua (Bidder) mới có quyền đặt giá!"));
+                new Message(
+                        "FAIL", "PLACE_BID", "Chỉ tài khoản Người mua (Bidder) mới có quyền đặt giá!"));
         out.flush();
         return;
       }
@@ -561,7 +561,7 @@ public class  ClientHandler implements Runnable {
       Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
       if (auction == null) {
         out.writeObject(
-            new Message("FAIL", "PLACE_BID", "Phiên đấu giá không tồn tại trên Server!"));
+                new Message("FAIL", "PLACE_BID", "Phiên đấu giá không tồn tại trên Server!"));
         out.flush();
         return;
       }
@@ -587,7 +587,7 @@ public class  ClientHandler implements Runnable {
         }
 
         if (auction.getItem() != null && auction.getItem().getSeller() != null
-            && currentUserId.equals(auction.getItem().getSeller().getUserId())) {
+                && currentUserId.equals(auction.getItem().getSeller().getUserId())) {
           out.writeObject(new Message("FAIL", "PLACE_BID", "Người bán không được phép tự đặt giá cho sản phẩm của mình!"));
           out.flush();
           return;
@@ -608,7 +608,7 @@ public class  ClientHandler implements Runnable {
         // 6. Save data to database
         BidDAO bidDAO = new BidDAO();
         boolean isBidSaved = bidDAO.insertBid(newBid); // Gọi đúng 1 tham số
-  //      userDAO.updateBalance(bidder.getUserId(), bidder.getBalance() - bidAmount); DO NOT change balance yet
+        //      userDAO.updateBalance(bidder.getUserId(), bidder.getBalance() - bidAmount); DO NOT change balance yet
 
         if (!isBidSaved) {
           out.writeObject(new Message("FAIL", "PLACE_BID", "Lỗi Database khi lưu lịch sử đặt giá."));
@@ -652,16 +652,16 @@ public class  ClientHandler implements Runnable {
       // Khi Broadcast được gửi đi, gói bưu kiện 'auction' này đã mang theo endTime mới!
       ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
 
-      ServerThreadPool.submitTask(()-> {
+      ServerThreadPool.submitTask(() -> {
         NotificationDAO notiDAO = new NotificationDAO();
         Set<String> targetUserIds = new HashSet<>();
 
-        if(auction.getItem() != null && auction.getItem().getSeller() != null) {
+        if (auction.getItem() != null && auction.getItem().getSeller() != null) {
           targetUserIds.add(auction.getItem().getSeller().getUserId());
         }
 
-        for(Bid bid : auction.getBids()) {
-          if(bid.getBidder() != null) {
+        for (Bid bid : auction.getBids()) {
+          if (bid.getBidder() != null) {
             targetUserIds.add(bid.getBidder().getUserId());
           }
         }
@@ -672,17 +672,17 @@ public class  ClientHandler implements Runnable {
         String notiMsg = timeStampStr + " || " + bidder.getUsername() + " vừa đặt giá cho " + auction.getItem().getName() +
                 " lên $" + bidAmount;
 
-        for(String userid : targetUserIds) {
+        for (String userid : targetUserIds) {
           boolean isOnline = false;
 
-          for(ClientHandler client : ServerMain.activeClients) {
-            if(client.getAuthenticatedUser() != null && client.getAuthenticatedUser().getUserId().equals(userid)) {
+          for (ClientHandler client : ServerMain.activeClients) {
+            if (client.getAuthenticatedUser() != null && client.getAuthenticatedUser().getUserId().equals(userid)) {
               client.sendMessage(new Message("SUCCESS", "PUSH_NOTIFICATION_BELL", notiMsg));
               isOnline = true;
               break;
             }
           }
-          if(!isOnline) {
+          if (!isOnline) {
             notiDAO.insertNotification(userid, notiMsg);
           }
         }
@@ -730,10 +730,10 @@ public class  ClientHandler implements Runnable {
       // 1. Kiểm tra độ mạnh của mật khẩu mới theo chuẩn ValidationUtils
       if (ValidationUtils.isInvalidPassword(newPassword)) {
         out.writeObject(
-            new Message(
-                "FAIL",
-                "UPDATE_PASSWORD",
-                "Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt (@#$%^&+=!)"));
+                new Message(
+                        "FAIL",
+                        "UPDATE_PASSWORD",
+                        "Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt (@#$%^&+=!)"));
         out.flush();
         return;
       }
@@ -743,7 +743,7 @@ public class  ClientHandler implements Runnable {
       User user = userDAO.getUserById(userId);
       if (user == null) {
         out.writeObject(
-            new Message("FAIL", "UPDATE_PASSWORD", "Tài khoản không tồn tại trên hệ thống!"));
+                new Message("FAIL", "UPDATE_PASSWORD", "Tài khoản không tồn tại trên hệ thống!"));
         out.flush();
         return;
       }
@@ -762,7 +762,7 @@ public class  ClientHandler implements Runnable {
         out.writeObject(new Message("SUCCESS", "UPDATE_PASSWORD", "Cập nhật mật khẩu thành công!"));
       } else {
         out.writeObject(
-            new Message("FAIL", "UPDATE_PASSWORD", "Lỗi hệ thống khi cập nhật mật khẩu."));
+                new Message("FAIL", "UPDATE_PASSWORD", "Lỗi hệ thống khi cập nhật mật khẩu."));
       }
       out.flush();
 
@@ -770,7 +770,7 @@ public class  ClientHandler implements Runnable {
       logger.error(e.getMessage());
       try {
         out.writeObject(
-            new Message("ERROR", "UPDATE_PASSWORD", "Định dạng dữ liệu gửi lên không hợp lệ."));
+                new Message("ERROR", "UPDATE_PASSWORD", "Định dạng dữ liệu gửi lên không hợp lệ."));
         out.flush();
       } catch (IOException ioException) {
         logger.error(ioException.getMessage());
@@ -848,7 +848,7 @@ public class  ClientHandler implements Runnable {
       logger.error(e.getMessage());
       try {
         out.writeObject(
-            new Message("ERROR", "GET_BIDS_HISTORY", "Lỗi hệ thống khi tải lịch sử đặt giá."));
+                new Message("ERROR", "GET_BIDS_HISTORY", "Lỗi hệ thống khi tải lịch sử đặt giá."));
         out.flush();
       } catch (IOException ioException) {
         logger.error(ioException.getMessage());

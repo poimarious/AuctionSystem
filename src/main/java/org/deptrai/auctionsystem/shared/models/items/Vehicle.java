@@ -11,13 +11,13 @@ public class Vehicle extends Item {
   }
 
   public Vehicle(
-      String itemId,
-      String name,
-      String description,
-      double startingPrice,
-      Seller seller,
-      String make,
-      int mileage) {
+          String itemId,
+          String name,
+          String description,
+          double startingPrice,
+          Seller seller,
+          String make,
+          int mileage) {
     super(itemId, name, description, startingPrice, seller);
     this.make = make;
     this.mileage = mileage;

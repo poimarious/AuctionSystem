@@ -50,9 +50,12 @@ public class MainController {
   @FXML
   private TextField searchField;
 
-  @FXML private Button toggleViewBtn;
-  @FXML private Label mainTitleLabel;
-  @FXML private Label subTitleLabel;
+  @FXML
+  private Button toggleViewBtn;
+  @FXML
+  private Label mainTitleLabel;
+  @FXML
+  private Label subTitleLabel;
   private List<AuctionSummary> allAuctions = new ArrayList<>();
   private boolean isShowingPending = false;
   private final List<AuctionSummary> runningAuctions = new ArrayList<>();
@@ -82,7 +85,7 @@ public class MainController {
       });
     });
 
-    if(notificationBell != null) {
+    if (notificationBell != null) {
       notificationBell.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
 
       var notifs = SessionManager.getInstance().getNotifications();
@@ -97,7 +100,7 @@ public class MainController {
       });
     }
 
-    if(searchField != null) {
+    if (searchField != null) {
       searchField.textProperty().addListener((_, _, newValue) -> {
         List<AuctionSummary> searchResult = SearchEngine.searchAuctions(allAuctions, newValue);
 
@@ -177,7 +180,7 @@ public class MainController {
     }
 
     Message request = new Message("GET_ALL_AUCTIONS", userId);
-    if(currentUser instanceof Seller) {
+    if (currentUser instanceof Seller) {
       request = new Message("GET_SELLER_AUCTIONS", userId);
     }
     Message response = SocketClient.sendRequest(request);
@@ -187,7 +190,7 @@ public class MainController {
         @SuppressWarnings("unchecked")
         List<Auction> sellerAuctions = (List<Auction>) response.getData();
 
-        for(Auction auction : sellerAuctions) {
+        for (Auction auction : sellerAuctions) {
           AuctionSummary auctionSummary = new AuctionSummary(
                   auction.getAuctionId(),
                   auction.getItem().getName(),
@@ -253,8 +256,8 @@ public class MainController {
   private void displayAuctions(List<AuctionSummary> auctionsToDisplay) {
     javafx.application.Platform.runLater(() -> {
 
-      for(Node node : productsContainer.getChildren()) {
-        if(node.getUserData() instanceof ItemCardController oldController) {
+      for (Node node : productsContainer.getChildren()) {
+        if (node.getUserData() instanceof ItemCardController oldController) {
           SocketClient.removeListener(oldController);
         }
       }
@@ -264,7 +267,7 @@ public class MainController {
       int limit = Math.min(auctionsToDisplay.size(), 6);
 
       for (int i = 0; i < limit; i++) {
-        if(auctionsToDisplay.get(i).getStatus() == AuctionStatus.PAID) continue;
+        if (auctionsToDisplay.get(i).getStatus() == AuctionStatus.PAID) continue;
         try {
           FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/deptrai/auctionsystem/client/views/item-card.fxml"));
           Node itemCard = loader.load();
@@ -294,7 +297,7 @@ public class MainController {
       //listView.getItems().addAll(notifs);
       listView.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
 
-      for(String text : notifs) {
+      for (String text : notifs) {
         Label lb = new Label(text);
         lb.setWrapText(true);
         lb.setPrefWidth(280);
@@ -303,7 +306,7 @@ public class MainController {
       }
 
       listView.getSelectionModel().selectionModeProperty().addListener((_, _, newVal) -> {
-        if(newVal != null) {
+        if (newVal != null) {
           javafx.application.Platform.runLater(() -> listView.getSelectionModel().clearSelection());
         }
       });
@@ -323,13 +326,13 @@ public class MainController {
   @FXML
   public void handleLogin() {
     SceneManager.getInstance()
-        .switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
+            .switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
   }
 
   @FXML
   public void handleRegister() {
     SceneManager.getInstance()
-        .switchScene("/org/deptrai/auctionsystem/client/views/register-view.fxml", "Đăng ký");
+            .switchScene("/org/deptrai/auctionsystem/client/views/register-view.fxml", "Đăng ký");
   }
 
   @FXML
@@ -343,27 +346,27 @@ public class MainController {
     SceneManager.getInstance().clearHistory();
     setUpGuestView();
     SceneManager.getInstance()
-        .switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
+            .switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
   }
 
   @FXML
   public void handleShowProfile() {
     SceneManager.getInstance()
-        .switchScene("/org/deptrai/auctionsystem/client/views/profile-view.fxml", "Hồ sơ của tôi");
+            .switchScene("/org/deptrai/auctionsystem/client/views/profile-view.fxml", "Hồ sơ của tôi");
   }
 
   @FXML
   public void handleShowBidHistory() {
     SceneManager.getInstance()
-        .switchScene(
-            "/org/deptrai/auctionsystem/client/views/bid-history-view.fxml", "Lịch sử đặt giá");
+            .switchScene(
+                    "/org/deptrai/auctionsystem/client/views/bid-history-view.fxml", "Lịch sử đặt giá");
   }
 
   @FXML
   public void handleOpenAuctionFloor() {
     SceneManager.getInstance()
-        .switchScene(
-            "/org/deptrai/auctionsystem/client/views/auction-floor-view.fxml", "Sàn Đấu Giá");
+            .switchScene(
+                    "/org/deptrai/auctionsystem/client/views/auction-floor-view.fxml", "Sàn Đấu Giá");
   }
   @FXML
   public void handleToggleView() {
@@ -413,7 +416,7 @@ public class MainController {
   @FXML
   public void handleGoToSellerCenter() {
     SceneManager.getInstance()
-        .switchScene("/org/deptrai/auctionsystem/client/views/seller.fxml", "Kênh Người Bán");
+            .switchScene("/org/deptrai/auctionsystem/client/views/seller.fxml", "Kênh Người Bán");
   }
   // Hàm xử lý sự kiện khi ấn nút "Làm mới"
   @FXML

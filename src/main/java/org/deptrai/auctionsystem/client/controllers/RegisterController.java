@@ -8,15 +8,20 @@ import org.deptrai.auctionsystem.shared.network.Message;
 
 public class RegisterController {
 
-  @FXML private TextField usernameField;
+  @FXML
+  private TextField usernameField;
 
-  @FXML private TextField emailField;
+  @FXML
+  private TextField emailField;
 
-  @FXML private PasswordField passwordField;
+  @FXML
+  private PasswordField passwordField;
 
-  @FXML private PasswordField confirmPasswordField;
+  @FXML
+  private PasswordField confirmPasswordField;
 
-  @FXML private ToggleGroup roleGroup;
+  @FXML
+  private ToggleGroup roleGroup;
 
   // Đã xóa roleComboBox và hàm initialize() đi vì giao diện mới dùng RadioButton
 
@@ -29,20 +34,20 @@ public class RegisterController {
 
     // 1. Kiểm tra không được để trống (Cập nhật check thêm fullName)
     if (username.isEmpty()
-        || email.isEmpty()
-        || password.isEmpty()
-        || confirmPassword.isEmpty()) {
+            || email.isEmpty()
+            || password.isEmpty()
+            || confirmPassword.isEmpty()) {
       showAlert(
-          Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng điền đầy đủ tất cả các trường!");
+              Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng điền đầy đủ tất cả các trường!");
       return;
     }
 
     // 2. Kiểm tra mật khẩu xác nhận
     if (!password.equals(confirmPassword)) {
       showAlert(
-          Alert.AlertType.ERROR,
-          "Lỗi mật khẩu",
-          "Mật khẩu xác nhận không khớp. Vui lòng nhập lại!");
+              Alert.AlertType.ERROR,
+              "Lỗi mật khẩu",
+              "Mật khẩu xác nhận không khớp. Vui lòng nhập lại!");
       return;
     }
 
@@ -63,14 +68,14 @@ public class RegisterController {
 
     if (response.getStatus().equals("SUCCESS")) {
       showAlert(
-          Alert.AlertType.INFORMATION,
-          "Thành công",
-          "Đăng ký tài khoản thành công! Vui lòng đăng nhập.");
+              Alert.AlertType.INFORMATION,
+              "Thành công",
+              "Đăng ký tài khoản thành công! Vui lòng đăng nhập.");
       // Chuyển hướng về trang Đăng nhập
       SceneManager.getInstance()
-          .switchScene(
-              "/org/deptrai/auctionsystem/client/views/login-view.fxml",
-              "Hệ thống Đấu giá - Đăng nhập");
+              .switchScene(
+                      "/org/deptrai/auctionsystem/client/views/login-view.fxml",
+                      "Hệ thống Đấu giá - Đăng nhập");
     } else {
       String errorMsg = (String) response.getData();
       showAlert(Alert.AlertType.ERROR, "Lỗi hệ thống", errorMsg);
@@ -81,9 +86,9 @@ public class RegisterController {
   public void handleBackToLogin() {
     // Dùng cho nút ⬅ quay lại trang đăng nhập
     SceneManager.getInstance()
-        .switchScene(
-            "/org/deptrai/auctionsystem/client/views/login-view.fxml",
-            "Hệ thống Đấu giá - Đăng nhập");
+            .switchScene(
+                    "/org/deptrai/auctionsystem/client/views/login-view.fxml",
+                    "Hệ thống Đấu giá - Đăng nhập");
   }
 
   // Hàm tiện ích hiển thị thông báo

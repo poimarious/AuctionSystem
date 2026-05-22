@@ -153,20 +153,20 @@ public class BiddingDetailController implements AuctionUpdateListener {
     quickBidLabel.setText(String.format("$%.2f", currentIntendedBid));
 
     //byte[] imageBytes = auction.getItem().getImageBytes();
-    String imagePath =auction.getItem().getImageUrl();
-    if(imagePath != null && !imagePath.isEmpty()) {
+    String imagePath = auction.getItem().getImageUrl();
+    if (imagePath != null && !imagePath.isEmpty()) {
       SocketClient.runAsync(() -> {
         Message request = new Message("GET_IMAGE", imagePath);
         Message response = SocketClient.sendRequest(request);
 
         Platform.runLater(() -> {
-          if("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
+          if ("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
             try {
               byte[] imageBytes = (byte[]) response.getData();
               Image image = new Image(new ByteArrayInputStream(imageBytes));
               productImageView.setImage(image);
             } catch (Exception e) {
-              logger.error("Lỗi khi load ảnh:",e);
+              logger.error("Lỗi khi load ảnh:", e);
             }
           } else {
             logger.info("Không tìm thấy file ảnh gốc trên server!");

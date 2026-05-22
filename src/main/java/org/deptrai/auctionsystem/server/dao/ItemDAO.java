@@ -1,5 +1,9 @@
 package org.deptrai.auctionsystem.server.dao;
 
+import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
+import org.deptrai.auctionsystem.shared.models.items.*;
+import org.deptrai.auctionsystem.shared.models.users.Seller;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.sql.Connection;
@@ -7,27 +11,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
-import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
-import org.deptrai.auctionsystem.shared.models.items.Art;
-import org.deptrai.auctionsystem.shared.models.items.ArtFactory;
-import org.deptrai.auctionsystem.shared.models.items.Electronics;
-import org.deptrai.auctionsystem.shared.models.items.ElectronicsFactory;
-import org.deptrai.auctionsystem.shared.models.items.Item;
-import org.deptrai.auctionsystem.shared.models.items.ItemFactory;
-import org.deptrai.auctionsystem.shared.models.items.Vehicle;
-import org.deptrai.auctionsystem.shared.models.items.VehicleFactory;
-import org.deptrai.auctionsystem.shared.models.users.Seller;
 
 public class ItemDAO {
 
   public boolean insertItem(Item item) {
     String sql =
-        "INSERT INTO Items (itemId, name, description, startingPrice, category, sellerId, "
-            + "brand, warrantyMonths, artist, yearCreated, make, mileage, imageUrl) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO Items (itemId, name, description, startingPrice, category, sellerId, "
+                    + "brand, warrantyMonths, artist, yearCreated, make, mileage, imageUrl) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       String id = (item.getItemId() != null) ? item.getItemId() : UUID.randomUUID().toString();
       item.setItemId(id);
@@ -86,7 +80,7 @@ public class ItemDAO {
     String sql = "SELECT * FROM Items WHERE itemId = ?";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       pstmt.setString(1, itemId);
       ResultSet rs = pstmt.executeQuery();

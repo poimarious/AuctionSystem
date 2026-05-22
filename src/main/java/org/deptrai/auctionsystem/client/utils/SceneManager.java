@@ -1,13 +1,14 @@
 package org.deptrai.auctionsystem.client.utils;
 
-import java.io.IOException;
-import java.util.Stack;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Stack;
 
 public class SceneManager {
 
@@ -34,7 +35,7 @@ public class SceneManager {
 
   public void switchScene(String fxmlPath, String title) {
     if (currentFxml != null && currentTitle != null) {
-      historyStack.push(new String[] {currentFxml, currentTitle});
+      historyStack.push(new String[]{currentFxml, currentTitle});
     }
     loadScene(fxmlPath, title);
   }

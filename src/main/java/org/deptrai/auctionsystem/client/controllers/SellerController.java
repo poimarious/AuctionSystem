@@ -64,7 +64,7 @@ public class SellerController {
 
       if ("SUCCESS".equals(response.getStatus())) {
         @SuppressWarnings("unchecked")
-        List <Auction > auctions = (List<Auction>) response.getData();
+        List<Auction> auctions = (List<Auction>) response.getData();
         sellerAuctions = auctions;
 
 
@@ -87,7 +87,7 @@ public class SellerController {
         }
 
         for (Auction auction : sellerAuctions) {
-          if(auction.getStatus() != AuctionStatus.PAID) continue;
+          if (auction.getStatus() != AuctionStatus.PAID) continue;
           for (Bid bid : auction.getBids()) {
             if (bid.getTimestamp() != null) {
               DayOfWeek day = bid.getTimestamp().getDayOfWeek();
@@ -148,8 +148,8 @@ public class SellerController {
     // Chuyển hướng sang file tkdt.fxml (Lịch sử giao dịch)
     // Lưu ý: Hãy kiểm tra lại đường dẫn thư mục xem tkdt.fxml nằm chính xác ở đâu nhé
     SceneManager.getInstance().switchScene(
-        "/org/deptrai/auctionsystem/client/views/tkdt.fxml",
-        "Thống kê doanh thu"
+            "/org/deptrai/auctionsystem/client/views/tkdt.fxml",
+            "Thống kê doanh thu"
     );
   }
 }

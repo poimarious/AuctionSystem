@@ -47,55 +47,55 @@ public class SocketClient {
       in = new ObjectInputStream(socket.getInputStream());
       System.out.println("Đã kết nối tới Server thành công!");
 
-      if(clientExecutor == null || clientExecutor.isShutdown() || clientExecutor.isTerminated()) {
+      if (clientExecutor == null || clientExecutor.isShutdown() || clientExecutor.isTerminated()) {
         clientExecutor = Executors.newCachedThreadPool();
       }
 
       // Listening at all time
       Thread listenerThread =
-          new Thread(
-              () -> {
-                try {
-                  Message msg;
-                  while ((msg = (Message) in.readObject()) != null) {
-                    switch (msg.getCommand()) {
-                      case "PUSH_NOTIFICATION_BELL" -> {
-                        String msgText = (String) msg.getData();
-                        SessionManager.getInstance().addNotification(msgText);
-                      }
-                      case "AUCTION_UPDATE" -> {
-                        // Nhận được Broadcast -> Báo cho giao diện cập nhật ngay lập tức
-                        Auction updatedAuction = (Auction) msg.getData();
+              new Thread(
+                      () -> {
+                        try {
+                          Message msg;
+                          while ((msg = (Message) in.readObject()) != null) {
+                            switch (msg.getCommand()) {
+                              case "PUSH_NOTIFICATION_BELL" -> {
+                                String msgText = (String) msg.getData();
+                                SessionManager.getInstance().addNotification(msgText);
+                              }
+                              case "AUCTION_UPDATE" -> {
+                                // Nhận được Broadcast -> Báo cho giao diện cập nhật ngay lập tức
+                                Auction updatedAuction = (Auction) msg.getData();
 
-                        for (AuctionUpdateListener listener : listeners) {
-                          Platform.runLater(() -> listener.onAuctionUpdated(updatedAuction));
+                                for (AuctionUpdateListener listener : listeners) {
+                                  Platform.runLater(() -> listener.onAuctionUpdated(updatedAuction));
+                                }
+                              }
+                              case "FORCE_LOGOUT" -> {
+                                String banMessage = (String) msg.getData();
+
+                                Platform.runLater(
+                                        () -> {
+                                          SessionManager.getInstance().logout();
+                                          SceneManager.getInstance().clearHistory();
+                                          SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
+
+                                          Alert alert = new Alert(AlertType.ERROR);
+                                          alert.setTitle("TÀI KHOẢN BỊ CẤM");
+                                          alert.setHeaderText("Bạn đã bị buộc đăng xuất!");
+                                          alert.setContentText(banMessage);
+                                          alert.show();
+                                        });
+                              }
+                              default ->
+                                // Tin nhắn trả lời bình thường -> Nhét vào hàng đợi cho hàm sendRequest lấy
+                                      responseQueue.put(msg);
+                            }
+                          }
+                        } catch (Exception e) {
+                          System.out.println("Luồng lắng nghe ngắt kết nối.");
                         }
-                      }
-                      case "FORCE_LOGOUT" -> {
-                        String banMessage = (String) msg.getData();
-
-                        Platform.runLater(
-                                () -> {
-                                  SessionManager.getInstance().logout();
-                                  SceneManager.getInstance().clearHistory();
-                                  SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
-
-                                  Alert alert = new Alert(AlertType.ERROR);
-                                  alert.setTitle("TÀI KHOẢN BỊ CẤM");
-                                  alert.setHeaderText("Bạn đã bị buộc đăng xuất!");
-                                  alert.setContentText(banMessage);
-                                  alert.show();
-                                });
-                      }
-                      default ->
-                        // Tin nhắn trả lời bình thường -> Nhét vào hàng đợi cho hàm sendRequest lấy
-                              responseQueue.put(msg);
-                    }
-                  }
-                } catch (Exception e) {
-                  System.out.println("Luồng lắng nghe ngắt kết nối.");
-                }
-              });
+                      });
       listenerThread.setDaemon(true); // Tự động chết khi tắt App
       listenerThread.start();
 

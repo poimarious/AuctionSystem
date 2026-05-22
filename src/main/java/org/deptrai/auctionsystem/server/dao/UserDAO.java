@@ -1,5 +1,11 @@
 package org.deptrai.auctionsystem.server.dao;
 
+import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
+import org.deptrai.auctionsystem.shared.models.users.Admin;
+import org.deptrai.auctionsystem.shared.models.users.Bidder;
+import org.deptrai.auctionsystem.shared.models.users.Seller;
+import org.deptrai.auctionsystem.shared.models.users.User;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,20 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
-import org.deptrai.auctionsystem.shared.models.users.Admin;
-import org.deptrai.auctionsystem.shared.models.users.Bidder;
-import org.deptrai.auctionsystem.shared.models.users.Seller;
-import org.deptrai.auctionsystem.shared.models.users.User;
 
 public class UserDAO {
 
   public boolean insertUser(User user, String role) {
     String sql =
-        "INSERT INTO Users (userId, username, password, email, role, adminLevel, balance, isBanned, banReason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO Users (userId, username, password, email, role, adminLevel, balance, isBanned, banReason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       String id = (user.getUserId() != null) ? user.getUserId() : UUID.randomUUID().toString();
       user.setUserId(id);
@@ -91,7 +92,7 @@ public class UserDAO {
     String sql = "SELECT * FROM Users WHERE userId = ?";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       pstmt.setString(1, userId);
       ResultSet rs = pstmt.executeQuery();
@@ -108,7 +109,7 @@ public class UserDAO {
     String sql = "SELECT * FROM Users WHERE username = ?";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       pstmt.setString(1, username);
       ResultSet rs = pstmt.executeQuery();
@@ -123,7 +124,7 @@ public class UserDAO {
     // isBanned = 1 nghĩa là đã bị khóa
     String sql = "UPDATE Users SET isBanned = 1, banReason = ? WHERE userId = ?";
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       pstmt.setString(1, reason);
       pstmt.setString(2, userId);
@@ -140,7 +141,7 @@ public class UserDAO {
   public boolean unbanUser(String userId) {
     String sql = "UPDATE Users SET isBanned = 0, banReason = NULL WHERE userId = ?";
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
       pstmt.setString(1, userId);
       return pstmt.executeUpdate() > 0;
     } catch (SQLException e) {
@@ -152,7 +153,7 @@ public class UserDAO {
     String sql = "SELECT 1 FROM Users WHERE username = ?";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       pstmt.setString(1, username);
       ResultSet rs = pstmt.executeQuery();
@@ -171,7 +172,7 @@ public class UserDAO {
     String sql = "SELECT 1 FROM Users WHERE email = ?";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       pstmt.setString(1, email);
       ResultSet rs = pstmt.executeQuery();
@@ -189,7 +190,7 @@ public class UserDAO {
   public boolean updateBalance(String userId, double newBalance) {
     String sql = "UPDATE Users SET balance = ? WHERE userId = ?";
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
       pstmt.setDouble(1, newBalance);
       pstmt.setString(2, userId);
       pstmt.executeUpdate();
@@ -222,8 +223,8 @@ public class UserDAO {
     String sql = "SELECT * FROM Users";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        ResultSet rs = pstmt.executeQuery()) {
+         PreparedStatement pstmt = conn.prepareStatement(sql);
+         ResultSet rs = pstmt.executeQuery()) {
 
       while (rs.next()) {
         User user = mapResultSetToUser(rs);

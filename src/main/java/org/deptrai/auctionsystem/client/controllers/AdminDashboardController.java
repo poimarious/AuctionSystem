@@ -26,29 +26,46 @@ public class AdminDashboardController {
   private static final Logger logger = LoggerFactory.getLogger(AdminDashboardController.class);
 
   // Nút Menu
-  @FXML private Button btnNavAuctions;
-  @FXML private Button btnNavUsers;
-  @FXML private Label lblAdminInfo;
+  @FXML
+  private Button btnNavAuctions;
+  @FXML
+  private Button btnNavUsers;
+  @FXML
+  private Label lblAdminInfo;
 
   // Panes
-  @FXML private VBox paneAuctions;
-  @FXML private VBox paneUsers;
+  @FXML
+  private VBox paneAuctions;
+  @FXML
+  private VBox paneUsers;
 
   // Bảng Auctions
-  @FXML private TableView<Auction> tableAuctions;
-  @FXML private TableColumn<Auction, String> colAuctionId;
-  @FXML private TableColumn<Auction, String> colItemName;
-  @FXML private TableColumn<Auction, String> colPrice;
-  @FXML private TableColumn<Auction, String> colStatus;
-  @FXML private TableColumn<Auction, Void> colAuctionAction;
+  @FXML
+  private TableView<Auction> tableAuctions;
+  @FXML
+  private TableColumn<Auction, String> colAuctionId;
+  @FXML
+  private TableColumn<Auction, String> colItemName;
+  @FXML
+  private TableColumn<Auction, String> colPrice;
+  @FXML
+  private TableColumn<Auction, String> colStatus;
+  @FXML
+  private TableColumn<Auction, Void> colAuctionAction;
 
   // Bảng Users
-  @FXML private TableView<User> tableUsers;
-  @FXML private TableColumn<User, String> colUserId;
-  @FXML private TableColumn<User, String> colUsername;
-  @FXML private TableColumn<User, String> colRole;
-  @FXML private TableColumn<User, String> colUserStatus;
-  @FXML private TableColumn<User, Void> colUserAction;
+  @FXML
+  private TableView<User> tableUsers;
+  @FXML
+  private TableColumn<User, String> colUserId;
+  @FXML
+  private TableColumn<User, String> colUsername;
+  @FXML
+  private TableColumn<User, String> colRole;
+  @FXML
+  private TableColumn<User, String> colUserStatus;
+  @FXML
+  private TableColumn<User, Void> colUserAction;
 
   private Admin currentAdmin;
 
@@ -128,6 +145,7 @@ public class AdminDashboardController {
     // Nút Xóa
     colAuctionAction.setCellFactory(ignored -> new TableCell<>() {
       private final Button btn = new Button("XÓA");
+
       {
         btn.setStyle("-fx-background-color: #ff003c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
         btn.setOnAction(ignored -> {
@@ -140,7 +158,10 @@ public class AdminDashboardController {
       protected void updateItem(Void item, boolean empty) {
         super.updateItem(item, empty);
         if (empty) setGraphic(null);
-        else { setGraphic(btn); setAlignment(Pos.CENTER); }
+        else {
+          setGraphic(btn);
+          setAlignment(Pos.CENTER);
+        }
       }
     });
   }
@@ -201,6 +222,7 @@ public class AdminDashboardController {
     // Nút BAN/BỎ BAN
     colUserAction.setCellFactory(ignored -> new TableCell<>() {
       private final Button btn = new Button();
+
       {
         btn.setOnAction(ignored -> {
           User user = getTableView().getItems().get(getIndex());
@@ -242,7 +264,7 @@ public class AdminDashboardController {
   @FXML
   public void loadAllUsers() {
     new Thread(() -> {
-      try{
+      try {
         Message request = new Message("GET_ALL_USERS", null);
         Message response = SocketClient.sendRequest(request);
 
@@ -253,10 +275,10 @@ public class AdminDashboardController {
             tableUsers.getItems().setAll(users);
             System.out.println(">> Đã tải " + users.size() + " người dùng vào Admin Panel");
           });
-        } else{
+        } else {
           System.err.println(">> Server từ chối tải danh sách User");
         }
-      } catch(Exception e) {
+      } catch (Exception e) {
         logger.error("Lỗi khi nạp bảng User: ", e);
       }
     }).start();
@@ -296,8 +318,8 @@ public class AdminDashboardController {
 
   private void handleUnbanUser(User user) {
     Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-        "Bạn có chắc chắn muốn gỡ cấm cho tài khoản: " + user.getUsername() + "?",
-        ButtonType.YES, ButtonType.NO);
+            "Bạn có chắc chắn muốn gỡ cấm cho tài khoản: " + user.getUsername() + "?",
+            ButtonType.YES, ButtonType.NO);
     confirm.setTitle("Xác nhận Gỡ Cấm");
 
     confirm.showAndWait().ifPresent(response -> {

@@ -25,25 +25,25 @@ public abstract class User implements Serializable {
   }
 
   // region Getters & Setters
-  public String getUserId() { return userId; }
-  public void setUserId(String userId) { this.userId = userId; }
+  public String getUserId() {return userId;}
+  public void setUserId(String userId) {this.userId = userId;}
 
-  public String getUsername() { return username; }
-  public void setUsername(String username) { this.username = username; }
+  public String getUsername() {return username;}
+  public void setUsername(String username) {this.username = username;}
 
-  public String getPassword() { return password; }
-  public void setPassword(String password) { this.password = password; }
+  public String getPassword() {return password;}
+  public void setPassword(String password) {this.password = password;}
 
-  public String getEmail() { return email; }
-  public void setEmail(String email) { this.email = email; }
+  public String getEmail() {return email;}
+  public void setEmail(String email) {this.email = email;}
 
-  public double getBalance() { return balance; }
-  public void setBalance(double balance) { this.balance = balance; }
+  public double getBalance() {return balance;}
+  public void setBalance(double balance) {this.balance = balance;}
 
-  public boolean isBanned() { return isBanned; }
-  public void setBanned(boolean banned) { this.isBanned = banned; }
+  public boolean isBanned() {return isBanned;}
+  public void setBanned(boolean banned) {this.isBanned = banned;}
 
-  public String getBanReason() { return banReason; }
-  public void setBanReason(String banReason) { this.banReason = banReason; }
+  public String getBanReason() {return banReason;}
+  public void setBanReason(String banReason) {this.banReason = banReason;}
   // endregion
 }

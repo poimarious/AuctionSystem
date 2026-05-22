@@ -1,7 +1,8 @@
 package org.deptrai.auctionsystem.shared.models.users;
 
-import java.util.List;
 import org.deptrai.auctionsystem.shared.models.items.Item;
+
+import java.util.List;
 
 public class Seller extends User {
   private List<Item> listedItems;

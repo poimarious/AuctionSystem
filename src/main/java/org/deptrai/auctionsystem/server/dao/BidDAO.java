@@ -1,5 +1,10 @@
 package org.deptrai.auctionsystem.server.dao;
 
+import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
+import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.bid.Bid;
+import org.deptrai.auctionsystem.shared.models.users.Bidder;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,18 +13,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
-import org.deptrai.auctionsystem.shared.models.auction.Auction;
-import org.deptrai.auctionsystem.shared.models.bid.Bid;
-import org.deptrai.auctionsystem.shared.models.users.Bidder;
 
 public class BidDAO {
   public boolean insertBid(Bid bid) {
     String sql =
-        "INSERT INTO Bids (bidId, bidderId, auctionId, amount, timestamp) VALUES (?, ?, ?, ?, ?)";
+            "INSERT INTO Bids (bidId, bidderId, auctionId, amount, timestamp) VALUES (?, ?, ?, ?, ?)";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       String id = (bid.getBidId() != null) ? bid.getBidId() : UUID.randomUUID().toString();
       bid.setBidId(id);
@@ -44,7 +45,7 @@ public class BidDAO {
     String sql = "SELECT * FROM Bids WHERE bidderId = ? ORDER BY timestamp DESC";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       pstmt.setString(1, bidderId);
       ResultSet rs = pstmt.executeQuery();
@@ -53,7 +54,7 @@ public class BidDAO {
       AuctionDAO auctionDAO = new AuctionDAO();
 
       Bidder currentBidder =
-          (Bidder) userDAO.getUserById(bidderId); // Can pass in a Bidder instance from method
+              (Bidder) userDAO.getUserById(bidderId); // Can pass in a Bidder instance from method
 
       while (rs.next()) {
         String bidId = rs.getString("bidId");
@@ -81,7 +82,7 @@ public class BidDAO {
     String sql = "SELECT * FROM Bids WHERE auctionId = ? ORDER BY timestamp DESC";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       pstmt.setString(1, auctionId);
       ResultSet rs = pstmt.executeQuery();
