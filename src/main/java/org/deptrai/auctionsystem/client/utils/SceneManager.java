@@ -43,7 +43,7 @@ public class SceneManager {
   // Phương thức chuyên biệt để về Home và xóa lịch sử
   public void navigateToHome() {
     historyStack.clear();
-    loadScene("/org/deptrai/auctionsystem/client/views/home-view.fxml", "Trang Chủ Auction.UET");
+    loadScene("/org/deptrai/auctionsystem/client/views/home-view.fxml", "Trang Chủ");
   }
 
   public void goBack() {

@@ -1,5 +1,6 @@
 package org.deptrai.auctionsystem.server.dao;
 
+import org.deptrai.auctionsystem.server.managers.AuctionManager;
 import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
@@ -10,7 +11,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -44,6 +47,10 @@ public class BidDAO {
     // Order by descending timestamps
     String sql = "SELECT * FROM Bids WHERE bidderId = ? ORDER BY timestamp DESC";
 
+    Map<String, Auction> localAuctionCache = new HashMap<>();
+    AuctionDAO auctionDAO = new AuctionDAO();
+
+
     try (Connection conn = DatabaseConnection.getConnection();
          PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -51,21 +58,28 @@ public class BidDAO {
       ResultSet rs = pstmt.executeQuery();
 
       UserDAO userDAO = new UserDAO();
-      AuctionDAO auctionDAO = new AuctionDAO();
 
-      Bidder currentBidder =
-              (Bidder) userDAO.getUserById(bidderId); // Can pass in a Bidder instance from method
+      Bidder currentBidder = (Bidder) userDAO.getUserById(bidderId); // Can pass in a Bidder instance from method
 
       while (rs.next()) {
         String bidId = rs.getString("bidId");
         double amount = rs.getDouble("amount");
-        String timeString = rs.getString("timestamp");
+        LocalDateTime timestamp = LocalDateTime.parse(rs.getString("timestamp"));
         String auctionId = rs.getString("auctionId");
 
-        LocalDateTime timestamp = LocalDateTime.parse(timeString);
 
-        Auction auction = auctionDAO.getAuctionById(auctionId);
 
+        Auction auction = localAuctionCache.get(auctionId);
+
+        if(auction == null) {
+          auction = AuctionManager.getInstance().getAuctionById(auctionId);
+          if(auction == null) {
+            auction = auctionDAO.getAuctionById(auctionId);
+          }
+
+          localAuctionCache.put(auctionId, auction);
+        }
+        auction.setBids(null);
         Bid bid = new Bid(bidId, currentBidder, auction, amount, timestamp);
         history.add(bid);
       }

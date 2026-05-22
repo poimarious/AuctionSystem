@@ -41,8 +41,6 @@ public class BidHistoryController {
 
   @FXML
   public void initialize() {
-    logger.info("Đã load trang Lịch sử đặt giá!");
-
     // 1. Cột Tên sản phẩm
     productNameColumn.setCellValueFactory(
             cellData -> {
@@ -122,12 +120,6 @@ public class BidHistoryController {
               allBidsList = myBids;
 
               filterBids("ALL"); // Mặc định hiển thị tất cả
-
-              if (myBids.isEmpty()) {
-                logger.info("Bạn chưa có lượt đặt giá nào.");
-              } else {
-                logger.info("Đã tải {} lượt đặt giá từ Server.", myBids.size());
-              }
             });
           } else {
             logger.error("Lỗi khi tải lịch sử.");
