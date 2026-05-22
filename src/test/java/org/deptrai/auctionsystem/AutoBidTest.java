@@ -111,7 +111,7 @@ public class AutoBidTest {
     // ==========================================
     // TEST 1: TỰ ĐỘNG ĐẶT GIÁ KHI BỊ NGƯỜI KHÁC DẪN ĐẦU
     // ==========================================
-    /*@Test
+    @Test
     @Order(1)
     void testAutoBid_ShouldTrigger_WhenCompetitorIsWinning() throws Exception {
         // 1. Giả lập đối thủ (competitor) đang dẫn đầu với giá 100$
@@ -139,7 +139,7 @@ public class AutoBidTest {
         assertEquals(115.0, ramAuction.getCurrentPrice(), "Giá phải được Auto Bid nâng lên thành 115.0");
         assertNotNull(ramAuction.getWinner());
         assertEquals(autoBidUser.getUserId(), ramAuction.getWinner().getUserId(), "Bot phải giúp User cướp lại vị trí Top 1");
-    }*/
+    }
 
     // ==========================================
     // TEST 2: TỰ ĐỘNG TẮT KHI VƯỢT QUÁ GIỚI HẠN TÀI CHÍNH (MAX BID)

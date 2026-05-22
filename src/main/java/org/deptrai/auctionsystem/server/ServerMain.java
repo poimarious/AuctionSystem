@@ -17,7 +17,7 @@ public class ServerMain {
 
   public static java.util.List<ClientHandler> activeClients = new java.util.concurrent.CopyOnWriteArrayList<>();
 
-  static void main(String[] args) {
+  public static void main(String[] args) {
     System.out.println("=== HỆ THỐNG ĐẤU GIÁ SERVER ===");
 
     DatabaseConnection.initializeDatabase();
