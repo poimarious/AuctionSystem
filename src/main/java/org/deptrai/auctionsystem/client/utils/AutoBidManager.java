@@ -3,13 +3,17 @@ package org.deptrai.auctionsystem.client.utils;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AutoBidManager {
 
-  private static AutoBidManager instance;
+  private static final Logger logger = LoggerFactory.getLogger(AutoBidManager.class);
+
+  private static volatile AutoBidManager instance;
 
   private final Map<String, AutoBidConfig> activeAutoBids = new ConcurrentHashMap<>();
   private AutoBidManager() {
@@ -64,7 +68,7 @@ public class AutoBidManager {
             Thread.sleep(1000);
             sendAutoBidRequest(auctionId, myId,nextBidAmount);
           } catch(Exception e) {
-            e.printStackTrace();
+            logger.error("",e);
           }
         }).start();
       } else {
@@ -81,6 +85,7 @@ public class AutoBidManager {
 
       if("FAIL".equals(res.getStatus())) {
         stopAutoBid(auctionId);
+        logger.info("Can't auto-bid more, stopped auto-bid.");
       }
     });
   }

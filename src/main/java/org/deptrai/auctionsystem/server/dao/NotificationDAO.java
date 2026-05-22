@@ -10,7 +10,7 @@ import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
 
 public class NotificationDAO {
 
-  public boolean insertNotification(String userId, String message) {
+  public void insertNotification(String userId, String message) {
     String sql = "INSERT INTO notifications (notification_id, user_id, message, created_at) VALUES (?, ?, ?, ?)";
     try (Connection conn = DatabaseConnection.getConnection();
          PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -20,10 +20,9 @@ public class NotificationDAO {
       pstmt.setString(3, message);
       pstmt.setString(4, java.time.LocalDateTime.now().toString());
 
-      return pstmt.executeUpdate() > 0;
+      pstmt.executeUpdate();
     } catch (Exception e) {
       System.err.println("Lỗi lưu thông báo vào DB: " + e.getMessage());
-      return false;
     }
   }
 
@@ -42,17 +41,6 @@ public class NotificationDAO {
       System.err.println("Lỗi tải thông báo từ DB: " + e.getMessage());
     }
     return list;
-  }
-
-  public void markAllAsRead(String userId) {
-    String sql = "UPDATE notifications SET is_read = 1 WHERE user_id = ?";
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-      pstmt.setString(1, userId);
-      pstmt.executeUpdate();
-    } catch (Exception e) {
-      System.err.println("Lỗi cập nhật trạng thái thông báo: " + e.getMessage());
-    }
   }
 
   public void deleteNotificationsByUserId(String userId) {

@@ -1,12 +1,10 @@
 package org.deptrai.auctionsystem.client.controllers;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
@@ -25,8 +23,6 @@ import java.util.Map;
 
 public class SellerController {
   private static final Logger logger = LoggerFactory.getLogger(SellerController.class);
-  @FXML
-  private TextField searchField;
   @FXML
   private Label welcomeLabel;
   @FXML
@@ -66,8 +62,10 @@ public class SellerController {
       Message request = new Message("GET_SELLER_AUCTIONS", currentUser.getUserId());
       Message response = SocketClient.sendRequest(request);
 
-      if (response != null && "SUCCESS".equals(response.getStatus())) {
-        sellerAuctions = (List<Auction>) response.getData();
+      if ("SUCCESS".equals(response.getStatus())) {
+        @SuppressWarnings("unchecked")
+        List <Auction > auctions = (List<Auction>) response.getData();
+        sellerAuctions = auctions;
 
 
         // Đếm các auction đang đấu giá và đã đấu giá thành công của seller
@@ -124,29 +122,29 @@ public class SellerController {
   // --- CÁC HÀM ĐIỀU HƯỚNG ---
 
   @FXML
-  public void handleGoBack(ActionEvent event) {
+  public void handleGoBack() {
     SceneManager.getInstance().goBack();
   }
 
   @FXML
-  public void handleLogout(ActionEvent event) {
+  public void handleLogout() {
     SessionManager.getInstance().logout();
     SceneManager.getInstance().clearHistory();
     SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
   }
 
   @FXML
-  public void handleAddNewProduct(ActionEvent event) {
+  public void handleAddNewProduct() {
     SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/add-product-view.fxml", "Đăng sản phẩm mới");
   }
 
   @FXML
-  public void handleOpenInventory(ActionEvent event) {
+  public void handleOpenInventory() {
     SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/inventory-view.fxml", "Kho hàng của tôi");
   }
 
   @FXML
-  public void handleShowRevenue(ActionEvent event) {
+  public void handleShowRevenue() {
     // Chuyển hướng sang file tkdt.fxml (Lịch sử giao dịch)
     // Lưu ý: Hãy kiểm tra lại đường dẫn thư mục xem tkdt.fxml nằm chính xác ở đâu nhé
     SceneManager.getInstance().switchScene(

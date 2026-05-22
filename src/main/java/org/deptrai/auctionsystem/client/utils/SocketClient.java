@@ -5,6 +5,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.network.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,6 +16,9 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class SocketClient {
+
+  private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);
+
   private static Socket socket;
   private static ObjectOutputStream out;
   private static ObjectInputStream in;
@@ -53,34 +58,38 @@ public class SocketClient {
                 try {
                   Message msg;
                   while ((msg = (Message) in.readObject()) != null) {
-                    if (msg.getCommand().equals("PUSH_NOTIFICATION_BELL")) {
-                      String msgText = (String) msg.getData();
-                      SessionManager.getInstance().addNotification(msgText);
-                    } else if (msg.getCommand().equals("AUCTION_UPDATE")) {
-                      // Nhận được Broadcast -> Báo cho giao diện cập nhật ngay lập tức
-                      Auction updatedAuction = (Auction) msg.getData();
-
-                      for (AuctionUpdateListener listener : listeners) {
-                        Platform.runLater(() -> listener.onAuctionUpdated(updatedAuction));
+                    switch (msg.getCommand()) {
+                      case "PUSH_NOTIFICATION_BELL" -> {
+                        String msgText = (String) msg.getData();
+                        SessionManager.getInstance().addNotification(msgText);
                       }
-                    } else if (msg.getCommand().equals("FORCE_LOGOUT")) {
-                      String banMessage = (String) msg.getData();
+                      case "AUCTION_UPDATE" -> {
+                        // Nhận được Broadcast -> Báo cho giao diện cập nhật ngay lập tức
+                        Auction updatedAuction = (Auction) msg.getData();
 
-                      Platform.runLater(
-                          () -> {
-                            SessionManager.getInstance().logout();
-                            SceneManager.getInstance().clearHistory();
-                            SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
+                        for (AuctionUpdateListener listener : listeners) {
+                          Platform.runLater(() -> listener.onAuctionUpdated(updatedAuction));
+                        }
+                      }
+                      case "FORCE_LOGOUT" -> {
+                        String banMessage = (String) msg.getData();
 
-                            Alert alert = new Alert(AlertType.ERROR);
-                            alert.setTitle("TÀI KHOẢN BỊ CẤM");
-                            alert.setHeaderText("Bạn đã bị buộc đăng xuất!");
-                            alert.setContentText(banMessage);
-                            alert.show();
-                          });
-                    } else {
-                      // Tin nhắn trả lời bình thường -> Nhét vào hàng đợi cho hàm sendRequest lấy
-                      responseQueue.put(msg);
+                        Platform.runLater(
+                                () -> {
+                                  SessionManager.getInstance().logout();
+                                  SceneManager.getInstance().clearHistory();
+                                  SceneManager.getInstance().switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
+
+                                  Alert alert = new Alert(AlertType.ERROR);
+                                  alert.setTitle("TÀI KHOẢN BỊ CẤM");
+                                  alert.setHeaderText("Bạn đã bị buộc đăng xuất!");
+                                  alert.setContentText(banMessage);
+                                  alert.show();
+                                });
+                      }
+                      default ->
+                        // Tin nhắn trả lời bình thường -> Nhét vào hàng đợi cho hàm sendRequest lấy
+                              responseQueue.put(msg);
                     }
                   }
                 } catch (Exception e) {
@@ -113,7 +122,7 @@ public class SocketClient {
       if (socket != null) socket.close();
       clientExecutor.shutdown();
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
     }
   }
 }

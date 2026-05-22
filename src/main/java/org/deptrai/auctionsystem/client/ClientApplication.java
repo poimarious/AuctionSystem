@@ -1,6 +1,8 @@
 package org.deptrai.auctionsystem.client;
 
 import java.io.IOException;
+import java.util.Objects;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -35,10 +37,10 @@ public class ClientApplication extends Application {
     SceneManager.getInstance().setPrimaryStage(stage);
 
     try {
-      Image appIcon = new Image(getClass().getResourceAsStream("/org/deptrai/auctionsystem/client/views/images/logo.png"));
+      Image appIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/org/deptrai/auctionsystem/client/views/images/logo.png")));
       stage.getIcons().add(appIcon);
     } catch (Exception e) {
-      logger.error("Không thể load logo ứng dụng: " + e.getMessage());
+      logger.error("Không thể load logo ứng dụng:", e);
     }
 
 

@@ -6,8 +6,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SceneManager {
+
+  private static final Logger logger = LoggerFactory.getLogger(SceneManager.class);
+
   private static SceneManager instance;
   private final Stack<String[]> historyStack = new Stack<>();
   private Stage primaryStage;
@@ -83,8 +88,7 @@ public class SceneManager {
       this.currentFxml = fxmlPath;
       this.currentTitle = title;
     } catch (IOException e) {
-      System.err.println("Lỗi chuyển trang: " + e.getMessage());
-      e.printStackTrace();
+      logger.error("Lỗi chuyển trang: ", e);
     }
   }
 }

@@ -4,7 +4,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
@@ -62,8 +61,6 @@ public class BiddingDetailController implements AuctionUpdateListener {
   @FXML
   private RadioButton radioQuick;
   @FXML
-  private RadioButton radioCustom;
-  @FXML
   private ToggleGroup bidModeGroup;
   @FXML
   private HBox quickBidBox;
@@ -110,7 +107,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
     }
 
     // Lắng nghe sự kiện chuyển đổi Mode đặt bid
-    bidModeGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
+    bidModeGroup.selectedToggleProperty().addListener((_, _, _) -> {
       if (radioQuick.isSelected()) {
         quickBidBox.setVisible(true);
         bidAmountField.setVisible(false);
@@ -133,13 +130,13 @@ public class BiddingDetailController implements AuctionUpdateListener {
         Message res = SocketClient.sendRequest(req);
 
         Platform.runLater(() -> {
-          if (res != null && "SUCCESS".equals(res.getStatus())) {
+          if ("SUCCESS".equals(res.getStatus())) {
             Auction freshAuction = (Auction) res.getData();
             setAuctionData(freshAuction);
           } else {
             // Xử lý khi mạng lỗi hoặc phiên đấu giá bị xóa
             showError("Không thể tải thông tin phiên đấu giá. Vui lòng thử lại sau!");
-            handleGoBack(null); // Đẩy người dùng quay lại trang trước
+            handleGoBack(); // Đẩy người dùng quay lại trang trước
           }
         });
       });
@@ -168,7 +165,9 @@ public class BiddingDetailController implements AuctionUpdateListener {
               byte[] imageBytes = (byte[]) response.getData();
               Image image = new Image(new ByteArrayInputStream(imageBytes));
               productImageView.setImage(image);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+              logger.error("Lỗi khi load ảnh:",e);
+            }
           } else {
             logger.info("Không tìm thấy file ảnh gốc trên server!");
           }
@@ -201,7 +200,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
   private void startTimer() {
     if (countdownTimeline != null) countdownTimeline.stop();
-    countdownTimeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(1), e -> updateCountdown()));
+    countdownTimeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(1), _ -> updateCountdown()));
     countdownTimeline.setCycleCount(Timeline.INDEFINITE);
     countdownTimeline.play();
   }
@@ -231,7 +230,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
   // SỬA NÚT QUAY LẠI: Kiểm tra kỹ đường dẫn này!
   @FXML
-  public void handleGoBack(ActionEvent event) {
+  public void handleGoBack() {
     if (countdownTimeline != null) countdownTimeline.stop();
     // Removing observer
     SocketClient.removeListener(this);
@@ -272,7 +271,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
             Alert a = new Alert(Alert.AlertType.INFORMATION, "Đặt giá thành công!");
             a.show();
           } else {
-            String realErrorMessage = "Không nhận được phản hồi từ Server (Mất kết nối).";
+            String realErrorMessage;
 
             if (res.getData() instanceof String) {
               // Nếu Server trả về lỗi dạng chuỗi String
@@ -316,7 +315,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
   }
 
   @FXML
-  public void handleActivateAutoBid(ActionEvent event) {
+  public void handleActivateAutoBid() {
     String auctionId = currentAuction.getAuctionId();
 
     if (AutoBidManager.getInstance().isAutoBidActive(auctionId)) {

@@ -2,7 +2,6 @@ package org.deptrai.auctionsystem.client.controllers;
 
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.NodeOrientation;
@@ -17,7 +16,6 @@ import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
-import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
@@ -52,18 +50,13 @@ public class MainController {
   @FXML
   private TextField searchField;
 
-  @FXML
-  private ScrollPane floorScrollPane;
   @FXML private Button toggleViewBtn;
   @FXML private Label mainTitleLabel;
   @FXML private Label subTitleLabel;
-
-  private final int PAGE_SIZE = 12;
-  private int currentIndex = 0;
   private List<AuctionSummary> allAuctions = new ArrayList<>();
   private boolean isShowingPending = false;
-  private List<AuctionSummary> runningAuctions = new ArrayList<>();
-  private List<AuctionSummary> pendingAuctions = new ArrayList<>();
+  private final List<AuctionSummary> runningAuctions = new ArrayList<>();
+  private final List<AuctionSummary> pendingAuctions = new ArrayList<>();
 
 
   @FXML
@@ -93,9 +86,7 @@ public class MainController {
       notificationBell.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
 
       var notifs = SessionManager.getInstance().getNotifications();
-      notifs.addListener((ListChangeListener<String>) change -> {
-        Platform.runLater(this::updateNotification);
-      });
+      notifs.addListener((ListChangeListener<String>) _ -> Platform.runLater(this::updateNotification));
       updateNotification();
 
       // Fix JavaFX nếu mở lần đầu, khi đó javaFX chưa biết kích thước của cái box nên nó sẽ show ra hẳn ngoài app
@@ -107,7 +98,7 @@ public class MainController {
     }
 
     if(searchField != null) {
-      searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+      searchField.textProperty().addListener((_, _, newValue) -> {
         List<AuctionSummary> searchResult = SearchEngine.searchAuctions(allAuctions, newValue);
 
         displayAuctions(searchResult);
@@ -154,7 +145,8 @@ public class MainController {
         Message req = new Message("GET_NOTIFICATIONS", currentUser.getUserId());
         Message res = SocketClient.sendRequest(req);
 
-        if (res != null && "SUCCESS".equals(res.getStatus())) {
+        if ("SUCCESS".equals(res.getStatus())) {
+          @SuppressWarnings("unchecked")
           List<String> offlineNotifs = (List<String>) res.getData();
           Platform.runLater(() -> {
             // Đổ toàn bộ thông báo tích lũy vào chuông thông báo trên RAM Client
@@ -190,8 +182,9 @@ public class MainController {
     }
     Message response = SocketClient.sendRequest(request);
 
-    if (response != null && response.getStatus().equals("SUCCESS")) {
+    if (response.getStatus().equals("SUCCESS")) {
       if (currentUser instanceof Seller) {
+        @SuppressWarnings("unchecked")
         List<Auction> sellerAuctions = (List<Auction>) response.getData();
 
         for(Auction auction : sellerAuctions) {
@@ -209,7 +202,9 @@ public class MainController {
           allAuctions.add(auctionSummary);
         }
       } else {
-        allAuctions = (List<AuctionSummary>) response.getData();
+        @SuppressWarnings("unchecked")
+        List<AuctionSummary> auctions = (List<AuctionSummary>) response.getData();
+        allAuctions = auctions;
       }
       // Dọn sạch 2 kho chứa trước khi chia bài
       runningAuctions.clear();
@@ -245,12 +240,10 @@ public class MainController {
       });
 
       Platform.runLater(() -> {
-        Platform.runLater(() -> {
-          if (mainScrollPane != null) {
-            mainScrollPane.setVvalue(0.0);
-            mainScrollPane.requestFocus();
-          }
-        });
+        if (mainScrollPane != null) {
+          mainScrollPane.setVvalue(0.0);
+          mainScrollPane.requestFocus();
+        }
       });
     } else {
       logger.error("Không thể lấy danh sách đấu giá từ server");
@@ -281,7 +274,7 @@ public class MainController {
           }
           productsContainer.getChildren().add(itemCard);
         } catch (IOException e) {
-          logger.error("Lỗi nạp item-card: " + e.getMessage());
+          logger.error("Lỗi nạp item-card: ", e);
         }
       }
     });
@@ -309,7 +302,7 @@ public class MainController {
         listView.getItems().add(lb);
       }
 
-      listView.getSelectionModel().selectionModeProperty().addListener((obs, oldVal, newVal) -> {
+      listView.getSelectionModel().selectionModeProperty().addListener((_, _, newVal) -> {
         if(newVal != null) {
           javafx.application.Platform.runLater(() -> listView.getSelectionModel().clearSelection());
         }
@@ -328,19 +321,19 @@ public class MainController {
   }
 
   @FXML
-  public void handleLogin(ActionEvent event) {
+  public void handleLogin() {
     SceneManager.getInstance()
         .switchScene("/org/deptrai/auctionsystem/client/views/login-view.fxml", "Đăng nhập");
   }
 
   @FXML
-  public void handleRegister(ActionEvent event) {
+  public void handleRegister() {
     SceneManager.getInstance()
         .switchScene("/org/deptrai/auctionsystem/client/views/register-view.fxml", "Đăng ký");
   }
 
   @FXML
-  public void handleLogout(ActionEvent event) {
+  public void handleLogout() {
     new Thread(() -> {
       Message logoutReq = new Message("REQUEST", "LOGOUT", null);
       SocketClient.sendRequest(logoutReq);
@@ -354,26 +347,26 @@ public class MainController {
   }
 
   @FXML
-  public void handleShowProfile(ActionEvent event) {
+  public void handleShowProfile() {
     SceneManager.getInstance()
         .switchScene("/org/deptrai/auctionsystem/client/views/profile-view.fxml", "Hồ sơ của tôi");
   }
 
   @FXML
-  public void handleShowBidHistory(ActionEvent event) {
+  public void handleShowBidHistory() {
     SceneManager.getInstance()
         .switchScene(
             "/org/deptrai/auctionsystem/client/views/bid-history-view.fxml", "Lịch sử đặt giá");
   }
 
   @FXML
-  public void handleOpenAuctionFloor(ActionEvent event) {
+  public void handleOpenAuctionFloor() {
     SceneManager.getInstance()
         .switchScene(
             "/org/deptrai/auctionsystem/client/views/auction-floor-view.fxml", "Sàn Đấu Giá");
   }
   @FXML
-  public void handleToggleView(ActionEvent event) {
+  public void handleToggleView() {
     if (productsContainer == null) return;
 
     // Kiểm tra xem người dùng hiện tại có phải là Seller không
@@ -418,13 +411,13 @@ public class MainController {
   }
 
   @FXML
-  public void handleGoToSellerCenter(ActionEvent event) {
+  public void handleGoToSellerCenter() {
     SceneManager.getInstance()
         .switchScene("/org/deptrai/auctionsystem/client/views/seller.fxml", "Kênh Người Bán");
   }
   // Hàm xử lý sự kiện khi ấn nút "Làm mới"
   @FXML
-  public void handleReload(ActionEvent event) {
+  public void handleReload() {
     logger.info("Đang tải lại danh sách đấu giá mới nhất...");
 
     // Xóa chữ trong ô tìm kiếm (nếu đang có) để hiển thị lại toàn bộ danh sách

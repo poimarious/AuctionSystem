@@ -50,7 +50,6 @@ public class ItemCardController implements AuctionUpdateListener {
       SocketClient.runAsync(() -> {
         Message request = new Message("GET_IMAGE", imagePath);
         Message response = SocketClient.sendRequest(request);
-        logger.info(response.getStatus() + " " + response.getData());
         Platform.runLater(() -> {
           if("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
             try {
@@ -83,7 +82,7 @@ public class ItemCardController implements AuctionUpdateListener {
 
   private void startCountdown() {
     if (timeline != null) timeline.stop();
-    timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> updateTimer()));
+    timeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> updateTimer()));
     timeline.setCycleCount(Timeline.INDEFINITE);
     timeline.play();
     updateTimer();
@@ -108,9 +107,7 @@ public class ItemCardController implements AuctionUpdateListener {
           }
           else {
             bidButton.setText("Thanh toán");
-            bidButton.setOnAction(event -> {
-              handleDirectCheckout();
-            });
+            bidButton.setOnAction(_ -> handleDirectCheckout());
           }
         }
       }
@@ -201,9 +198,7 @@ public class ItemCardController implements AuctionUpdateListener {
       this.auction.setCurrentPrice(updatedAuction.getCurrentPrice());
 
       // Nhảy số tiền trên giao diện
-      Platform.runLater(() -> {
-        priceLabel.setText(String.format("$%.2f", updatedAuction.getCurrentPrice()));
-      });
+      Platform.runLater(() -> priceLabel.setText(String.format("$%.2f", updatedAuction.getCurrentPrice())));
     }
   }
 }

@@ -1,6 +1,5 @@
 package org.deptrai.auctionsystem.client.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
@@ -8,8 +7,6 @@ import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.network.Message;
 
 public class RegisterController {
-
-  @FXML private TextField fullNameField; // Đã thêm trường này để khớp với FXML
 
   @FXML private TextField usernameField;
 
@@ -24,7 +21,7 @@ public class RegisterController {
   // Đã xóa roleComboBox và hàm initialize() đi vì giao diện mới dùng RadioButton
 
   @FXML
-  public void handleRegisterAction(ActionEvent event) {
+  public void handleRegisterAction() {
     String username = usernameField.getText();
     String email = emailField.getText();
     String password = passwordField.getText();
@@ -81,7 +78,7 @@ public class RegisterController {
   }
 
   @FXML
-  public void handleBackToLogin(ActionEvent event) {
+  public void handleBackToLogin() {
     // Dùng cho nút ⬅ quay lại trang đăng nhập
     SceneManager.getInstance()
         .switchScene(

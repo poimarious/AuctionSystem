@@ -1,7 +1,6 @@
 package org.deptrai.auctionsystem.client.utils;
 
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
-import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 
 import java.util.List;
 import java.util.stream.Collectors;

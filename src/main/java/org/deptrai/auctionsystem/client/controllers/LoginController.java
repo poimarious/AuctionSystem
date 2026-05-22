@@ -1,6 +1,5 @@
 package org.deptrai.auctionsystem.client.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
@@ -21,12 +20,12 @@ public class LoginController {
   @FXML private PasswordField passwordField;
 
   @FXML
-  public void handleGoBack(ActionEvent event) {
+  public void handleGoBack() {
     SceneManager.getInstance().navigateToHome();
   }
 
   @FXML
-  public void handleLoginAction(ActionEvent event) {
+  public void handleLoginAction() {
     String inputUsername = usernameField.getText();
     String inputPassword = passwordField.getText();
 
@@ -91,7 +90,7 @@ public class LoginController {
   }
 
   @FXML
-  public void handleGoToRegister(ActionEvent event) {
+  public void handleGoToRegister() {
     // Chuyển sang trang Register
     SceneManager.getInstance()
         .switchScene(

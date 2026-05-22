@@ -15,8 +15,4 @@ public class ServerThreadPool {
   public static void submitTask(Runnable task) {
     threadPool.submit(task);
   }
-
-  public static void shutdown() {
-    threadPool.shutdown();
-  }
 }

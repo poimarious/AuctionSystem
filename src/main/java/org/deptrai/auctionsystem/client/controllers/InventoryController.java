@@ -2,29 +2,20 @@ package org.deptrai.auctionsystem.client.controllers;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
-import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 
-import javafx.scene.control.TableView;
-// CÁC THƯ VIỆN BỔ SUNG CHO NÚT XÓA
-import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.geometry.Pos;
-
-import java.net.Socket;
-import java.util.Optional;
 import java.util.List;
+
+// CÁC THƯ VIỆN BỔ SUNG CHO NÚT XÓA
 
 public class InventoryController {
 
@@ -37,7 +28,7 @@ public class InventoryController {
 @FXML private TableColumn<Auction, String> finalPriceColumn;
 
   @FXML
-  public void handleAddNewProduct(ActionEvent event) {
+  public void handleAddNewProduct() {
     // Chuyển sang trang Đăng sản phẩm mới
     SceneManager.getInstance()
         .switchScene(
@@ -59,8 +50,9 @@ public class InventoryController {
       Message request = new Message("REQUEST", "GET_SELLER_AUCTIONS", currentUser.getUserId());
       Message response = SocketClient.sendRequest(request);
 
-      if (response != null && "SUCCESS".equals(response.getStatus())) {
+      if ("SUCCESS".equals(response.getStatus())) {
         // Ép kiểu dữ liệu trả về
+        @SuppressWarnings("unchecked")
         List<Auction> myAuctions = (List<Auction>) response.getData();
         // 3. Đưa vào luồng chính JavaFX để hiển thị
         Platform.runLater(() -> {
@@ -73,7 +65,7 @@ public class InventoryController {
 
       } else {
         Platform.runLater(() -> {
-          String errorMsg = (response != null && response.getData() instanceof String)
+          String errorMsg = response.getData() instanceof String
                   ? (String) response.getData()
                   : "Lỗi kết nối mạng!";
           System.out.println("Lỗi tải kho hàng: " + errorMsg);
@@ -83,7 +75,7 @@ public class InventoryController {
   }
 
   @FXML
-  public void handleGoBack(ActionEvent event) {
+  public void handleGoBack() {
     SceneManager.getInstance().goBack();
   }
 
