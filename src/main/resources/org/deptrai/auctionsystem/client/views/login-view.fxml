@@ -65,8 +65,6 @@
                                                    onAction="#handleGoToRegister"/>
                                     </children>
                                 </HBox>
-
-                                <Hyperlink text="❓ Quên mật khẩu?" style="-fx-text-fill: #ff003c;"/>
                             </children>
                         </VBox>
                     </children>
