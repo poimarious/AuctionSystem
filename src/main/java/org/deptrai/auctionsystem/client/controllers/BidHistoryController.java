@@ -1,10 +1,5 @@
 package org.deptrai.auctionsystem.client.controllers;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.ArrayList; // BỔ SUNG IMPORT
-import java.util.List;
-
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -21,14 +16,25 @@ import org.deptrai.auctionsystem.shared.network.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList; // BỔ SUNG IMPORT
+import java.util.List;
+
 public class BidHistoryController {
   private static final Logger logger = LoggerFactory.getLogger(BidHistoryController.class);
-  @FXML private TableView<Bid> bidHistoryTable;
-  @FXML private TableColumn<Bid, String> productNameColumn;
-  @FXML private TableColumn<Bid, String> myBidPriceColumn;
-  @FXML private TableColumn<Bid, String> currentPriceColumn;
-  @FXML private TableColumn<Bid, String> timeRemainingColumn;
-  @FXML private TableColumn<Bid, String> statusColumn;
+  @FXML
+  private TableView<Bid> bidHistoryTable;
+  @FXML
+  private TableColumn<Bid, String> productNameColumn;
+  @FXML
+  private TableColumn<Bid, String> myBidPriceColumn;
+  @FXML
+  private TableColumn<Bid, String> currentPriceColumn;
+  @FXML
+  private TableColumn<Bid, String> timeRemainingColumn;
+  @FXML
+  private TableColumn<Bid, String> statusColumn;
 
   // --- Kho chứa gốc lưu TOÀN BỘ lịch sử trên RAM ---
   private List<Bid> allBidsList = new ArrayList<>();
@@ -39,55 +45,55 @@ public class BidHistoryController {
 
     // 1. Cột Tên sản phẩm
     productNameColumn.setCellValueFactory(
-        cellData -> {
-          if (cellData.getValue().getAuction() != null) {
-            return new SimpleStringProperty(cellData.getValue().getAuction().getItem().getName());
-          }
-          return new SimpleStringProperty("N/A");
-        });
+            cellData -> {
+              if (cellData.getValue().getAuction() != null) {
+                return new SimpleStringProperty(cellData.getValue().getAuction().getItem().getName());
+              }
+              return new SimpleStringProperty("N/A");
+            });
 
     // 2. Cột Giá bạn đặt
     myBidPriceColumn.setCellValueFactory(
-        cellData ->
-            new SimpleStringProperty(String.format("$%.2f", cellData.getValue().getAmount())));
+            cellData ->
+                    new SimpleStringProperty(String.format("$%.2f", cellData.getValue().getAmount())));
 
     // 3. Cột Giá hiện tại của phiên đấu giá
     currentPriceColumn.setCellValueFactory(
-        cellData -> {
-          if (cellData.getValue().getAuction() != null) {
-            return new SimpleStringProperty(
-                String.format("$%.2f", cellData.getValue().getAuction().getCurrentPrice()));
-          }
-          return new SimpleStringProperty("$0.00");
-        });
+            cellData -> {
+              if (cellData.getValue().getAuction() != null) {
+                return new SimpleStringProperty(
+                        String.format("$%.2f", cellData.getValue().getAuction().getCurrentPrice()));
+              }
+              return new SimpleStringProperty("$0.00");
+            });
 
     // 4. Cột Thời gian còn lại (Tính toán tự động)
     timeRemainingColumn.setCellValueFactory(
-        cellData -> {
-          if (cellData.getValue().getAuction() != null) {
-            LocalDateTime endTime = cellData.getValue().getAuction().getEndTime();
-            Duration remaining = Duration.between(LocalDateTime.now(), endTime);
+            cellData -> {
+              if (cellData.getValue().getAuction() != null) {
+                LocalDateTime endTime = cellData.getValue().getAuction().getEndTime();
+                Duration remaining = Duration.between(LocalDateTime.now(), endTime);
 
-            if (remaining.isNegative() || remaining.isZero()) {
-              return new SimpleStringProperty("Đã kết thúc");
-            }
-            return new SimpleStringProperty(
-                String.format(
-                    "%02d:%02d:%02d",
-                    remaining.toHours(), remaining.toMinutesPart(), remaining.toSecondsPart()));
-          }
-          return new SimpleStringProperty("--:--:--");
-        });
+                if (remaining.isNegative() || remaining.isZero()) {
+                  return new SimpleStringProperty("Đã kết thúc");
+                }
+                return new SimpleStringProperty(
+                        String.format(
+                                "%02d:%02d:%02d",
+                                remaining.toHours(), remaining.toMinutesPart(), remaining.toSecondsPart()));
+              }
+              return new SimpleStringProperty("--:--:--");
+            });
 
     // 5. Cột Trạng thái
     statusColumn.setCellValueFactory(
-        cellData -> {
-          if (cellData.getValue().getAuction() != null) {
-            return new SimpleStringProperty(
-                cellData.getValue().getAuction().getStatus().toString());
-          }
-          return new SimpleStringProperty("N/A");
-        });
+            cellData -> {
+              if (cellData.getValue().getAuction() != null) {
+                return new SimpleStringProperty(
+                        cellData.getValue().getAuction().getStatus().toString());
+              }
+              return new SimpleStringProperty("N/A");
+            });
 
     // Kéo dữ liệu đổ vào bảng
     loadBidHistory();
@@ -183,7 +189,7 @@ public class BidHistoryController {
           break;
         case "WON":
           if (("FINISHED".equalsIgnoreCase(status) || "CLOSED".equalsIgnoreCase(status))
-              && bid.getAmount() == bid.getAuction().getCurrentPrice()) {
+                  && bid.getAmount() == bid.getAuction().getCurrentPrice()) {
             filteredList.add(bid);
           }
           break;

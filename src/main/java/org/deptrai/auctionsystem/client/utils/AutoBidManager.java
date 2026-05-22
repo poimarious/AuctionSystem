@@ -60,15 +60,15 @@ public class AutoBidManager {
     String myId = currentUser.getUserId();
     String winnerId = lastestAuction.getWinner() != null ? lastestAuction.getWinner().getUserId() : "";
 
-    if(!myId.equals(winnerId)) {
+    if (!myId.equals(winnerId)) {
       double nextBidAmount = lastestAuction.getCurrentPrice() + config.increment;
-      if(nextBidAmount <= config.maxBid) {
+      if (nextBidAmount <= config.maxBid) {
         new Thread(() -> {
           try {
             Thread.sleep(1000);
-            sendAutoBidRequest(auctionId, myId,nextBidAmount);
-          } catch(Exception e) {
-            logger.error("",e);
+            sendAutoBidRequest(auctionId, myId, nextBidAmount);
+          } catch (Exception e) {
+            logger.error("", e);
           }
         }).start();
       } else {
@@ -83,7 +83,7 @@ public class AutoBidManager {
       Message req = new Message("PLACE_BID", payload);
       Message res = SocketClient.sendRequest(req);
 
-      if("FAIL".equals(res.getStatus())) {
+      if ("FAIL".equals(res.getStatus())) {
         stopAutoBid(auctionId);
         logger.info("Can't auto-bid more, stopped auto-bid.");
       }

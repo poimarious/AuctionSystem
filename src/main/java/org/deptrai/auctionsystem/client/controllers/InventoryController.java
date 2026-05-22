@@ -19,21 +19,27 @@ import java.util.List;
 
 public class InventoryController {
 
-  @FXML private TableView<Auction> inventoryTable;
-  @FXML private TableColumn<Auction, String> idColumn;
-  @FXML private TableColumn<Auction, String> nameColumn;
-  @FXML private TableColumn<Auction, String> priceColumn; // Đổi sang String để format có dấu $
-  @FXML private TableColumn<Auction, String> statusColumn;
-//  @FXML private TableColumn<Auction, String> actionColumn;
-@FXML private TableColumn<Auction, String> finalPriceColumn;
+  @FXML
+  private TableView<Auction> inventoryTable;
+  @FXML
+  private TableColumn<Auction, String> idColumn;
+  @FXML
+  private TableColumn<Auction, String> nameColumn;
+  @FXML
+  private TableColumn<Auction, String> priceColumn; // Đổi sang String để format có dấu $
+  @FXML
+  private TableColumn<Auction, String> statusColumn;
+  //  @FXML private TableColumn<Auction, String> actionColumn;
+  @FXML
+  private TableColumn<Auction, String> finalPriceColumn;
 
   @FXML
   public void handleAddNewProduct() {
     // Chuyển sang trang Đăng sản phẩm mới
     SceneManager.getInstance()
-        .switchScene(
-            "/org/deptrai/auctionsystem/client/views/add-product-view.fxml",
-            "Đăng sản phẩm đấu giá mới");
+            .switchScene(
+                    "/org/deptrai/auctionsystem/client/views/add-product-view.fxml",
+                    "Đăng sản phẩm đấu giá mới");
   }
 
 
@@ -94,16 +100,16 @@ public class InventoryController {
 
     // 3. Cột Giá: Ép kiểu sang chuỗi và format thêm dấu $
     priceColumn.setCellValueFactory(cellData ->
-        new SimpleStringProperty(String.format("$%,.2f", cellData.getValue().getItem().getStartingPrice()))
+            new SimpleStringProperty(String.format("$%,.2f", cellData.getValue().getItem().getStartingPrice()))
     );
     // Cột Giá cuối cùng: Lấy giá đấu cao nhất hiện tại (currentPrice)
     finalPriceColumn.setCellValueFactory(cellData ->
-        new SimpleStringProperty(String.format("$%,.2f", cellData.getValue().getCurrentPrice()))
+            new SimpleStringProperty(String.format("$%,.2f", cellData.getValue().getCurrentPrice()))
     );
 
     // 4. Cột Trạng thái
     statusColumn.setCellValueFactory(cellData ->
-        new SimpleStringProperty(cellData.getValue().getStatus().toString())
+            new SimpleStringProperty(cellData.getValue().getStatus().toString())
     );
 
     // 5. Nạp dữ liệu từ Server sau khi đã setup xong các cột

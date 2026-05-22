@@ -29,15 +29,24 @@ public class AddProductController {
   private static final Logger logger = LoggerFactory.getLogger(AddProductController.class);
 
   private final Map<String, ItemFactory> factoryRegistry = new HashMap<>();
-  @FXML private TextField productNameInput;
-  @FXML private ComboBox<String> categoryCombo;
-  @FXML private TextField basePriceInput;
-  @FXML private DatePicker endDatePicker;
-  @FXML private TextArea descriptionInput;
-  @FXML private ImageView previewImage;
-  @FXML private Label placeholderLabel;
-  @FXML private ComboBox<String> hourCombo;
-  @FXML private ComboBox<String> minuteCombo;
+  @FXML
+  private TextField productNameInput;
+  @FXML
+  private ComboBox<String> categoryCombo;
+  @FXML
+  private TextField basePriceInput;
+  @FXML
+  private DatePicker endDatePicker;
+  @FXML
+  private TextArea descriptionInput;
+  @FXML
+  private ImageView previewImage;
+  @FXML
+  private Label placeholderLabel;
+  @FXML
+  private ComboBox<String> hourCombo;
+  @FXML
+  private ComboBox<String> minuteCombo;
   private String selectedImagePath = "";
 
   @FXML
@@ -55,13 +64,13 @@ public class AddProductController {
     // check không cho chọn ngày trong quá khứ
     if (endDatePicker != null) {
       endDatePicker.setDayCellFactory(
-          ignored ->
-              new DateCell() {
-                public void updateItem(LocalDate date, boolean empty) {
-                  super.updateItem(date, empty);
-                  setDisable(empty || date.isBefore(LocalDate.now()) || date.isAfter(LocalDate.now().plusYears(1)));
-                }
-              });
+              ignored ->
+                      new DateCell() {
+                        public void updateItem(LocalDate date, boolean empty) {
+                          super.updateItem(date, empty);
+                          setDisable(empty || date.isBefore(LocalDate.now()) || date.isAfter(LocalDate.now().plusYears(1)));
+                        }
+                      });
       // Nạp dữ liệu cho ô chọn Giờ (00 - 23)
       if (hourCombo != null) {
         for (int i = 0; i < 24; i++) {
@@ -96,13 +105,13 @@ public class AddProductController {
     LocalDate endDate = endDatePicker.getValue();
 
     if (name == null
-        || name.trim().isEmpty()
-        || category == null
-        || priceStr == null
-        || priceStr.trim().isEmpty()
-        || description == null
-        || description.trim().isEmpty()
-        || endDate == null) {
+            || name.trim().isEmpty()
+            || category == null
+            || priceStr == null
+            || priceStr.trim().isEmpty()
+            || description == null
+            || description.trim().isEmpty()
+            || endDate == null) {
       showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập đầy đủ dữ liệu!");
       return;
     }
@@ -137,28 +146,27 @@ public class AddProductController {
     LocalDateTime endDateTime = endDate.atTime(time);
 
     // Kiểm tra thời gian kết thúc phải lớn hơn thời điểm hiện tại
-    if(endDateTime.isBefore(LocalDateTime.now())) {
+    if (endDateTime.isBefore(LocalDateTime.now())) {
       showAlert(Alert.AlertType.WARNING, "Lỗi thời gian", "Không thể chọn thời gian kết thúc trong quá khứ!");
-      return ;
-    } else if(endDateTime.isAfter(LocalDateTime.now().plusYears(1))) {
+      return;
+    } else if (endDateTime.isAfter(LocalDateTime.now().plusYears(1))) {
       showAlert(Alert.AlertType.WARNING, "Lỗi thời gian", "Thời gian đấu giá tối đa là 1 năm!");
-      return ;
+      return;
     }
-
 
 
     User currentUser = SessionManager.getInstance().getCurrentUser();
 
     if (!(currentUser instanceof Seller currentSeller)) {
       showAlert(
-          Alert.AlertType.ERROR, "Từ chối truy cập", "Chỉ có Người bán mới được đăng sản phẩm!");
+              Alert.AlertType.ERROR, "Từ chối truy cập", "Chỉ có Người bán mới được đăng sản phẩm!");
       return;
     }
 
     ItemFactory selectedFactory = factoryRegistry.get(category);
     if (selectedFactory == null) {
       showAlert(
-          Alert.AlertType.ERROR, "Lỗi hệ thống", "Không tìm thấy Factory xử lý cho danh mục này!");
+              Alert.AlertType.ERROR, "Lỗi hệ thống", "Không tìm thấy Factory xử lý cho danh mục này!");
       return;
     }
 
@@ -180,7 +188,7 @@ public class AddProductController {
         }
       }
 
-      Object[] payload = new Object[] {newItem, endDateTime, imageBytes, fileName};
+      Object[] payload = new Object[]{newItem, endDateTime, imageBytes, fileName};
       Message request = new Message("REQUEST", "CREATE_AUCTION", payload);
 
       logger.info("Đang gửi yêu cầu và Tải ảnh lên Server...");
@@ -190,15 +198,15 @@ public class AddProductController {
 
       if ("SUCCESS".equals(response.getStatus())) {
         showAlert(
-            Alert.AlertType.INFORMATION,
-            "Thành công",
-            "Sản phẩm và Hình ảnh đã được lưu trữ an toàn trên Server!");
+                Alert.AlertType.INFORMATION,
+                "Thành công",
+                "Sản phẩm và Hình ảnh đã được lưu trữ an toàn trên Server!");
         SceneManager.getInstance().goBack();
       } else {
         String errorMsg =
-            (response.getData() instanceof String)
-                ? (String) response.getData()
-                : "Lỗi đường truyền mạng!";
+                (response.getData() instanceof String)
+                        ? (String) response.getData()
+                        : "Lỗi đường truyền mạng!";
         showAlert(Alert.AlertType.ERROR, "Đăng tải thất bại", errorMsg);
       }
     }
@@ -209,8 +217,8 @@ public class AddProductController {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Chọn hình ảnh sản phẩm");
     fileChooser
-        .getExtensionFilters()
-        .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+            .getExtensionFilters()
+            .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
 
     File selectedFile = fileChooser.showOpenDialog(null);
     if (selectedFile != null) {

@@ -1,7 +1,5 @@
 package org.deptrai.auctionsystem.shared.models.users;
 
-import org.deptrai.auctionsystem.shared.models.items.Item;
-
 public class Admin extends User {
   private int adminLevel;
 

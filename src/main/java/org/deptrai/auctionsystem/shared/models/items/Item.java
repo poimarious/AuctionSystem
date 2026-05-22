@@ -1,7 +1,8 @@
 package org.deptrai.auctionsystem.shared.models.items;
 
-import java.io.Serializable;
 import org.deptrai.auctionsystem.shared.models.users.Seller;
+
+import java.io.Serializable;
 
 public abstract class Item implements Serializable {
   private String itemId; // Database automatically assigns this
@@ -22,11 +23,11 @@ public abstract class Item implements Serializable {
   }
 
   public Item(
-      String itemId,
-      String name,
-      String description,
-      double startingPrice,
-      Seller seller) {
+          String itemId,
+          String name,
+          String description,
+          double startingPrice,
+          Seller seller) {
     this.itemId = itemId;
     this.name = name;
     this.description = description;
@@ -61,7 +62,7 @@ public abstract class Item implements Serializable {
     return imageUrl;
   }
 
-  public byte[] getImageBytes() { return imageBytes; }
+  public byte[] getImageBytes() {return imageBytes;}
 
   // endregion
 
@@ -96,7 +97,7 @@ public abstract class Item implements Serializable {
     this.imageUrl = imageUrl;
   }
 
-  public void setImageBytes(byte[] imageBytes) { this.imageBytes = imageBytes; }
+  public void setImageBytes(byte[] imageBytes) {this.imageBytes = imageBytes;}
 
   // endregion
 }

@@ -1,12 +1,13 @@
 package org.deptrai.auctionsystem.shared.models.auction;
 
+import org.deptrai.auctionsystem.shared.models.bid.Bid;
+import org.deptrai.auctionsystem.shared.models.items.Item;
+import org.deptrai.auctionsystem.shared.models.users.Bidder;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.deptrai.auctionsystem.shared.models.bid.Bid;
-import org.deptrai.auctionsystem.shared.models.items.Item;
-import org.deptrai.auctionsystem.shared.models.users.Bidder;
 
 public class Auction implements Serializable {
 
@@ -26,8 +27,8 @@ public class Auction implements Serializable {
   }
 
   public Auction(
-      String auctionId, Item item, double currentPrice,
-      AuctionStatus status, LocalDateTime endTime, List<Bid> bids) {
+          String auctionId, Item item, double currentPrice,
+          AuctionStatus status, LocalDateTime endTime, List<Bid> bids) {
     this.auctionId = auctionId;
     this.item = item;
     this.currentPrice = currentPrice;
@@ -42,22 +43,22 @@ public class Auction implements Serializable {
   }
 
   // region Getters & Setters
-  public String getAuctionId() { return auctionId; }
-  public void setAuctionId(String auctionId) { this.auctionId = auctionId; }
+  public String getAuctionId() {return auctionId;}
+  public void setAuctionId(String auctionId) {this.auctionId = auctionId;}
 
-  public Item getItem() { return item; }
-  public void setItem(Item item) { this.item = item; }
+  public Item getItem() {return item;}
+  public void setItem(Item item) {this.item = item;}
 
-  public double getCurrentPrice() { return currentPrice; }
-  public void setCurrentPrice(double currentPrice) { this.currentPrice = currentPrice; }
+  public double getCurrentPrice() {return currentPrice;}
+  public void setCurrentPrice(double currentPrice) {this.currentPrice = currentPrice;}
 
-  public AuctionStatus getStatus() { return status; }
-  public void setStatus(AuctionStatus status) { this.status = status; }
+  public AuctionStatus getStatus() {return status;}
+  public void setStatus(AuctionStatus status) {this.status = status;}
 
-  public LocalDateTime getEndTime() { return endTime; }
-  public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
+  public LocalDateTime getEndTime() {return endTime;}
+  public void setEndTime(LocalDateTime endTime) {this.endTime = endTime;}
 
-  public List<Bid> getBids() { return bids; }
-  public void setBids(List<Bid> bids) { this.bids = bids; }
+  public List<Bid> getBids() {return bids;}
+  public void setBids(List<Bid> bids) {this.bids = bids;}
   // endregion
 }

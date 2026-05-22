@@ -1,13 +1,14 @@
 package org.deptrai.auctionsystem.server;
 
+import org.deptrai.auctionsystem.server.managers.AuctionManager;
+import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
+import org.deptrai.auctionsystem.shared.network.Message;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.deptrai.auctionsystem.server.managers.AuctionManager;
-import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
-import org.deptrai.auctionsystem.shared.network.Message;
 
 public class ServerMain {
   private static final int PORT = 5000;
@@ -37,7 +38,7 @@ public class ServerMain {
         // Waiting for a connection from clients
         Socket clientSocket = serverSocket.accept();
         System.out.println(
-            ">> Có Client mới kết nối: " + clientSocket.getInetAddress().getHostAddress());
+                ">> Có Client mới kết nối: " + clientSocket.getInetAddress().getHostAddress());
 
         // Thay new Thread(handler).start() → submit vào pool, không tạo thread mới
         ClientHandler handler = new ClientHandler(clientSocket);

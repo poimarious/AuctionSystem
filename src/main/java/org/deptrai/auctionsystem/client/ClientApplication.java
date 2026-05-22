@@ -1,8 +1,5 @@
 package org.deptrai.auctionsystem.client;
 
-import java.io.IOException;
-import java.util.Objects;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -13,6 +10,9 @@ import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Objects;
 
 public class ClientApplication extends Application {
 
@@ -28,8 +28,8 @@ public class ClientApplication extends Application {
 
     // 2. Nạp file FXML từ thư mục resources mới
     FXMLLoader fxmlLoader =
-        new FXMLLoader(
-            getClass().getResource("/org/deptrai/auctionsystem/client/views/home-view.fxml"));
+            new FXMLLoader(
+                    getClass().getResource("/org/deptrai/auctionsystem/client/views/home-view.fxml"));
 
     Scene scene = new Scene(fxmlLoader.load());
 

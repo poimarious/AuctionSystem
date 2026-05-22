@@ -6,7 +6,7 @@ public class ElectronicsFactory extends ItemFactory {
 
   @Override
   public Electronics createItem(
-      String name, String description, double startingPrice, Seller seller) {
+          String name, String description, double startingPrice, Seller seller) {
     return new Electronics(name, description, startingPrice, seller);
   }
 }

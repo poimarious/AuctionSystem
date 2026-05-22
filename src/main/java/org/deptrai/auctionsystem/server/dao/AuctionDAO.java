@@ -1,9 +1,5 @@
 package org.deptrai.auctionsystem.server.dao;
 
-import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
@@ -13,22 +9,27 @@ import org.deptrai.auctionsystem.shared.models.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 public class AuctionDAO {
 
   private static final Logger logger = LoggerFactory.getLogger(AuctionDAO.class);
 
   public boolean insertAuction(Auction auction) {
     String sql =
-        "INSERT INTO Auctions (auctionId, itemId, currentPrice, status, endTime) VALUES (?, ?, ?, ?, ?)";
+            "INSERT INTO Auctions (auctionId, itemId, currentPrice, status, endTime) VALUES (?, ?, ?, ?, ?)";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
       String id =
-          (auction.getAuctionId() != null) ? auction.getAuctionId() : UUID.randomUUID().toString();
+              (auction.getAuctionId() != null) ? auction.getAuctionId() : UUID.randomUUID().toString();
       auction.setAuctionId(id);
 
       pstmt.setString(
-          1, auction.getAuctionId()); // Always has id if it is handled in AuctionManager
+              1, auction.getAuctionId()); // Always has id if it is handled in AuctionManager
       pstmt.setString(2, auction.getItem().getItemId());
       pstmt.setDouble(3, auction.getCurrentPrice());
       pstmt.setString(4, auction.getStatus().name());
@@ -67,7 +68,7 @@ public class AuctionDAO {
     String sql = "SELECT * FROM Auctions WHERE auctionId = ?";
 
     try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
       pstmt.setString(1, auctionId);
       ResultSet rs = pstmt.executeQuery();
@@ -85,8 +86,8 @@ public class AuctionDAO {
         LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
 
         Auction auction =
-            new Auction(
-                auctionId, item, currentPrice, status, endTime, new CopyOnWriteArrayList<>());
+                new Auction(
+                        auctionId, item, currentPrice, status, endTime, new CopyOnWriteArrayList<>());
         BidDAO bidDAO = new BidDAO();
         List<Bid> auctionBids = bidDAO.getBidsByAuctionId(auctionId, auction);
         auction.setBids(auctionBids);
@@ -106,8 +107,8 @@ public class AuctionDAO {
     try (Connection conn = DatabaseConnection.getConnection();
          Statement stmt = conn.createStatement()) {
       Map<String, User> userCache = new HashMap<>();
-      try(ResultSet rs = stmt.executeQuery("SELECT * FROM Users")) {
-        while(rs.next()) {
+      try (ResultSet rs = stmt.executeQuery("SELECT * FROM Users")) {
+        while (rs.next()) {
           String role = rs.getString("role");
           String userId = rs.getString("userId");
           String username = rs.getString("username");
@@ -196,13 +197,13 @@ public class AuctionDAO {
         }
       }
 
-    } catch(Exception e) {
+    } catch (Exception e) {
       logger.error("Lỗi khi lấy danh sách tất cả Auction bằng Cache RAM:", e);
     }
     return auctionList;
   }
 
-  public boolean deleteAuctionById(String auctionId,String itemId) {
+  public boolean deleteAuctionById(String auctionId, String itemId) {
 
     String deleteBidsSql = "DELETE FROM Bids WHERE auctionId = ?";
     String deleteAuctionSql = "DELETE FROM Auctions WHERE auctionId = ?";
@@ -211,8 +212,8 @@ public class AuctionDAO {
       conn.setAutoCommit(false); // Bắt đầu Transaction
 
       try (PreparedStatement pstmtBids = conn.prepareStatement(deleteBidsSql);
-          PreparedStatement pstmtAuction = conn.prepareStatement(deleteAuctionSql);
-          PreparedStatement pstmtItem = conn.prepareStatement(deleteItemSql)) {
+           PreparedStatement pstmtAuction = conn.prepareStatement(deleteAuctionSql);
+           PreparedStatement pstmtItem = conn.prepareStatement(deleteItemSql)) {
 
         // 1. Xóa Bids
         pstmtBids.setString(1, auctionId);

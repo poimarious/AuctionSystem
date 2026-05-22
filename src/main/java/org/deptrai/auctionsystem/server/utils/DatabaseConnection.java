@@ -1,12 +1,6 @@
 package org.deptrai.auctionsystem.server.utils;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
+import java.sql.*;
 
 public class DatabaseConnection {
   // Database file name (sẽ tự động tạo trong thư mục project)
@@ -18,56 +12,56 @@ public class DatabaseConnection {
 
   public static void initializeDatabase() {
     String sqlCreateUsers =
-        "CREATE TABLE IF NOT EXISTS Users ("
-            + "userId TEXT PRIMARY KEY, "
-            + "username TEXT UNIQUE NOT NULL, "
-            + "password TEXT NOT NULL, "
-            + "email TEXT, "
-            + "role TEXT NOT NULL,"
-            + "adminLevel INTEGER DEFAULT 0, "
-            + "balance REAL DEFAULT 0.0, "
-            + "isBanned INTEGER DEFAULT 0, "
-            + "banReason TEXT"
-            + ");";
+            "CREATE TABLE IF NOT EXISTS Users ("
+                    + "userId TEXT PRIMARY KEY, "
+                    + "username TEXT UNIQUE NOT NULL, "
+                    + "password TEXT NOT NULL, "
+                    + "email TEXT, "
+                    + "role TEXT NOT NULL,"
+                    + "adminLevel INTEGER DEFAULT 0, "
+                    + "balance REAL DEFAULT 0.0, "
+                    + "isBanned INTEGER DEFAULT 0, "
+                    + "banReason TEXT"
+                    + ");";
 
     String sqlCreateItems =
-        "CREATE TABLE IF NOT EXISTS Items ("
-            + "itemId TEXT PRIMARY KEY, "
-            + "name TEXT NOT NULL, "
-            + "description TEXT, "
-            + "startingPrice REAL, "
-            + "category TEXT, "
-            + "sellerId TEXT, "
-            + "brand TEXT, "
-            + "warrantyMonths INTEGER, "
-            + "artist TEXT, "
-            + "yearCreated INTEGER, "
-            + "make TEXT, "
-            + "mileage INTEGER, "
-            + "imageUrl TEXT, "
-            + "FOREIGN KEY(sellerId) REFERENCES Users(userId)"
-            + ");";
+            "CREATE TABLE IF NOT EXISTS Items ("
+                    + "itemId TEXT PRIMARY KEY, "
+                    + "name TEXT NOT NULL, "
+                    + "description TEXT, "
+                    + "startingPrice REAL, "
+                    + "category TEXT, "
+                    + "sellerId TEXT, "
+                    + "brand TEXT, "
+                    + "warrantyMonths INTEGER, "
+                    + "artist TEXT, "
+                    + "yearCreated INTEGER, "
+                    + "make TEXT, "
+                    + "mileage INTEGER, "
+                    + "imageUrl TEXT, "
+                    + "FOREIGN KEY(sellerId) REFERENCES Users(userId)"
+                    + ");";
 
     String sqlCreateAuctions =
-        "CREATE TABLE IF NOT EXISTS Auctions ("
-            + "auctionId TEXT PRIMARY KEY, "
-            + "itemId TEXT, "
-            + "currentPrice REAL, "
-            + "status TEXT, "
-            + "endTime TEXT, " // Lưu LocalDateTime dưới dạng chuỗi ISO
-            + "FOREIGN KEY(itemId) REFERENCES Items(itemId)"
-            + ");";
+            "CREATE TABLE IF NOT EXISTS Auctions ("
+                    + "auctionId TEXT PRIMARY KEY, "
+                    + "itemId TEXT, "
+                    + "currentPrice REAL, "
+                    + "status TEXT, "
+                    + "endTime TEXT, " // Lưu LocalDateTime dưới dạng chuỗi ISO
+                    + "FOREIGN KEY(itemId) REFERENCES Items(itemId)"
+                    + ");";
 
     String sqlCreateBids =
-        "CREATE TABLE IF NOT EXISTS Bids ("
-            + "bidId TEXT PRIMARY KEY, "
-            + "bidderId TEXT, "
-            + "auctionId TEXT, "
-            + "amount REAL, "
-            + "timestamp TEXT, "
-            + "FOREIGN KEY(bidderId) REFERENCES Users(userId), "
-            + "FOREIGN KEY(auctionId) REFERENCES Auctions(auctionId)"
-            + ");";
+            "CREATE TABLE IF NOT EXISTS Bids ("
+                    + "bidId TEXT PRIMARY KEY, "
+                    + "bidderId TEXT, "
+                    + "auctionId TEXT, "
+                    + "amount REAL, "
+                    + "timestamp TEXT, "
+                    + "FOREIGN KEY(bidderId) REFERENCES Users(userId), "
+                    + "FOREIGN KEY(auctionId) REFERENCES Auctions(auctionId)"
+                    + ");";
     String sqlCreateNotifications = "CREATE TABLE IF NOT EXISTS notifications ("
             + "notification_id TEXT PRIMARY KEY, "
             + "user_id TEXT, "
@@ -119,10 +113,10 @@ public class DatabaseConnection {
       }
       ResultSet rsImageUrl = metaData.getColumns(null, null, "Items", "imageUrl");
       if (!rsImageUrl.next()) {
-          try (Statement stmt = conn.createStatement()) {
-              stmt.execute("ALTER TABLE Items ADD COLUMN imageUrl TEXT;");
-              System.out.println("[SCHEMA UPDATE] Đã tự động thêm cột 'imageUrl' vào bảng Items.");
-          }
+        try (Statement stmt = conn.createStatement()) {
+          stmt.execute("ALTER TABLE Items ADD COLUMN imageUrl TEXT;");
+          System.out.println("[SCHEMA UPDATE] Đã tự động thêm cột 'imageUrl' vào bảng Items.");
+        }
       }
 
       // Kiểm tra cột adminLevel, isBanned, banReason
@@ -143,7 +137,7 @@ public class DatabaseConnection {
   private static void seedDefaultAdmins(Connection conn) {
     String checkSql = "SELECT count(*) FROM Users WHERE role = 'ADMIN'";
     try (Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(checkSql)) {
+         ResultSet rs = stmt.executeQuery(checkSql)) {
 
       // Nếu đếm số lượng Admin == 0, tiến hành tạo mới
       if (rs.next() && rs.getInt(1) == 0) {

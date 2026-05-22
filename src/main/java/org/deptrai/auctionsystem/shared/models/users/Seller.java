@@ -1,6 +1,5 @@
 package org.deptrai.auctionsystem.shared.models.users;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.deptrai.auctionsystem.shared.models.items.Item;
 
@@ -9,12 +8,10 @@ public class Seller extends User {
 
   public Seller(String username, String password, String email) {
     super(username, password, email);
-    listedItems = new ArrayList<>();
   }
 
   public Seller(String userId, String username, String password, String email) {
     super(userId, username, password, email);
-    listedItems = new ArrayList<>();
   }
 
   public void addItem(Item item) {

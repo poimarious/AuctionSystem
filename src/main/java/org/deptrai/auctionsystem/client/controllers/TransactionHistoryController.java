@@ -21,13 +21,20 @@ import java.util.stream.Collectors;
 public class TransactionHistoryController {
 
   // Khai báo các thành phần giao diện từ FXML
-  @FXML private TableView<Auction> revenueTable;
-  @FXML private TableColumn<Auction, String> colDate;
-  @FXML private TableColumn<Auction, String> colOrderId;
-  @FXML private TableColumn<Auction, String> colProduct;
-  @FXML private TableColumn<Auction, String> colBuyer;
-  @FXML private TableColumn<Auction, String> colFinalPrice;
-  @FXML private TableColumn<Auction, String> colStatus;
+  @FXML
+  private TableView<Auction> revenueTable;
+  @FXML
+  private TableColumn<Auction, String> colDate;
+  @FXML
+  private TableColumn<Auction, String> colOrderId;
+  @FXML
+  private TableColumn<Auction, String> colProduct;
+  @FXML
+  private TableColumn<Auction, String> colBuyer;
+  @FXML
+  private TableColumn<Auction, String> colFinalPrice;
+  @FXML
+  private TableColumn<Auction, String> colStatus;
 
   @FXML
   public void initialize() {
@@ -69,7 +76,7 @@ public class TransactionHistoryController {
 
     // 5. Giá chốt
     colFinalPrice.setCellValueFactory(cellData ->
-        new SimpleStringProperty(String.format("$%,.2f", cellData.getValue().getCurrentPrice()))
+            new SimpleStringProperty(String.format("$%,.2f", cellData.getValue().getCurrentPrice()))
     );
 
     // 6. Trạng thái
@@ -91,8 +98,8 @@ public class TransactionHistoryController {
 
         // LỌC DỮ LIỆU: Chỉ giữ lại những phiên đã KẾT THÚC và CÓ NGƯỜI THẮNG
         List<Auction> completedTransactions = allAuctions.stream()
-            .filter(a -> (a.getStatus() == AuctionStatus.FINISHED || a.getStatus() == AuctionStatus.PAID) && a.getWinner() != null)
-            .collect(Collectors.toList());
+                .filter(a -> (a.getStatus() == AuctionStatus.FINISHED || a.getStatus() == AuctionStatus.PAID) && a.getWinner() != null)
+                .collect(Collectors.toList());
 
         // Đẩy dữ liệu vào JavaFX Thread để cập nhật giao diện
         Platform.runLater(() -> revenueTable.setItems(FXCollections.observableArrayList(completedTransactions)));

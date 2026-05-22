@@ -8,12 +8,12 @@ module org.deptrai.auctionsystem {
   // === CẤU HÌNH CHO PHÍA CLIENT (GIAO DIỆN) ===
   // 1. Mở package controllers để JavaFX có quyền "bơm" dữ liệu vào các biến @FXML
   opens org.deptrai.auctionsystem.client.controllers to
-      javafx.fxml;
+          javafx.fxml;
 
   // 2. Mở package client (nơi chứa ClientApplication) để JavaFX khởi động ứng dụng
   opens org.deptrai.auctionsystem.client to
-      javafx.graphics,
-      javafx.fxml;
+          javafx.graphics,
+          javafx.fxml;
 
   // 3. Xuất các package để trình biên dịch và JavaFX có thể nhìn thấy
   exports org.deptrai.auctionsystem.client;

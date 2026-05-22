@@ -11,13 +11,13 @@ public class Electronics extends Item {
   }
 
   public Electronics(
-      String itemId,
-      String name,
-      String description,
-      double startingPrice,
-      Seller seller,
-      String brand,
-      int warrantyMonths) {
+          String itemId,
+          String name,
+          String description,
+          double startingPrice,
+          Seller seller,
+          String brand,
+          int warrantyMonths) {
     super(itemId, name, description, startingPrice, seller);
     this.brand = brand;
     this.warrantyMonths = warrantyMonths;

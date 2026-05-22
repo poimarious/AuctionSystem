@@ -12,7 +12,10 @@
     -fx-background-color: #151226; /* Nền tím than sáng của Skin.club */
     -fx-text-fill: #ffffff;
 }
-.label { -fx-text-fill: #e2e8f0; }
+
+.label {
+    -fx-text-fill: #e2e8f0;
+}
 
 /* --- 2. CARD COMPONENT --- */
 .card {
@@ -23,10 +26,12 @@
     -fx-border-width: 1.5px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 15, 0, 0, 5);
 }
+
 .card:hover {
     -fx-border-color: #00f3ff; /* Hắt sáng xanh cyan nhẹ khi hover */
     -fx-effect: dropshadow(gaussian, rgba(0, 243, 255, 0.2), 20, 0, 0, 0);
 }
+
 .metric-card {
     -fx-background-color: #231d40;
     -fx-background-radius: 10;
@@ -34,6 +39,7 @@
     -fx-border-radius: 10;
     -fx-border-width: 1px;
 }
+
 .sidebar-neon {
     -fx-background-color: #1a162e;
     -fx-border-color: transparent #2b244d transparent transparent;
@@ -52,6 +58,7 @@
     -fx-border-width: 1.5px;
     -fx-padding: 10 14;
 }
+
 /* ĐÃ SỬA: Đổi .combo-box thành .my-combo */
 .text-field:focused, .password-field:focused, .my-combo:focused {
     -fx-border-color: #00f3ff;
@@ -62,8 +69,8 @@
 .text-area {
     -fx-control-inner-background: #1e1936; /* Ép phần ruột nhập văn bản xuống nền tối panel */
     -fx-background-color: #1a162e;
-    -fx-text-fill: #ffffff;                /* Màu chữ trắng ngà rõ nét khi bôi mô tả dài */
-    -fx-prompt-text-fill: #6d698a;         /* Màu chữ Placeholder */
+    -fx-text-fill: #ffffff; /* Màu chữ trắng ngà rõ nét khi bôi mô tả dài */
+    -fx-prompt-text-fill: #6d698a; /* Màu chữ Placeholder */
     -fx-background-radius: 8;
     -fx-border-color: #2b244d;
     -fx-border-radius: 8;
@@ -81,13 +88,14 @@
     -fx-border-color: #00f3ff;
     -fx-effect: dropshadow(gaussian, rgba(0, 243, 255, 0.5), 10, 0, 0, 0);
 }
+
 .text-area:focused .content {
     -fx-background-color: #151226; /* Chìm sâu xuống tone nền chính khi đang gõ */
 }
 
 /* Màu chữ và khối khi bạn quét chuột bôi đen văn bản (Highlight) */
 .text-area {
-    -fx-highlight-fill: #b026ff;        /* Khối chọn màu Tím Neon */
+    -fx-highlight-fill: #b026ff; /* Khối chọn màu Tím Neon */
     -fx-highlight-text-fill: #ffffff;
 }
 
@@ -101,67 +109,171 @@
     -fx-cursor: hand;
     -fx-padding: 10 22;
 }
+
 /* Nút Tím Neon */
 .btn-primary {
     -fx-border-color: #b026ff;
     -fx-text-fill: #b026ff;
     -fx-effect: dropshadow(gaussian, rgba(176, 38, 255, 0.4), 10, 0, 0, 0);
 }
+
 .btn-primary:hover {
     -fx-background-color: #b026ff;
     -fx-text-fill: #ffffff;
     -fx-effect: dropshadow(gaussian, rgba(176, 38, 255, 0.8), 20, 0.3, 0, 0);
 }
+
 /* Nút Xanh Lá Neon */
 .btn-success {
     -fx-border-color: #39ff14;
     -fx-text-fill: #39ff14;
     -fx-effect: dropshadow(gaussian, rgba(57, 255, 20, 0.4), 10, 0, 0, 0);
 }
+
 .btn-success:hover {
     -fx-background-color: #39ff14;
     -fx-text-fill: #151226;
     -fx-effect: dropshadow(gaussian, rgba(57, 255, 20, 0.8), 20, 0.3, 0, 0);
 }
+
 /* Nút Hồng Neon */
 .btn-accent {
     -fx-border-color: #ff003c;
     -fx-text-fill: #ff003c;
     -fx-effect: dropshadow(gaussian, rgba(255, 0, 60, 0.4), 10, 0, 0, 0);
 }
+
 .btn-accent:hover {
     -fx-background-color: #ff003c;
     -fx-text-fill: #ffffff;
     -fx-effect: dropshadow(gaussian, rgba(255, 0, 60, 0.8), 20, 0.3, 0, 0);
 }
-.btn-back { -fx-border-color: transparent; -fx-text-fill: #00f3ff; }
-.btn-back:hover { -fx-background-color: rgba(0, 243, 255, 0.1); }
-.btn-sidebar { -fx-border-color: transparent; -fx-text-fill: #8c88a8; -fx-alignment: CENTER_LEFT; }
-.btn-sidebar:hover { -fx-text-fill: #00f3ff; -fx-background-color: #1e1936; }
-.btn-tab { -fx-border-color: #2b244d; -fx-text-fill: #8c88a8; -fx-background-radius: 20; -fx-border-radius: 20; -fx-padding: 6 16; }
-.btn-tab:hover { -fx-border-color: #bd93f9; -fx-text-fill: #bd93f9; }
+
+.btn-back {
+    -fx-border-color: transparent;
+    -fx-text-fill: #00f3ff;
+}
+
+.btn-back:hover {
+    -fx-background-color: rgba(0, 243, 255, 0.1);
+}
+
+.btn-sidebar {
+    -fx-border-color: transparent;
+    -fx-text-fill: #8c88a8;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.btn-sidebar:hover {
+    -fx-text-fill: #00f3ff;
+    -fx-background-color: #1e1936;
+}
+
+.btn-tab {
+    -fx-border-color: #2b244d;
+    -fx-text-fill: #8c88a8;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-padding: 6 16;
+}
+
+.btn-tab:hover {
+    -fx-border-color: #bd93f9;
+    -fx-text-fill: #bd93f9;
+}
 
 /* --- 5. DATA TABLES & CHARTS --- */
-.table-view { -fx-background-color: transparent; -fx-border-color: #2b244d; }
-.table-view .column-header-background { -fx-background-color: #1a162e; }
-.table-view .column-header { -fx-background-color: transparent; -fx-border-color: transparent transparent #2b244d transparent; -fx-padding: 12; }
-.table-view .column-header .label { -fx-text-fill: #bd93f9; -fx-font-weight: bold; }
-.table-cell { -fx-text-fill: #ffffff; }
-.table-row-cell { -fx-background-color: #151226; }
-.table-row-cell:odd { -fx-background-color: #1e1936; }
-.table-row-cell:hover { -fx-background-color: #2b244d; }
-.table-row-cell:selected { -fx-background-color: rgba(0, 243, 255, 0.15); -fx-border-color: transparent transparent transparent #00f3ff; -fx-border-width: 0 0 0 4px; }
-.chart-plot-background { -fx-background-color: #1a162e; }
-.chart-vertical-grid-lines, .chart-horizontal-grid-lines { -fx-stroke: #2b244d; -fx-stroke-dash-array: 5 5; }
-.chart-series-line { -fx-stroke: #00f3ff; -fx-stroke-width: 3px; }
-.axis { -fx-tick-label-fill: #8c88a8; }
-.axis-label { -fx-text-fill: #bd93f9; -fx-font-weight: bold; }
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #2b244d;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #1a162e;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #2b244d transparent;
+    -fx-padding: 12;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #bd93f9;
+    -fx-font-weight: bold;
+}
+
+.table-cell {
+    -fx-text-fill: #ffffff;
+}
+
+.table-row-cell {
+    -fx-background-color: #151226;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #1e1936;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #2b244d;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: rgba(0, 243, 255, 0.15);
+    -fx-border-color: transparent transparent transparent #00f3ff;
+    -fx-border-width: 0 0 0 4px;
+}
+
+.chart-plot-background {
+    -fx-background-color: #1a162e;
+}
+
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+    -fx-stroke: #2b244d;
+    -fx-stroke-dash-array: 5 5;
+}
+
+.chart-series-line {
+    -fx-stroke: #00f3ff;
+    -fx-stroke-width: 3px;
+}
+
+.axis {
+    -fx-tick-label-fill: #8c88a8;
+}
+
+.axis-label {
+    -fx-text-fill: #bd93f9;
+    -fx-font-weight: bold;
+}
 
 /* --- 6. TEXT STYLE CLASSES --- */
-.text-title { -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #bd93f9; -fx-effect: dropshadow(gaussian, rgba(189, 147, 249, 0.4), 8, 0, 0, 0); }
-.text-price { -fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #39ff14; -fx-effect: dropshadow(gaussian, rgba(57, 255, 20, 0.4), 8, 0, 0, 0); }
-.text-timer { -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ff003c; -fx-effect: dropshadow(gaussian, rgba(255, 0, 60, 0.4), 8, 0, 0, 0); }
-.text-cyan { -fx-text-fill: #00f3ff; -fx-font-weight: bold; }
+.text-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #bd93f9;
+    -fx-effect: dropshadow(gaussian, rgba(189, 147, 249, 0.4), 8, 0, 0, 0);
+}
+
+.text-price {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #39ff14;
+    -fx-effect: dropshadow(gaussian, rgba(57, 255, 20, 0.4), 8, 0, 0, 0);
+}
+
+.text-timer {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ff003c;
+    -fx-effect: dropshadow(gaussian, rgba(255, 0, 60, 0.4), 8, 0, 0, 0);
+}
+
+.text-cyan {
+    -fx-text-fill: #00f3ff;
+    -fx-font-weight: bold;
+}
 
 /* style.css */
 
@@ -176,7 +288,7 @@
 /* Đổi màu nền của phần tiêu đề cột (header) sang màu tối giống nền */
 .modern-table .column-header {
     -fx-background-color: #1a162e; /* Cùng màu nền với VBox cha */
-    -fx-border-color: #2b244d;    /* Cùng màu viền với VBox cha */
+    -fx-border-color: #2b244d; /* Cùng màu viền với VBox cha */
 }
 
 /* Đổi màu chữ của phần tiêu đề sang trắng để dễ đọc */
@@ -194,7 +306,7 @@
     -fx-border-color: #6272a4; /* Viền xám tím */
     -fx-border-radius: 8;
     -fx-background-radius: 8;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 5);
 }
 
 .menu-item {
@@ -233,6 +345,7 @@
 .user-menu-button > .arrow-button {
     -fx-padding: 0;
 }
+
 .user-menu-button > .arrow-button > .arrow {
     -fx-background-color: transparent;
 }
@@ -250,7 +363,7 @@
 /* Nhuộm từng dòng ruột bên trong (ListCell) */
 .context-menu .list-view .list-cell {
     -fx-background-color: #282a36; /* Đồng bộ nền đen nhám */
-    -fx-text-fill: #f8f8f2;        /* Chữ trắng ngà Dracula */
+    -fx-text-fill: #f8f8f2; /* Chữ trắng ngà Dracula */
     -fx-border-color: transparent transparent #44475a transparent; /* Vạch phân cách mờ giữa các thông báo */
 }
 
@@ -290,6 +403,7 @@
     -fx-background-color: transparent;
     -fx-padding: 0;
 }
+
 /* =========================================
    FIX MÀU CHỮ CHO COMBOBOX VÀ DATEPICKER
    ========================================= */
