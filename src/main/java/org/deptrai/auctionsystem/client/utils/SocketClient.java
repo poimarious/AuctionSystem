@@ -21,7 +21,7 @@ public class SocketClient {
   private static final BlockingQueue<Message> responseQueue = new ArrayBlockingQueue<>(1);
   private static final List<AuctionUpdateListener> listeners = new CopyOnWriteArrayList<>();
 
-  private static final ExecutorService clientExecutor = Executors.newCachedThreadPool();
+  private static ExecutorService clientExecutor = Executors.newCachedThreadPool();
 
   public static void runAsync(Runnable task) {
     clientExecutor.submit(task);
@@ -41,6 +41,10 @@ public class SocketClient {
       out = new ObjectOutputStream(socket.getOutputStream()); // Output is always first to avoid deadlock
       in = new ObjectInputStream(socket.getInputStream());
       System.out.println("Đã kết nối tới Server thành công!");
+
+      if(clientExecutor == null || clientExecutor.isShutdown() || clientExecutor.isTerminated()) {
+        clientExecutor = Executors.newCachedThreadPool();
+      }
 
       // Listening at all time
       Thread listenerThread =
