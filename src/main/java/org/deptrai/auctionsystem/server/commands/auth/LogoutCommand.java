@@ -14,11 +14,16 @@ public class LogoutCommand implements Command {
   @Override
   public void execute(ClientHandler clientHandler, Message request, ObjectOutputStream out) throws Exception {
     try {
+      String username = (clientHandler.getAuthenticatedUser() != null) ?
+          clientHandler.getAuthenticatedUser().getUsername() : "Guest";
+
       clientHandler.setAuthenticatedUser(null);
+
       out.reset();
       out.writeObject(new Message("SUCCESS", "LOGOUT", "Đã đăng xuất an toàn khỏi Server"));
       out.flush();
-      logger.info("Một Client đã hủy Session và đăng xuất thành công.");
+
+      logger.info("Người dùng [{}] đã chủ động hủy Session và đăng xuất.", username);
     } catch (Exception e) {
       logger.error("Lỗi gửi phản hồi đăng xuất: ", e);
     }
