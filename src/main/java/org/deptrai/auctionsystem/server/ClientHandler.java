@@ -93,7 +93,20 @@ public class ClientHandler implements Runnable {
         }
       }
     } catch (Exception e) {
-      logger.info("Client ngắt kết nối mạng: {}", e.getMessage());
+      String errorType = e.getClass().getSimpleName();
+      String errorMsg = (e.getMessage() != null) ? e.getMessage() : "Mất kết nối đột ngột";
+
+      // Lấy thông tin ai vừa rớt mạng (Nếu đã đăng nhập thì lấy Username, chưa thì lấy IP)
+      String clientInfo = (authenticatedUser != null) ?
+          authenticatedUser.getUsername() :
+          socket.getInetAddress().toString();
+
+      // Phân loại: Nếu rớt mạng bình thường thì in INFO, nếu lỗi lạ thì in ERROR
+      if (e instanceof java.io.EOFException || e instanceof java.net.SocketException) {
+        logger.info("Client [{}] đã ngắt kết nối. ({})", clientInfo, errorType);
+      } else {
+        logger.error("Client [{}] văng lỗi mạng: {} - {}", clientInfo, errorType, errorMsg);
+      }
     } finally {
       try {
         ServerMain.activeClients.remove(this);
