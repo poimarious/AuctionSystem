@@ -40,7 +40,7 @@ public class AuctionFloorController {
   @FXML
   private ScrollPane floorScrollPane;
 
-  private static final int PAGE_SIZE = 12;
+  private static final int PAGE_SIZE = 18;
   private int currentIndex = 0;
   private List<AuctionSummary> currentFilteredList = new ArrayList<>();
 
@@ -72,12 +72,12 @@ public class AuctionFloorController {
 
     if (floorScrollPane != null) {
       floorScrollPane.vvalueProperty().addListener((ignoredObs, ignoredOld, newValue) -> {
-        if (newValue.doubleValue() >= 0.9) {
+        if (newValue.doubleValue() >= 0.85) {
           loadMoreAuctions();
         }
       });
     } else {
-      System.err.println("CẢNH BÁO: floorScrollPane bị NULL! Hãy kiểm tra lại SceneBuilder.");
+      logger.warn("CẢNH BÁO: floorScrollPane bị NULL! Hãy kiểm tra lại SceneBuilder.");
     }
 
     // 2. SỬA CÁCH LOAD DỮ LIỆU: Lấy từ Server thay vì AuctionManager
@@ -199,6 +199,9 @@ public class AuctionFloorController {
           logger.error("Lỗi nạp item-card: ", e);
         }
       }
+
+      if(floorScrollPane != null) floorScrollPane.requestLayout();
+
       // Cập nhật lại chỉ số cho lần cuộn tiếp theo
       currentIndex = endIndex;
     });

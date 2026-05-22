@@ -4,7 +4,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: #151226;"
-      prefHeight="600.0" prefWidth="800.0"
       spacing="20.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25"
       fx:controller="org.deptrai.auctionsystem.client.controllers.AuctionFloorController">
     <children>
@@ -38,11 +37,16 @@
         </HBox>
 
         <ScrollPane style="-fx-background-color: transparent; -fx-background: transparent;"
-                    fitToWidth="true" VBox.vgrow="ALWAYS" fx:id="floorScrollPane">
+                    fitToWidth="true"
+                    fitToHeight="true"
+                    hbarPolicy="NEVER"
+                    vbarPolicy="AS_NEEDED"
+                    VBox.vgrow="ALWAYS"
+                    fx:id="floorScrollPane">
             <content>
                 <FlowPane hgap="25.0" stylesheets="@style.css" vgap="25.0" fx:id="productsContainer">
                     <padding>
-                        <Insets bottom="25.0" left="25.0" right="25.0" top="25.0"/>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
                     </padding>
                 </FlowPane>
             </content>
