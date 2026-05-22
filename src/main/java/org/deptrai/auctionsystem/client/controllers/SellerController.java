@@ -13,8 +13,6 @@ import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.DayOfWeek;
 import java.util.EnumMap;
@@ -22,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 public class SellerController {
-  private static final Logger logger = LoggerFactory.getLogger(SellerController.class);
   @FXML
   private Label welcomeLabel;
   @FXML
@@ -46,9 +43,6 @@ public class SellerController {
 
   @FXML
   public void initialize() {
-    logger.info("--- Seller Center Initialized ---");
-
-
     currentUser = SessionManager.getInstance().getCurrentUser();
     if (currentUser != null && welcomeLabel != null) {
       welcomeLabel.setText("Chào mừng, " + currentUser.getUsername() + "!");
@@ -108,9 +102,13 @@ public class SellerController {
 
             int id = 0;
             for (DayOfWeek day : DayOfWeek.values()) {
-              series.getData().add(new XYChart.Data<>(days[id++], biddingPerDay.get(day)));
+              series.getData().add(new XYChart.Data<>(days[id], biddingPerDay.get(day)));
+              id++;
             }
 
+
+            revenueChart.setAnimated(false);
+            revenueChart.getXAxis().setAnimated(false);
             revenueChart.getData().clear();
             revenueChart.getData().add(series);
           }

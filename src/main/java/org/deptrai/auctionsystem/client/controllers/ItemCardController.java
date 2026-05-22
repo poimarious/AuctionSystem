@@ -57,7 +57,7 @@ public class ItemCardController implements AuctionUpdateListener {
               Image image = new Image(new ByteArrayInputStream(imageBytes));
               itemImageView.setImage(image);
             } catch(Exception e) {
-              logger.info(e.getMessage());
+              logger.error(e.getMessage());
             }
           } else {
             logger.info("Không tìm thấy ảnh trên server!");
