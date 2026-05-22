@@ -1,14 +1,5 @@
 package org.deptrai.auctionsystem.client.controllers;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.Map;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -23,6 +14,15 @@ import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AddProductController {
 
@@ -55,7 +55,7 @@ public class AddProductController {
     // check không cho chọn ngày trong quá khứ
     if (endDatePicker != null) {
       endDatePicker.setDayCellFactory(
-          picker ->
+          ignored ->
               new DateCell() {
                 public void updateItem(LocalDate date, boolean empty) {
                   super.updateItem(date, empty);
@@ -81,13 +81,13 @@ public class AddProductController {
   }
 
   @FXML
-  public void handleGoBack(ActionEvent event) {
+  public void handleGoBack() {
     // Quay lại trang trước đó (thường là trang Kho hàng)
     SceneManager.getInstance().goBack();
   }
 
   @FXML
-  public void handleUploadProduct(ActionEvent event) {
+  public void handleUploadProduct() {
     // Kiểm tra sơ bộ xem đã nhập tên chưa
     String name = productNameInput.getText();
     String category = categoryCombo.getValue();
@@ -176,7 +176,7 @@ public class AddProductController {
           imageBytes = Files.readAllBytes(path);
           fileName = path.getFileName().toString(); // Lấy tên file gốc
         } catch (Exception e) {
-          logger.error("Lỗi đọc file ảnh để gửi đi: " + e.getMessage());
+          logger.error(e.getMessage());
         }
       }
 
@@ -188,7 +188,7 @@ public class AddProductController {
       // Gọi SocketClient gửi đi
       Message response = SocketClient.sendRequest(request);
 
-      if (response != null && "SUCCESS".equals(response.getStatus())) {
+      if ("SUCCESS".equals(response.getStatus())) {
         showAlert(
             Alert.AlertType.INFORMATION,
             "Thành công",
@@ -196,7 +196,7 @@ public class AddProductController {
         SceneManager.getInstance().goBack();
       } else {
         String errorMsg =
-            (response != null && response.getData() instanceof String)
+            (response.getData() instanceof String)
                 ? (String) response.getData()
                 : "Lỗi đường truyền mạng!";
         showAlert(Alert.AlertType.ERROR, "Đăng tải thất bại", errorMsg);
@@ -205,7 +205,7 @@ public class AddProductController {
   }
 
   @FXML
-  public void handleChooseImage(ActionEvent event) {
+  public void handleChooseImage() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Chọn hình ảnh sản phẩm");
     fileChooser

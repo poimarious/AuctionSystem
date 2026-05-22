@@ -1,12 +1,11 @@
 package org.deptrai.auctionsystem.server.managers;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 import org.deptrai.auctionsystem.server.dao.AuctionDAO;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.items.Item;
+
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class AuctionManager {
   // implement treemap with thread-safe
@@ -58,7 +57,7 @@ public class AuctionManager {
       auctions.put(auction.getAuctionId(), auction);
     }
     System.out.println(
-        "Đã đồng bộ " + dbAuctions.size() + " phiên đấu giá từ Database lên AuctionManager.");
+            "Đã đồng bộ " + dbAuctions.size() + " phiên đấu giá từ Database lên AuctionManager.");
   }
   // Thêm method này để đồng bộ 1 phiên đấu giá lẻ từ DB lên RAM,do nếu lệnh lưu vào db thất bại thì phiên đấu giá vẫn tồn tại trên ram
   public void addAuctionToMemory(Auction auction) {

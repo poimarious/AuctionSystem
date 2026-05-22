@@ -47,15 +47,21 @@ public class ItemDAO {
       String make = null;
       int mileage = -1;
 
-      if (item instanceof Electronics e) {
-        brand = e.getBrand();
-        warrantyMonths = e.getWarrantyMonths();
-      } else if (item instanceof Art a) {
-        artist = a.getArtist();
-        yearCreated = a.getYearCreated();
-      } else if (item instanceof Vehicle v) {
-        make = v.getMake();
-        mileage = v.getMileage();
+      switch (item) {
+        case Electronics e -> {
+          brand = e.getBrand();
+          warrantyMonths = e.getWarrantyMonths();
+        }
+        case Art a -> {
+          artist = a.getArtist();
+          yearCreated = a.getYearCreated();
+        }
+        case Vehicle v -> {
+          make = v.getMake();
+          mileage = v.getMileage();
+        }
+        default -> {
+        }
       }
 
       // Value of non-properties will be null/-1
@@ -97,18 +103,12 @@ public class ItemDAO {
         Seller seller = (Seller) userDAO.getUserById(sellerId);
 
         // Using Factory Method to create new Item
-        ItemFactory factory = null;
-        switch (category) {
-          case "Electronics":
-            factory = new ElectronicsFactory();
-            break;
-          case "Art":
-            factory = new ArtFactory();
-            break;
-          case "Vehicle":
-            factory = new VehicleFactory();
-            break;
-        }
+        ItemFactory factory = switch (category) {
+          case "Electronics" -> new ElectronicsFactory();
+          case "Art" -> new ArtFactory();
+          case "Vehicle" -> new VehicleFactory();
+          default -> null;
+        };
 
         if (factory != null) {
           Item item = factory.createItem(name, description, startingPrice, seller);
@@ -127,14 +127,14 @@ public class ItemDAO {
             }
           }
 
-          if (item instanceof Electronics) {
-            ((Electronics) item)
-                .setBrand(rs.getString("brand"))
-                .setWarrantyMonths(rs.getInt("warrantyMonths"));
-          } else if (item instanceof Art) {
-            ((Art) item).setArtist(rs.getString("artist")).setYearCreated(rs.getInt("yearCreated"));
-          } else if (item instanceof Vehicle) {
-            ((Vehicle) item).setMake(rs.getString("make")).setMileage(rs.getInt("mileage"));
+          switch (item) {
+            case Electronics electronics -> electronics
+                    .setBrand(rs.getString("brand"))
+                    .setWarrantyMonths(rs.getInt("warrantyMonths"));
+            case Art art -> art.setArtist(rs.getString("artist")).setYearCreated(rs.getInt("yearCreated"));
+            case Vehicle vehicle -> vehicle.setMake(rs.getString("make")).setMileage(rs.getInt("mileage"));
+            default -> {
+            }
           }
 
           return item;

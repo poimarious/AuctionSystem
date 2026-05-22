@@ -15,11 +15,15 @@ import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.users.Admin;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
 
 public class AdminDashboardController {
+
+  private static final Logger logger = LoggerFactory.getLogger(AdminDashboardController.class);
 
   // Nút Menu
   @FXML private Button btnNavAuctions;
@@ -78,7 +82,7 @@ public class AdminDashboardController {
   // ====================
 
   @FXML
-  public void showAuctionsPane(ActionEvent event) {
+  public void showAuctionsPane(ActionEvent ignored) {
     paneAuctions.setVisible(true);
     paneUsers.setVisible(false);
     // Đổi màu menu để biết đang ở đâu
@@ -89,7 +93,7 @@ public class AdminDashboardController {
   }
 
   @FXML
-  public void showUsersPane(ActionEvent event) {
+  public void showUsersPane(ActionEvent ignored) {
     paneAuctions.setVisible(false);
     paneUsers.setVisible(true);
 
@@ -100,7 +104,7 @@ public class AdminDashboardController {
   }
 
   @FXML
-  public void handleLogout(ActionEvent event) {
+  public void handleLogout(ActionEvent ignored) {
     new Thread(() -> {
       Message logoutReq = new Message("REQUEST", "LOGOUT", null);
       SocketClient.sendRequest(logoutReq);
@@ -122,11 +126,11 @@ public class AdminDashboardController {
     colStatus.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatus().toString()));
 
     // Nút Xóa
-    colAuctionAction.setCellFactory(param -> new TableCell<>() {
+    colAuctionAction.setCellFactory(ignored -> new TableCell<>() {
       private final Button btn = new Button("XÓA");
       {
         btn.setStyle("-fx-background-color: #ff003c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
-        btn.setOnAction(event -> {
+        btn.setOnAction(ignored -> {
           Auction auction = getTableView().getItems().get(getIndex());
           handleDeleteAuction(auction);
         });
@@ -149,6 +153,7 @@ public class AdminDashboardController {
         Message response = SocketClient.sendRequest(request);
 
         if (response.getStatus().equals("SUCCESS")) {
+          @SuppressWarnings("unchecked")
           List<Auction> auctions = (List<Auction>) response.getData();
           Platform.runLater(() -> {
             tableAuctions.getItems().setAll(auctions);
@@ -158,8 +163,7 @@ public class AdminDashboardController {
           System.err.println(">> Server từ chối tải danh sách Auction!");
         }
       } catch (Exception e) {
-        System.err.println(">> Lỗi khi nạp bảng Auction: ");
-        e.printStackTrace();
+        logger.error("Lỗi khi tải danh sách Auction: ", e);
       }
     }).start();
   }
@@ -195,10 +199,10 @@ public class AdminDashboardController {
     });
 
     // Nút BAN/BỎ BAN
-    colUserAction.setCellFactory(param -> new TableCell<>() {
+    colUserAction.setCellFactory(ignored -> new TableCell<>() {
       private final Button btn = new Button();
       {
-        btn.setOnAction(event -> {
+        btn.setOnAction(ignored -> {
           User user = getTableView().getItems().get(getIndex());
           if (user.isBanned()) {
             handleUnbanUser(user);
@@ -243,6 +247,7 @@ public class AdminDashboardController {
         Message response = SocketClient.sendRequest(request);
 
         if (response.getStatus().equals("SUCCESS")) {
+          @SuppressWarnings("unchecked")
           List<User> users = (List<User>) response.getData();
           Platform.runLater(() -> {
             tableUsers.getItems().setAll(users);
@@ -252,8 +257,7 @@ public class AdminDashboardController {
           System.err.println(">> Server từ chối tải danh sách User");
         }
       } catch(Exception e) {
-        System.err.println(">> Lỗi khi nạp bảng User: ");
-        e.printStackTrace();
+        logger.error("Lỗi khi nạp bảng User: ", e);
       }
     }).start();
 

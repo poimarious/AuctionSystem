@@ -25,12 +25,16 @@ import org.deptrai.auctionsystem.shared.models.users.Seller;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 import org.deptrai.auctionsystem.utils.ValidationUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class  ClientHandler implements Runnable {
+
+  private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
+
   private final Socket socket;
   private final UserDAO userDAO;
   private ObjectOutputStream out;
-  private ObjectInputStream in;
   private User authenticatedUser;
 
   public User getAuthenticatedUser() {
@@ -54,7 +58,7 @@ public class  ClientHandler implements Runnable {
   public void run() {
     try {
       out = new ObjectOutputStream(socket.getOutputStream()); // Output always before
-      in = new ObjectInputStream(socket.getInputStream());
+      ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
       Message request;
       while ((request = (Message) in.readObject()) != null) {
@@ -66,7 +70,7 @@ public class  ClientHandler implements Runnable {
             handleRegister(request);
             break;
           case "LOGOUT":
-            handleLogout(request);
+            handleLogout();
             break;
           case "CHANGE_BALANCE":
             handleChangeBalance(request);
@@ -111,10 +115,10 @@ public class  ClientHandler implements Runnable {
             handleCheckout(request);
             break;
           case "GET_ALL_USERS":
-            handleGetAllUsers(request);
+            handleGetAllUsers();
             break;
           case "GET_ALL_AUCTIONS_ADMIN":
-            handleGetAllAuctionsAdmin(request);
+            handleGetAllAuctionsAdmin();
             break;
           case "BAN_USER":
             handleBanUser(request);
@@ -136,12 +140,12 @@ public class  ClientHandler implements Runnable {
         ServerMain.activeClients.remove(this);
         socket.close();
       } catch (IOException e) {
-        e.printStackTrace();
+        logger.error(e.getMessage());
       }
     }
   }
 
-  public void sendMessage(Message msg) {
+  void sendMessage(Message msg) {
     try {
       out.reset();
       out.writeObject(msg);
@@ -175,7 +179,7 @@ public class  ClientHandler implements Runnable {
       }
       out.flush();
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
     }
   }
 
@@ -224,11 +228,11 @@ public class  ClientHandler implements Runnable {
       out.flush();
 
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
     }
   }
 
-  private void handleLogout(Message request) {
+  private void handleLogout() {
     // Đưa đường truyền Socket này về trạng thái vô danh (Guest)
     this.setAuthenticatedUser(null);
 
@@ -286,12 +290,12 @@ public class  ClientHandler implements Runnable {
 
 
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
       try {
         out.writeObject(new Message("ERROR", "CHANGE_BALANCE", "Lỗi hệ thống khi xử lý giao dịch."));
         out.flush();
       } catch (IOException ioException) {
-        ioException.printStackTrace();
+        logger.error(ioException.getMessage());
       }
     }
   }
@@ -314,7 +318,7 @@ public class  ClientHandler implements Runnable {
       try {
         out.writeObject(new Message("FAIL", "GET_IMAGE", null));
         out.flush();
-      } catch(IOException e2) {}
+      } catch(IOException _) {}
     }
   }
 
@@ -364,8 +368,7 @@ public class  ClientHandler implements Runnable {
       out.flush();
 
     } catch (Exception e) {
-      System.out.println("Lỗi khi gửi danh sách Auction cho Client.");
-      e.printStackTrace();
+      logger.error("Lỗi khi gửi danh sách Auction cho Client:", e);
     }
   }
 
@@ -390,7 +393,7 @@ public class  ClientHandler implements Runnable {
       }
       out.flush();
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
     }
   }
 
@@ -408,7 +411,10 @@ public class  ClientHandler implements Runnable {
         // Tạo thư mục "uploads" trên Server nếu chưa có
         File uploadDir = new File("server_uploads");
         if (!uploadDir.exists()) {
-          uploadDir.mkdir();
+          boolean isCreated = uploadDir.mkdirs();
+          if(!isCreated){
+            logger.warn("WARN: Không thể tạo thư mục server_uploads");
+          }
         }
 
         // Tạo đường dẫn lưu file (Thêm timestamp để không bị trùng tên)
@@ -449,12 +455,12 @@ public class  ClientHandler implements Runnable {
       out.flush();
 
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
       try {
         out.writeObject(new Message("ERROR", "CREATE_AUCTION", "Lỗi dữ liệu đầu vào."));
         out.flush();
       } catch (IOException ioException) {
-        ioException.printStackTrace();
+        logger.error(ioException.getMessage());
       }
     }
   }
@@ -493,7 +499,7 @@ public class  ClientHandler implements Runnable {
       out.flush();
 
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
     }
   }
 
@@ -522,13 +528,13 @@ public class  ClientHandler implements Runnable {
       out.flush();
 
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
       try {
         out.writeObject(
             new Message("FAIL", "GET_SELLER_AUCTIONS", "Lỗi khi tải danh sách kho hàng."));
         out.flush();
       } catch (IOException ioException) {
-        ioException.printStackTrace();
+        logger.error(ioException.getMessage());
       }
     }
   }
@@ -588,22 +594,7 @@ public class  ClientHandler implements Runnable {
         }
 
         // ================= KIỂM TRA SỐ DƯ ĐỘNG TRÊN RAM (ON-THE-FLY BALANCE CHECK) =================
-        double lockedBalance = 0.0;
-        List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
-
-        for (Auction a : allAuctions) {
-          if (a.getStatus() == AuctionStatus.OPEN || a.getStatus() == AuctionStatus.RUNNING) {
-            Bidder topBidder = a.getWinner();
-            // Nếu User hiện tại đang là người dẫn đầu ở một phiên đấu giá
-            if (topBidder != null && topBidder.getUserId().equals(bidder.getUserId())) {
-              // Chỉ cộng tiền giam nếu đó là một phiên đấu giá KHÁC.
-              // Nếu là phiên hiện tại, ta bỏ qua để lát nữa tính bằng mức giá mới (bidAmount)
-              if (!a.getAuctionId().equals(auctionId)) {
-                lockedBalance += a.getCurrentPrice();
-              }
-            }
-          }
-        }
+        double lockedBalance = getLockedBalance(bidder, auctionId);
 
         double totalRequiredBalance = lockedBalance + bidAmount;
 
@@ -648,7 +639,7 @@ public class  ClientHandler implements Runnable {
 
         // Lúc này hàm updateAuctionState sẽ tự động lưu cả giá mới, trạng thái mới và endTime mới
         AuctionDAO auctionDAO = new AuctionDAO();
-        boolean isAuctionUpdated = auctionDAO.updateAuctionState(auction);
+        auctionDAO.updateAuctionState(auction);
 
         // Update RAM data
         auction.getBids().add(newBid);
@@ -698,14 +689,33 @@ public class  ClientHandler implements Runnable {
       });
 
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
       try {
         out.writeObject(new Message("ERROR", "PLACE_BID", "Lỗi xử lý dữ liệu đặt giá tại Server."));
         out.flush();
       } catch (IOException ioException) {
-        ioException.printStackTrace();
+        logger.error(ioException.getMessage());
       }
     }
+  }
+  private static double getLockedBalance(Bidder bidder, String auctionId) {
+    double lockedBalance = 0.0;
+    List<Auction> allAuctions = AuctionManager.getInstance().getAllAuctions();
+
+    for (Auction a : allAuctions) {
+      if (a.getStatus() == AuctionStatus.OPEN || a.getStatus() == AuctionStatus.RUNNING) {
+        Bidder topBidder = a.getWinner();
+        // Nếu User hiện tại đang là người dẫn đầu ở một phiên đấu giá
+        if (topBidder != null && topBidder.getUserId().equals(bidder.getUserId())) {
+          // Chỉ cộng tiền giam nếu đó là một phiên đấu giá KHÁC.
+          // Nếu là phiên hiện tại, ta bỏ qua để lát nữa tính bằng mức giá mới (bidAmount)
+          if (!a.getAuctionId().equals(auctionId)) {
+            lockedBalance += a.getCurrentPrice();
+          }
+        }
+      }
+    }
+    return lockedBalance;
   }
 
   private void handleUpdatePassword(Message request) {
@@ -757,13 +767,13 @@ public class  ClientHandler implements Runnable {
       out.flush();
 
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
       try {
         out.writeObject(
             new Message("ERROR", "UPDATE_PASSWORD", "Định dạng dữ liệu gửi lên không hợp lệ."));
         out.flush();
       } catch (IOException ioException) {
-        ioException.printStackTrace();
+        logger.error(ioException.getMessage());
       }
     }
   }
@@ -808,13 +818,13 @@ public class  ClientHandler implements Runnable {
       out.flush();
 
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
       try {
         out.writeObject(
                 new Message("ERROR", "DELETE_AUCTION", "Lỗi xử lý yêu cầu xóa tại Server."));
         out.flush();
       } catch (IOException ioException) {
-        ioException.printStackTrace();
+        logger.error(ioException.getMessage());
       }
     }
   }
@@ -835,13 +845,13 @@ public class  ClientHandler implements Runnable {
 
     } catch (Exception e) {
       System.out.println("Lỗi khi gửi danh sách bid cho Client");
-      e.printStackTrace();
+      logger.error(e.getMessage());
       try {
         out.writeObject(
             new Message("ERROR", "GET_BIDS_HISTORY", "Lỗi hệ thống khi tải lịch sử đặt giá."));
         out.flush();
       } catch (IOException ioException) {
-        ioException.printStackTrace();
+        logger.error(ioException.getMessage());
       }
     }
   }
@@ -973,7 +983,7 @@ public class  ClientHandler implements Runnable {
 
 
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
     }
   }
 
@@ -1059,7 +1069,7 @@ public class  ClientHandler implements Runnable {
                   for (Map.Entry<String, String> users : usersMessage.entrySet()) {
                     String targetUserId = users.getKey();
                     String targetMessage = users.getValue();
-                    Boolean isOnline = false;
+                    boolean isOnline = false;
 
                     for (ClientHandler client : ServerMain.activeClients) {
                       if (client.getAuthenticatedUser() != null && client.getAuthenticatedUser().getUserId().equals(targetUserId)) {
@@ -1088,12 +1098,12 @@ public class  ClientHandler implements Runnable {
       out.flush();
 
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
       try {
         out.writeObject(new Message("ERROR", "CHECKOUT", "Lỗi Server khi xử lý thanh toán."));
         out.flush();
       } catch (IOException ex) {
-        ex.printStackTrace();
+        logger.error(ex.getMessage());
       }
     }
   }
@@ -1140,13 +1150,13 @@ public class  ClientHandler implements Runnable {
         out.flush();
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
       try {
 
         out.writeObject(new Message("ERROR", "BAN_USER", "Lỗi hệ thống Server khi xử lý Ban."));
         out.flush();
       } catch (IOException ex) {
-        ex.printStackTrace();
+        logger.error(ex.getMessage());
       }
     }
   }
@@ -1175,11 +1185,11 @@ public class  ClientHandler implements Runnable {
       out.flush();
 
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
     }
   }
 
-  private void handleGetAllUsers(Message request) {
+  private void handleGetAllUsers() {
     try {
       List<User> users = userDAO.getAllUsers();
 
@@ -1187,17 +1197,17 @@ public class  ClientHandler implements Runnable {
       out.writeObject(new Message("SUCCESS", "GET_ALL_USERS", users));
       out.flush();
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
     }
   }
 
-  private void handleGetAllAuctionsAdmin(Message request) {
+  private void handleGetAllAuctionsAdmin() {
     try {
       // Lấy danh sách full hd không che dành riêng cho Admin
       List<Auction> auctions = AuctionManager.getInstance().getAllAuctions();
 
       out.reset();
-      out.writeObject(new org.deptrai.auctionsystem.shared.network.Message("SUCCESS", "GET_ALL_AUCTIONS_ADMIN", auctions));
+      out.writeObject(new Message("SUCCESS", "GET_ALL_AUCTIONS_ADMIN", auctions));
       out.flush();
     } catch (Exception e) {
       System.out.println("Lỗi gửi danh sách cho Admin: " + e.getMessage());

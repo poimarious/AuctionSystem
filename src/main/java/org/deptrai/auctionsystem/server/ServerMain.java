@@ -17,7 +17,7 @@ public class ServerMain {
 
   public static java.util.List<ClientHandler> activeClients = new java.util.concurrent.CopyOnWriteArrayList<>();
 
-  static void main(String[] args) {
+  static void main() {
     System.out.println("=== HỆ THỐNG ĐẤU GIÁ SERVER ===");
 
     DatabaseConnection.initializeDatabase();
@@ -53,14 +53,5 @@ public class ServerMain {
     for (ClientHandler client : activeClients) {
       client.sendMessage(msg);
     }
-  }
-
-  public static ClientHandler getClientByUserId(String userId) {
-    for (ClientHandler client : activeClients) {
-      if (client.getAuthenticatedUser().getUserId() != null && client.getAuthenticatedUser().getUserId().equals(userId)) {
-        return client;
-      }
-    }
-    return null;
   }
 }

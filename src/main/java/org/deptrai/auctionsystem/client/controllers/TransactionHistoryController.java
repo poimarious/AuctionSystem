@@ -73,7 +73,7 @@ public class TransactionHistoryController {
     );
 
     // 6. Trạng thái
-    colStatus.setCellValueFactory(cellData -> new SimpleStringProperty("Hoàn tất"));
+    colStatus.setCellValueFactory(_ -> new SimpleStringProperty("Hoàn tất"));
   }
 
   private void loadTransactionHistory() {
@@ -85,7 +85,8 @@ public class TransactionHistoryController {
       Message request = new Message("REQUEST", "GET_SELLER_AUCTIONS", currentUser.getUserId());
       Message response = SocketClient.sendRequest(request);
 
-      if (response != null && "SUCCESS".equals(response.getStatus())) {
+      if ("SUCCESS".equals(response.getStatus())) {
+        @SuppressWarnings("unchecked")
         List<Auction> allAuctions = (List<Auction>) response.getData();
 
         // LỌC DỮ LIỆU: Chỉ giữ lại những phiên đã KẾT THÚC và CÓ NGƯỜI THẮNG
@@ -94,14 +95,12 @@ public class TransactionHistoryController {
             .collect(Collectors.toList());
 
         // Đẩy dữ liệu vào JavaFX Thread để cập nhật giao diện
-        Platform.runLater(() -> {
-          revenueTable.setItems(FXCollections.observableArrayList(completedTransactions));
-        });
+        Platform.runLater(() -> revenueTable.setItems(FXCollections.observableArrayList(completedTransactions)));
       }
     });
   }
   @FXML
-  public void handleGoBack(javafx.event.ActionEvent event) {
+  public void handleGoBack() {
     org.deptrai.auctionsystem.client.utils.SceneManager.getInstance().goBack();
   }
 }

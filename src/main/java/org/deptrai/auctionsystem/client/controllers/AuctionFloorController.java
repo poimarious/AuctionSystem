@@ -1,7 +1,6 @@
 package org.deptrai.auctionsystem.client.controllers;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -13,10 +12,8 @@ import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SearchEngine;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
-import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
-import org.deptrai.auctionsystem.shared.models.users.Bidder;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 import org.slf4j.Logger;
@@ -43,7 +40,7 @@ public class AuctionFloorController {
   @FXML
   private ScrollPane floorScrollPane;
 
-  private final int PAGE_SIZE = 12;
+  private static final int PAGE_SIZE = 12;
   private int currentIndex = 0;
   private List<AuctionSummary> currentFilteredList = new ArrayList<>();
 
@@ -53,7 +50,7 @@ public class AuctionFloorController {
    * 1. SỬA NÚT QUAY LẠI: Ép về thẳng Home View
    */
   @FXML
-  public void handleGoBack(ActionEvent event) {SceneManager.getInstance().goBack();}
+  public void handleGoBack() {SceneManager.getInstance().navigateToHome();}
 
   @FXML
   public void initialize() {
@@ -61,25 +58,21 @@ public class AuctionFloorController {
     if (categoryCombo != null) {
       categoryCombo.getItems().addAll("Tất cả", "Art", "Electronics", "Vehicle");
       categoryCombo.getSelectionModel().selectFirst();
-      categoryCombo.setOnAction(event -> filterAuctions());
+      categoryCombo.setOnAction(ignored -> filterAuctions());
     }
     if (statusCombo != null) {
       statusCombo.getItems().addAll("Tất cả", "Đang diễn ra", "Sắp kết thúc");
       statusCombo.getSelectionModel().selectFirst();
-      statusCombo.setOnAction(event -> {
-        filterAuctions();
-      });
+      statusCombo.setOnAction(ignored -> filterAuctions());
     }
 
     if (searchField != null) {
-      searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-        filterAuctions();
-      });
+      searchField.textProperty().addListener((ignoredObs, ignoredOld, ignoredNew) -> filterAuctions());
     }
 
-    if(floorScrollPane != null) {
-      floorScrollPane.vvalueProperty().addListener((observable, oldValue, newValue) -> {
-        if(newValue.doubleValue() >= 0.9) {
+    if (floorScrollPane != null) {
+      floorScrollPane.vvalueProperty().addListener((ignoredObs, ignoredOld, newValue) -> {
+        if (newValue.doubleValue() >= 0.9) {
           loadMoreAuctions();
         }
       });
@@ -103,12 +96,13 @@ public class AuctionFloorController {
     SocketClient.runAsync(() -> {
       Message response = SocketClient.sendRequest(request);
       if ("SUCCESS".equals(response.getStatus())) {
+        @SuppressWarnings("unchecked")
         List<AuctionSummary> allAuctions = (List<AuctionSummary>) response.getData();
 
         allAuctionsList = allAuctions;
 
         // Cập nhật giao diện an toàn trên luồng UI
-        Platform.runLater(() -> filterAuctions());
+        Platform.runLater(this::filterAuctions);
       }
     });
   }
@@ -135,14 +129,14 @@ public class AuctionFloorController {
       boolean matchStatus = true;
 
       if (selectedStatus != null && !selectedStatus.equals("Tất cả")) {
-        boolean isActive =  (auction.getStatus() == AuctionStatus.OPEN ||
+        boolean isActive = (auction.getStatus() == AuctionStatus.OPEN ||
                 auction.getStatus() == AuctionStatus.RUNNING) &&
                 auction.getEndTime().isAfter(now);
 
-        if(selectedStatus.equals("Đang diễn ra")) {
+        if (selectedStatus.equals("Đang diễn ra")) {
           matchStatus = isActive;
-        } else if(selectedStatus.equals("Sắp kết thúc")) {
-          if(isActive) {
+        } else if (selectedStatus.equals("Sắp kết thúc")) {
+          if (isActive) {
             long hourLeft = Duration.between(now, auction.getEndTime()).toHours();
 
             // một auction còn thời gian dưới 24 tiếng được gọi là sắp kết thúc
@@ -162,15 +156,15 @@ public class AuctionFloorController {
     this.currentFilteredList = finalResults;
     this.currentIndex = 0;
 
-    for(Node node : productsContainer.getChildren()) {
-      if(node.getUserData() instanceof ItemCardController oldController) {
+    for (Node node : productsContainer.getChildren()) {
+      if (node.getUserData() instanceof ItemCardController oldController) {
         SocketClient.removeListener(oldController);
       }
     }
 
     productsContainer.getChildren().clear();
 
-    if(floorScrollPane != null ) {
+    if (floorScrollPane != null) {
       floorScrollPane.setVvalue(0.0);
     }
     loadMoreAuctions();
@@ -202,7 +196,7 @@ public class AuctionFloorController {
 
           productsContainer.getChildren().add(itemCard);
         } catch (IOException e) {
-          logger.error("Lỗi nạp item-card: " + e.getMessage());
+          logger.error("Lỗi nạp item-card: ", e);
         }
       }
       // Cập nhật lại chỉ số cho lần cuộn tiếp theo

@@ -38,7 +38,7 @@ public class Auction implements Serializable {
 
   public Bidder getWinner() {
     if (bids == null || bids.isEmpty()) return null;
-    return bids.get(bids.size() - 1).getBidder();
+    return bids.getLast().getBidder();
   }
 
   // region Getters & Setters

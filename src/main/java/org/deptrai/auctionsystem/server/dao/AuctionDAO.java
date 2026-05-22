@@ -10,8 +10,13 @@ import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.items.Item;
 import org.deptrai.auctionsystem.shared.models.users.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AuctionDAO {
+
+  private static final Logger logger = LoggerFactory.getLogger(AuctionDAO.class);
+
   public boolean insertAuction(Auction auction) {
     String sql =
         "INSERT INTO Auctions (auctionId, itemId, currentPrice, status, endTime) VALUES (?, ?, ?, ?, ?)";
@@ -145,12 +150,15 @@ public class AuctionDAO {
             item.setItemId(itemId);
             item.setImageUrl(rs.getString("imageUrl"));
 
-            if (item instanceof org.deptrai.auctionsystem.shared.models.items.Electronics e) {
-              e.setBrand(rs.getString("brand")).setWarrantyMonths(rs.getInt("warrantyMonths"));
-            } else if (item instanceof org.deptrai.auctionsystem.shared.models.items.Art a) {
-              a.setArtist(rs.getString("artist")).setYearCreated(rs.getInt("yearCreated"));
-            } else if (item instanceof org.deptrai.auctionsystem.shared.models.items.Vehicle v) {
-              v.setMake(rs.getString("make")).setMileage(rs.getInt("mileage"));
+            switch (item) {
+              case org.deptrai.auctionsystem.shared.models.items.Electronics e ->
+                      e.setBrand(rs.getString("brand")).setWarrantyMonths(rs.getInt("warrantyMonths"));
+              case org.deptrai.auctionsystem.shared.models.items.Art a ->
+                      a.setArtist(rs.getString("artist")).setYearCreated(rs.getInt("yearCreated"));
+              case org.deptrai.auctionsystem.shared.models.items.Vehicle v ->
+                      v.setMake(rs.getString("make")).setMileage(rs.getInt("mileage"));
+              default -> {
+              }
             }
             itemCache.put(itemId, item);
           }
@@ -158,7 +166,7 @@ public class AuctionDAO {
       }
 
       Map<String, Auction> auctionCache = new LinkedHashMap<>();
-      try (ResultSet rs = stmt.executeQuery("SELECT * FROM Auctions ORDER BY rowid ASC")) {
+      try (ResultSet rs = stmt.executeQuery("SELECT * FROM Auctions ORDER BY rowid ")) {
         while (rs.next()) {
           String auctionId = rs.getString("auctionId");
           Item item = itemCache.get(rs.getString("itemId"));
@@ -171,7 +179,7 @@ public class AuctionDAO {
         }
       }
 
-      try (ResultSet rs = stmt.executeQuery("SELECT * FROM Bids ORDER BY timestamp ASC")) {
+      try (ResultSet rs = stmt.executeQuery("SELECT * FROM Bids ORDER BY timestamp ")) {
         while (rs.next()) {
           String auctionId = rs.getString("auctionId");
           Auction auction = auctionCache.get(auctionId);
@@ -189,8 +197,7 @@ public class AuctionDAO {
       }
 
     } catch(Exception e) {
-      System.out.println("Lỗi khi lấy danh sách tất cả Auction bằng Cache RAM: " + e.getMessage());
-      e.printStackTrace();
+      logger.error("Lỗi khi lấy danh sách tất cả Auction bằng Cache RAM:", e);
     }
     return auctionList;
   }

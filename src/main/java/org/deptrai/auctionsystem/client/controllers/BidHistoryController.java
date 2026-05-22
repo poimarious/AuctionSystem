@@ -9,7 +9,6 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -30,7 +29,6 @@ public class BidHistoryController {
   @FXML private TableColumn<Bid, String> currentPriceColumn;
   @FXML private TableColumn<Bid, String> timeRemainingColumn;
   @FXML private TableColumn<Bid, String> statusColumn;
-  @FXML private TableColumn<Bid, String> imageColumn;
 
   // --- Kho chứa gốc lưu TOÀN BỘ lịch sử trên RAM ---
   private List<Bid> allBidsList = new ArrayList<>();
@@ -108,7 +106,8 @@ public class BidHistoryController {
           Message request = new Message("GET_BIDS_HISTORY", userId);
           Message response = SocketClient.sendRequest(request);
 
-          if (response != null && "SUCCESS".equals(response.getStatus())) {
+          if ("SUCCESS".equals(response.getStatus())) {
+            @SuppressWarnings("unchecked")
             List<Bid> myBids = (List<Bid>) response.getData();
 
             Platform.runLater(() -> {
@@ -121,16 +120,14 @@ public class BidHistoryController {
               if (myBids.isEmpty()) {
                 logger.info("Bạn chưa có lượt đặt giá nào.");
               } else {
-                logger.info("Đã tải " + myBids.size() + " lượt đặt giá từ Server.");
+                logger.info("Đã tải {} lượt đặt giá từ Server.", myBids.size());
               }
             });
           } else {
-            String errorMsg = (response != null) ? (String) response.getData() : "Không có phản hồi từ Server";
-            logger.error("Lỗi khi tải lịch sử: " + errorMsg);
+            logger.error("Lỗi khi tải lịch sử.");
           }
         } catch (Exception e) {
-          logger.error("Lỗi kết nối mạng khi tải lịch sử đặt giá.");
-          e.printStackTrace();
+          logger.error("Lỗi kết nối mạng khi tải lịch sử đặt giá:", e);
         }
       });
       new Thread(() -> {
@@ -199,27 +196,27 @@ public class BidHistoryController {
 
   // --- 4 Hàm dành cho 4 cái nút trên FXML ---
   @FXML
-  public void handleShowAll(ActionEvent event) {
+  public void handleShowAll() {
     filterBids("ALL");
   }
 
   @FXML
-  public void handleShowRunning(ActionEvent event) {
+  public void handleShowRunning() {
     filterBids("RUNNING");
   }
 
   @FXML
-  public void handleShowFinished(ActionEvent event) {
+  public void handleShowFinished() {
     filterBids("FINISHED");
   }
 
   @FXML
-  public void handleShowWon(ActionEvent event) {
+  public void handleShowWon() {
     filterBids("WON");
   }
 
   @FXML
-  public void handleGoBack(ActionEvent event) {
+  public void handleGoBack() {
     SceneManager.getInstance().goBack();
   }
 }
