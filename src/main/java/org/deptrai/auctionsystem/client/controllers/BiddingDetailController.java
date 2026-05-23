@@ -330,6 +330,10 @@ public class BiddingDetailController implements AuctionUpdateListener {
     try {
       double maxBid = Double.parseDouble(maxBidField.getText());
       double increment = Double.parseDouble(incrementField.getText());
+
+      maxBid = Math.round(maxBid * 100.0) / 100.0;
+      increment = Math.round(increment * 100.0) / 100.0;
+
       if (maxBid <= currentAuction.getCurrentPrice()) {
         showError("Giới hạn Max phải lớn hơn mức giá hiện tại!");
         return;
@@ -337,6 +341,8 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
       AutoBidManager.getInstance().startAutoBid(currentAuction, maxBid, increment);
 
+      maxBidField.setText(String.format("%.2f", maxBid));
+      incrementField.setText(String.format("%.2f", increment));
       maxBidField.setDisable(true);
       incrementField.setDisable(true);
       btnAutoBid.setText("🛑 ĐANG CHẠY AUTO-BID (BẤM ĐỂ TẮT)");
