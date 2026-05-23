@@ -6,8 +6,10 @@ import org.deptrai.auctionsystem.shared.network.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class AutoBidManager {
 
@@ -20,6 +22,7 @@ public class AutoBidManager {
     SocketClient.addListener(this::onGlobalAuctionUpdated);
   }
 
+
   public static AutoBidManager getInstance() {
     if (instance == null) {
       synchronized (AutoBidManager.class) {
@@ -31,13 +34,38 @@ public class AutoBidManager {
     return instance;
   }
 
-  public void startAutoBid(Auction auction, double maxBid, double increment) {
-    activeAutoBids.put(auction.getAuctionId(), new AutoBidConfig(maxBid, increment));
-    onGlobalAuctionUpdated(auction);
+  public void startAutoBid(Auction auction, double maxBid, double increment, Runnable onStop) {
+    User currentUser = SessionManager.getInstance().getCurrentUser();
+    if(currentUser != null) {
+      Object[] payload = {currentUser.getUserId(), auction.getAuctionId(), maxBid};
+      Message req  = new Message("START_AUTOBID", payload);
+      Message res = SocketClient.sendRequest(req);
+
+      if("SUCCESS".equals(res.getStatus())) {
+        activeAutoBids.put(auction.getAuctionId(), new AutoBidConfig(maxBid, increment, onStop));
+        onGlobalAuctionUpdated(auction);
+      } else {
+        if(onStop != null) {
+          onStop.run();
+        }
+      }
+    }
   }
 
   public void stopAutoBid(String auctionId) {
-    activeAutoBids.remove(auctionId);
+    AutoBidConfig config = activeAutoBids.remove(auctionId);
+
+    User currentUser = SessionManager.getInstance().getCurrentUser();
+    if(currentUser != null) {
+      Object[] payload = {currentUser.getUserId(), auctionId};
+      SocketClient.runAsync(() -> {
+        SocketClient.sendRequest(new Message("STOP_AUTOBID", payload));
+      });
+    }
+
+    if(config != null && config.onStop != null) {
+      config.onStop.run();
+    }
   }
 
   public boolean isAutoBidActive(String auctionId) {
@@ -88,14 +116,5 @@ public class AutoBidManager {
         logger.info("Can't auto-bid more, stopped auto-bid.");
       }
     });
-  }
-
-  public static class AutoBidConfig {
-    public double maxBid;
-    public double increment;
-    public AutoBidConfig(double maxBid, double increment) {
-      this.maxBid = maxBid;
-      this.increment = increment;
-    }
   }
 }

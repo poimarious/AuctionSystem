@@ -339,7 +339,19 @@ public class BiddingDetailController implements AuctionUpdateListener {
         return;
       }
 
-      AutoBidManager.getInstance().startAutoBid(currentAuction, maxBid, increment);
+      AutoBidManager.getInstance().startAutoBid(currentAuction, maxBid, increment, () -> {
+        Platform.runLater(() -> {
+          btnAutoBid.setText("⚙️ KÍCH HOẠT AUTO-BID");
+          btnAutoBid.setStyle("");
+          maxBidField.setDisable(false);
+          incrementField.setDisable(false);
+          Alert alert = new Alert(Alert.AlertType.WARNING);
+          alert.setTitle("Auto-Bid Đã Dừng");
+          alert.setHeaderText("Hệ thống tự động dừng Auto-Bid");
+          alert.setContentText("Auto-Bid cho phiên này đã bị tắt. Nguyên nhân có thể do số dư khả dụng của bạn không đủ để theo cược tiếp!");
+          alert.show();
+        });
+      });
 
       maxBidField.setText(String.format("%.2f", maxBid));
       incrementField.setText(String.format("%.2f", increment));

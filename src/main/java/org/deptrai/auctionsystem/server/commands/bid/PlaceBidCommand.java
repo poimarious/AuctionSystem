@@ -127,7 +127,7 @@ public class PlaceBidCommand implements Command {
   private double getLockedBalance(Bidder bidder, String auctionId) {
     double lockedBalance = 0.0;
     for (Auction a : AuctionManager.getInstance().getAllAuctions()) {
-      if (a.getStatus() == AuctionStatus.OPEN || a.getStatus() == AuctionStatus.RUNNING) {
+      if (a.getStatus() == AuctionStatus.OPEN || a.getStatus() == AuctionStatus.RUNNING || a.getStatus() == AuctionStatus.FINISHED) {
         Bidder topBidder = a.getWinner();
         if (topBidder != null && topBidder.getUserId().equals(bidder.getUserId()) && !a.getAuctionId().equals(auctionId)) {
           lockedBalance += a.getCurrentPrice();

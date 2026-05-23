@@ -18,6 +18,8 @@ import org.deptrai.auctionsystem.server.commands.auth.RegisterCommand;
 import org.deptrai.auctionsystem.server.commands.auth.UpdatePasswordCommand;
 import org.deptrai.auctionsystem.server.commands.bid.GetBidsHistoryCommand;
 import org.deptrai.auctionsystem.server.commands.bid.PlaceBidCommand;
+import org.deptrai.auctionsystem.server.commands.bid.StartAutoBidCommand;
+import org.deptrai.auctionsystem.server.commands.bid.StopAutoBidCommand;
 import org.deptrai.auctionsystem.server.commands.payment.ChangeBalanceCommand;
 import org.deptrai.auctionsystem.server.commands.payment.CheckoutCommand;
 import org.deptrai.auctionsystem.server.commands.system.GetImageCommand;
@@ -69,6 +71,8 @@ public class ClientHandler implements Runnable {
     commandMap.put("GET_ALL_AUCTIONS_ADMIN", new GetAllAuctionsAdminCommand());
     commandMap.put("BAN_USER", new BanUserCommand());
     commandMap.put("UNBAN_USER", new UnbanUserCommand());
+    commandMap.put("START_AUTOBID", new StartAutoBidCommand());
+    commandMap.put("STOP_AUTOBID", new StopAutoBidCommand());
   }
 
   public Socket getSocket() { return socket; }

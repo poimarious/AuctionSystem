@@ -123,7 +123,7 @@ public class AutoBidTest {
 
     // 2. Kích hoạt Auto Bid cho user hiện tại: maxBid = 500$, bước giá = 15$
     System.out.println(">> Bật Auto Bid: Max = 500, Increment = 15");
-    AutoBidManager.getInstance().startAutoBid(targetAuction, 500.0, 15.0);
+    AutoBidManager.getInstance().startAutoBid(targetAuction, 500.0, 15.0, null);
 
     // Khẳng định trạng thái đang bật
     assertTrue(AutoBidManager.getInstance().isAutoBidActive(targetAuction.getAuctionId()));

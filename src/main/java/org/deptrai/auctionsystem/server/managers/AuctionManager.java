@@ -6,10 +6,14 @@ import org.deptrai.auctionsystem.shared.models.items.Item;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AuctionManager {
   // implement treemap with thread-safe
   private final Map<String, Auction> auctions = Collections.synchronizedMap(new LinkedHashMap<>());
+
+  // Map này userId -> <AuctionId, MaxBid>
+  private final Map<String, Map<String, Double>> autoBidLocks = new ConcurrentHashMap<>();
 
   private static class SingletonHelper { // Helper class to generate instance,because this class only loads once so it ensures thread-safe
     private static final AuctionManager INSTANCE = new AuctionManager();
@@ -70,5 +74,28 @@ public class AuctionManager {
     if (auctionId != null) {
       auctions.remove(auctionId);
     }
+  }
+
+
+  public void registerAutoBid(String userId, String auctionId, double maxBid) {
+    autoBidLocks.computeIfAbsent(userId, k -> new java.util.concurrent.ConcurrentHashMap<>()).put(auctionId, maxBid);
+  }
+
+  public void unregisterAutoBid(String userId, String auctionId) {
+    if (autoBidLocks.containsKey(userId)) {
+      autoBidLocks.get(userId).remove(auctionId);
+    }
+  }
+
+  public double getTotalLockedAutoBid(String userId, String excludeAuctionId) {
+    if (!autoBidLocks.containsKey(userId)) return 0.0;
+
+    double total = 0.0;
+    for (java.util.Map.Entry<String, Double> entry : autoBidLocks.get(userId).entrySet()) {
+      if (!entry.getKey().equals(excludeAuctionId)) {
+        total += entry.getValue();
+      }
+    }
+    return total;
   }
 }
