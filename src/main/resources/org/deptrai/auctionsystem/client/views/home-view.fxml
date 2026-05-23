@@ -74,7 +74,7 @@
                                                 <MenuItem mnemonicParsing="false" onAction="#handleShowBidHistory"
                                                           text="📜 Lịch sử đặt giá"/>
                                                 <MenuItem mnemonicParsing="false" onAction="#handleLogout"
-                                                          text=" 🚪 Đăng xuất"/>
+                                                          text=" 🚪  Đăng xuất"/>
                                                 <SeparatorMenuItem mnemonicParsing="false"/>
                                             </items>
                                         </MenuButton>
