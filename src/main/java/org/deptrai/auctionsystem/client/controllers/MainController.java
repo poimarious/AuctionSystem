@@ -189,6 +189,7 @@ public class MainController {
       if (currentUser instanceof Seller) {
         @SuppressWarnings("unchecked")
         List<Auction> sellerAuctions = (List<Auction>) response.getData();
+        allAuctions.clear();
 
         for (Auction auction : sellerAuctions) {
           AuctionSummary auctionSummary = new AuctionSummary(
