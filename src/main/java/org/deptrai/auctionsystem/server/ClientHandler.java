@@ -119,9 +119,12 @@ public class ClientHandler implements Runnable {
 
   public void sendMessage(Message msg) {
     try {
-      out.reset();
-      out.writeObject(msg);
-      out.flush();
+      if (out != null) {
+        out.reset();
+        out.writeObject(msg);
+        out.flush();
+      }
+
     } catch (IOException e) {
       // Nếu lỗi tức là client này rớt mạng -> Rút cáp, xóa khỏi danh sách
       ServerMain.activeClients.remove(this);
