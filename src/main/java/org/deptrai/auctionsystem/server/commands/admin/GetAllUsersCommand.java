@@ -9,8 +9,6 @@ import java.io.ObjectOutputStream;
 public class GetAllUsersCommand implements Command {
   @Override
   public void execute(ClientHandler clientHandler, Message request, ObjectOutputStream out) throws Exception {
-    out.reset();
-    out.writeObject(new Message("SUCCESS", "GET_ALL_USERS", new UserDAO().getAllUsers()));
-    out.flush();
+    clientHandler.sendMessage(new Message("SUCCESS", "GET_ALL_USERS", new UserDAO().getAllUsers()));
   }
 }

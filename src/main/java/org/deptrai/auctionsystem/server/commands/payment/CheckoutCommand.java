@@ -81,9 +81,10 @@ public class CheckoutCommand implements Command {
             if (dbWinner.getBalance() < finalPrice) {
               throw new InsufficientBalanceException("Tài khoản không đủ số dư để thanh toán!");
             }
-
-            if (userDAO.updateBalance(buyerId, dbWinner.getBalance() - finalPrice)) {
-              if (userDAO.updateBalance(sellerId, dbSeller.getBalance() + finalPrice)) {
+            boolean isBuyerDeducted = userDAO.updateBalance(buyerId, dbWinner.getBalance() - finalPrice);
+            if (isBuyerDeducted) {
+              boolean isSellerAdded = userDAO.updateBalance(sellerId, dbSeller.getBalance() + finalPrice);
+              if (isSellerAdded) {
 
                 // CẬP NHẬT TRẠNG THÁI THÀNH PAID
                 auction.setStatus(AuctionStatus.PAID);
