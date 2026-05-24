@@ -56,6 +56,9 @@ public class SessionManager {
   }
 
   public ObservableList<String> getNotifications() {
+    if(notifications.size() > 10) {
+      notifications.removeLast();
+    }
     return notifications;
   }
 

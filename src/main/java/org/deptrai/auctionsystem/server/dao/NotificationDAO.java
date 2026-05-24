@@ -15,16 +15,26 @@ public class NotificationDAO {
   private static final Logger logger = LoggerFactory.getLogger(NotificationDAO.class);
 
   public void insertNotification(String userId, String message) {
-    String sql = "INSERT INTO notifications (notification_id, user_id, message, created_at) VALUES (?, ?, ?, ?)";
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    String InsertSql = "INSERT INTO notifications (notification_id, user_id, message, created_at) VALUES (?, ?, ?, ?)";
+    String cleanupSql = "DELETE FROM notifications WHERE user_id = ? AND notification_id NOT IN (" +
+            "SELECT notification_id FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 10)";
+    try (Connection conn = DatabaseConnection.getConnection()) {
+      try (PreparedStatement pstmtInsert = conn.prepareStatement(InsertSql)) {
+        pstmtInsert.setString(1, UUID.randomUUID().toString());
+        pstmtInsert.setString(2, userId);
+        pstmtInsert.setString(3, message);
+        pstmtInsert.setString(4, java.time.LocalDateTime.now().toString());
+        pstmtInsert.executeUpdate();
+      }
 
-      pstmt.setString(1, UUID.randomUUID().toString());
-      pstmt.setString(2, userId);
-      pstmt.setString(3, message);
-      pstmt.setString(4, java.time.LocalDateTime.now().toString());
 
-      pstmt.executeUpdate();
+      try (PreparedStatement pstmtDelete = conn.prepareStatement(cleanupSql)) {
+        pstmtDelete.setString(1, userId);
+        pstmtDelete.setString(2, userId);
+        pstmtDelete.executeUpdate();
+      }
+
+
     } catch (Exception e) {
       System.err.println("Lỗi lưu thông báo vào DB: " + e.getMessage());
     }
