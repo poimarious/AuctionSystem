@@ -29,7 +29,10 @@ public class CheckoutCommand implements Command {
   @Override
   public void execute(ClientHandler clientHandler, Message request, ObjectOutputStream out) throws Exception {
     try {
-      String auctionId = (String) request.getData();
+      // SỬA ĐOẠN NÀY: Bóc tách mảng Object[] giống hệt PlaceBidCommand
+      Object[] data = (Object[]) request.getData();
+      String auctionId = (String) data[0];
+      String requesterId = (String) data[1];
       Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
 
       if (auction == null) {
@@ -54,8 +57,6 @@ public class CheckoutCommand implements Command {
         }
 
 
-        // Lấy ID của người đang thực sự gửi request này lên Server
-        String requesterId = clientHandler.getAuthenticatedUser().getUserId();
 
         // Kiểm tra xem người gửi có phải là người chiến thắng không?
         if (!requesterId.equals(winner.getUserId())) {
@@ -68,6 +69,7 @@ public class CheckoutCommand implements Command {
         String buyerId = winner.getUserId();
         String sellerId = auction.getItem().getSeller().getUserId();
         double finalPrice = auction.getCurrentPrice();
+        // ... (Đoạn code trừ tiền bên dưới giữ nguyên) ...
 
         UserDAO userDAO = new UserDAO();
 

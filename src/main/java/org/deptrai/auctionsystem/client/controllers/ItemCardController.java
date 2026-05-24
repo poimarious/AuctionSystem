@@ -177,7 +177,9 @@ public class ItemCardController implements AuctionUpdateListener {
 
     confirmAlert.showAndWait().ifPresent(response -> {
       if(response == ButtonType.YES) {
-        Message request = new Message("CHECKOUT", auction.getAuctionId());
+        //Đổi quy ước :{auctionid,userid} để check userid và winner id
+        Object[] payload = {auction.getAuctionId(), currentUser.getUserId()};
+        Message request = new Message("CHECKOUT", payload);
         SocketClient.runAsync(() -> {
           Message server_response = SocketClient.sendRequest(request);
           Platform.runLater(() -> {

@@ -510,12 +510,14 @@ public class BiddingCoreTest {
     List<String> responses = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
 
     for (int i = 0; i < numberOfThreads; i++) {
+      Bidder finalCheckoutBuyer = checkoutBuyer;
       new Thread(() -> {
         try (Socket s = new Socket("localhost", 5008);
              java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(s.getOutputStream());
              java.io.ObjectInputStream in = new java.io.ObjectInputStream(s.getInputStream())) {
 
-          Message req = new Message("CHECKOUT", checkoutAuction.getAuctionId());
+          Object[] payload = {checkoutAuction.getAuctionId(), finalCheckoutBuyer.getUserId()};
+          Message req = new Message("CHECKOUT", payload);
 
           // Nín thở chờ hiệu lệnh
           readyLatch.await();
