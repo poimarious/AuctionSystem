@@ -7,8 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.deptrai.auctionsystem.server.utils.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NotificationDAO {
+
+  private static final Logger logger = LoggerFactory.getLogger(NotificationDAO.class);
 
   public void insertNotification(String userId, String message) {
     String sql = "INSERT INTO notifications (notification_id, user_id, message, created_at) VALUES (?, ?, ?, ?)";
@@ -49,9 +53,8 @@ public class NotificationDAO {
          PreparedStatement pstmt = conn.prepareStatement(sql)) {
       pstmt.setString(1, userId);
       pstmt.executeUpdate();
-      System.out.println("Đã xóa sạch thông báo offline của user: " + userId);
     } catch (Exception e) {
-      System.err.println("Lỗi xóa thông báo dưới DB: " + e.getMessage());
+       logger.info("Lỗi xóa thông báo dưới DB: " + e.getMessage());
     }
   }
 }

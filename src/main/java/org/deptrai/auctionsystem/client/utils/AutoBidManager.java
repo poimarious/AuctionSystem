@@ -1,6 +1,7 @@
 package org.deptrai.auctionsystem.client.utils;
 
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.users.User;
 import org.deptrai.auctionsystem.shared.network.Message;
 import org.slf4j.Logger;
@@ -40,7 +41,6 @@ public class AutoBidManager {
       Object[] payload = {currentUser.getUserId(), auction.getAuctionId(), maxBid};
       Message req  = new Message("START_AUTOBID", payload);
       Message res = SocketClient.sendRequest(req);
-
       if("SUCCESS".equals(res.getStatus())) {
         activeAutoBids.put(auction.getAuctionId(), new AutoBidConfig(maxBid, increment, onStop));
         onGlobalAuctionUpdated(auction);
@@ -62,7 +62,6 @@ public class AutoBidManager {
         SocketClient.sendRequest(new Message("STOP_AUTOBID", payload));
       });
     }
-
     if(config != null && config.onStop != null) {
       config.onStop.run();
     }
@@ -91,14 +90,20 @@ public class AutoBidManager {
     if (!myId.equals(winnerId)) {
       double nextBidAmount = lastestAuction.getCurrentPrice() + config.increment;
       if (nextBidAmount <= config.maxBid) {
-        new Thread(() -> {
+        SocketClient.runAsync(() -> {
           try {
             Thread.sleep(1000);
-            sendAutoBidRequest(auctionId, myId, nextBidAmount);
+            if(lastestAuction.getStatus() == AuctionStatus.OPEN || lastestAuction.getStatus() == AuctionStatus.RUNNING) {
+              sendAutoBidRequest(auctionId, myId, nextBidAmount);
+            } else {
+              if(config.onStop != null) {
+                config.onStop.run();
+              }
+            }
           } catch (Exception e) {
             logger.error("", e);
           }
-        }).start();
+        });
       } else {
         stopAutoBid(auctionId);
       }
