@@ -18,7 +18,6 @@ public class StopAutoBidCommand implements Command {
 
     AuctionManager.getInstance().unregisterAutoBid(userId, auctionId);
 
-    out.writeObject(new Message("SUCCESS", "STOP_AUTOBID", "Đã giải phóng tiền giam Auto-Bid"));
-    out.flush();
+    clientHandler.sendMessage(new Message("SUCCESS", "STOP_AUTOBID", "Đã giải phóng tiền giam Auto-Bid"));
   }
 }

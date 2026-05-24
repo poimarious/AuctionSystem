@@ -29,17 +29,13 @@ public class GetAuctionByIdCommand implements Command {
         throw new ResourceNotFoundException("Không tìm thấy phiên đấu giá này!");
       }
 
-      out.reset();
-      out.writeObject(new Message("SUCCESS", "GET_AUCTION_BY_ID", auction));
-      out.flush();
+      clientHandler.sendMessage(new Message("SUCCESS", "GET_AUCTION_BY_ID",auction));
 
     } catch (ResourceNotFoundException e) {
-      out.writeObject(new Message("FAIL", "GET_AUCTION_BY_ID", e.getMessage()));
-      out.flush();
+      clientHandler.sendMessage(new Message("FAIL", "GET_AUCTION_BY_ID", e.getMessage()));
     } catch (Exception e) {
       logger.error("Lỗi lấy chi tiết Auction: ", e);
-      out.writeObject(new Message("ERROR", "GET_AUCTION_BY_ID", "Lỗi hệ thống Server."));
-      out.flush();
+      clientHandler.sendMessage(new Message("ERROR", "GET_AUCTION_BY_ID", "Lỗi hệ thống Server."));
     }
   }
 }

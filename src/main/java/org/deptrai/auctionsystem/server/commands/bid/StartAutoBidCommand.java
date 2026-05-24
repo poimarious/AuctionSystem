@@ -32,16 +32,13 @@ public class StartAutoBidCommand implements Command {
 
       if(lockedBalance + maxBid <= user.getBalance()) {
         AuctionManager.getInstance().registerAutoBid(userId, auctionId, maxBid);
-        out.writeObject(new Message("SUCCESS", "START_AUTOBID", "Đã bật auto-bid thành công!"));
+        clientHandler.sendMessage(new Message("SUCCESS", "START_AUTOBID", "Đã bật auto-bid thành công!"));
       } else {
-        out.writeObject(new Message("FAIL", "START_AUTOBID", "Số dư không đủ để bật auto-bid với mức giá này!"));
+        clientHandler.sendMessage(new Message("FAIL", "START_AUTOBID", "Số dư không đủ để bật auto-bid với mức giá này!"));
       }
-      out.flush();
     } catch(Exception e) {
       logger.error("Lỗi khi xử lí Auto-Bid:", e);
-      out.reset();
-      out.writeObject(new Message("FAIL", "START_AUTOBID", "Lỗi hệ thống Server."));
-      out.flush();
+      clientHandler.sendMessage(new Message("FAIL", "START_AUTOBID", "Lỗi hệ thống Server."));
     }
   }
 

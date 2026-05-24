@@ -22,8 +22,7 @@ public class DeleteAuctionCommand implements Command {
       Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
 
       if (auction == null || auction.getItem() == null) {
-        out.writeObject(new Message("FAIL", "DELETE_AUCTION", "Không tìm thấy phiên đấu giá trên hệ thống!"));
-        out.flush();
+        clientHandler.sendMessage(new Message("FAIL", "DELETE_AUCTION", "Không tìm thấy phiên đấu giá trên hệ thống!"));
         return;
       }
 
@@ -35,18 +34,15 @@ public class DeleteAuctionCommand implements Command {
           AuctionManager.getInstance().removeAuctionFromMemory(auctionId);
           auction.setStatus(AuctionStatus.CANCELED); // Ẩn khỏi main page
 
-          out.reset();
-          out.writeObject(new Message("SUCCESS", "DELETE_AUCTION", "Xóa triệt để phiên đấu giá thành công!"));
+          clientHandler.sendMessage(new Message("SUCCESS", "DELETE_AUCTION", "Xóa triệt để phiên đấu giá thành công!"));
         } else {
-          out.writeObject(new Message("FAIL", "DELETE_AUCTION", "Lỗi cơ sở dữ liệu khi xóa."));
+          clientHandler.sendMessage(new Message("FAIL", "DELETE_AUCTION", "Lỗi cơ sở dữ liệu khi xóa."));
         }
       }
-      out.flush();
 
     } catch (Exception e) {
       logger.error("Lỗi xóa phiên đấu giá: ", e);
-      out.writeObject(new Message("ERROR", "DELETE_AUCTION", "Lỗi xử lý yêu cầu xóa tại Server."));
-      out.flush();
+      clientHandler.sendMessage(new Message("ERROR", "DELETE_AUCTION", "Lỗi xử lý yêu cầu xóa tại Server."));
     }
   }
 }

@@ -23,8 +23,7 @@ public class CloseAuctionCommand implements Command {
       Auction auction = auctionDAO.getAuctionById(auctionId);
 
       if (auction == null) {
-        out.writeObject(new Message("FAIL", "CLOSE_AUCTION", "Không tìm thấy phiên đấu giá."));
-        out.flush();
+        clientHandler.sendMessage(new Message("FAIL", "CLOSE_AUCTION", "Không tìm thấy phiên đấu giá."));
         return;
       }
 
@@ -35,15 +34,13 @@ public class CloseAuctionCommand implements Command {
         if (inMemoryAuction != null) {
           inMemoryAuction.setStatus(AuctionStatus.CANCELED);
         }
-        out.reset();
-        out.writeObject(new Message("SUCCESS", "CLOSE_AUCTION", auction));
+        clientHandler.sendMessage(new Message("SUCCESS", "CLOSE_AUCTION", auction));
       } else {
-        out.writeObject(new Message("FAIL", "CLOSE_AUCTION", "Lỗi DB khi cập nhật trạng thái."));
+        clientHandler.sendMessage(new Message("FAIL", "CLOSE_AUCTION", "Lỗi DB khi cập nhật trạng thái."));
       }
-      out.flush();
-
     } catch (Exception e) {
       logger.error("Lỗi đóng phiên đấu giá: ", e);
+
     }
   }
 }

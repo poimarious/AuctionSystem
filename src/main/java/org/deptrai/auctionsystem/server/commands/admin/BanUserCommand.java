@@ -37,20 +37,15 @@ public class BanUserCommand implements Command {
             break;
           }
         }
-        out.reset();
-        out.writeObject(new Message("SUCCESS", "BAN_USER", "Đã ban người dùng thành công!"));
+        clientHandler.sendMessage(new Message("SUCCESS", "BAN_USER", "Đã ban người dùng thành công!"));
       } else {
-        out.writeObject(new Message("FAIL", "BAN_USER", "Lỗi CSDL không thể cập nhật trạng thái Ban."));
+        clientHandler.sendMessage(new Message("FAIL", "BAN_USER", "Lỗi CSDL không thể cập nhật trạng thái Ban."));
       }
-      out.flush();
-
     } catch (AuthenticationException e) {
-      out.writeObject(new Message("FAIL", "BAN_USER", e.getMessage()));
-      out.flush();
+      clientHandler.sendMessage(new Message("FAIL", "BAN_USER", e.getMessage()));
     } catch (Exception e) {
       logger.error("Lỗi khi Ban user: ", e);
-      out.writeObject(new Message("ERROR", "BAN_USER", "Lỗi hệ thống Server."));
-      out.flush();
+      clientHandler.sendMessage(new Message("ERROR", "BAN_USER", "Lỗi hệ thống Server."));
     }
   }
 }

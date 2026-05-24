@@ -47,8 +47,7 @@ public class CreateAuctionCommand implements Command {
       // 1. Lưu Item xuống DB
       ItemDAO itemDAO = new ItemDAO();
       if (!itemDAO.insertItem(item)) {
-        out.writeObject(new Message("FAIL", "CREATE_AUCTION", "Lỗi Database khi lưu Vật phẩm."));
-        out.flush();
+        clientHandler.sendMessage(new Message("FAIL", "CREATE_AUCTION", "Lỗi Database khi lưu Vật phẩm."));
         return;
       }
 
@@ -59,17 +58,13 @@ public class CreateAuctionCommand implements Command {
       AuctionDAO auctionDAO = new AuctionDAO();
       if (auctionDAO.insertAuction(newAuction)) {
         AuctionManager.getInstance().addAuctionToMemory(newAuction);
-        out.reset();
-        out.writeObject(new Message("SUCCESS", "CREATE_AUCTION", newAuction));
+        clientHandler.sendMessage(new Message("SUCCESS", "CREATE_AUCTION", newAuction));
       } else {
-        out.writeObject(new Message("FAIL", "CREATE_AUCTION", "Lỗi Database khi tạo Phiên đấu giá."));
+        clientHandler.sendMessage(new Message("FAIL", "CREATE_AUCTION", "Lỗi Database khi tạo Phiên đấu giá."));
       }
-      out.flush();
-
     } catch (Exception e) {
       logger.error("Lỗi tạo phiên đấu giá: ", e);
-      out.writeObject(new Message("ERROR", "CREATE_AUCTION", "Lỗi dữ liệu đầu vào."));
-      out.flush();
+      clientHandler.sendMessage(new Message("ERROR", "CREATE_AUCTION", "Lỗi dữ liệu đầu vào."));
     }
   }
 }

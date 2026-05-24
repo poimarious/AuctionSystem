@@ -17,19 +17,15 @@ public class GetBidsHistoryCommand implements Command {
     try {
       String userId = (String) request.getData();
       if (userId == null || userId.trim().isEmpty()) {
-        out.writeObject(new Message("FAIL", "GET_BIDS_HISTORY", "ID người dùng không hợp lệ."));
-        out.flush();
+        clientHandler.sendMessage(new Message("FAIL", "GET_BIDS_HISTORY", "ID người dùng không hợp lệ."));
         return;
       }
 
-      out.reset();
-      out.writeObject(new Message("SUCCESS", "GET_BIDS_HISTORY", new BidDAO().getBidsByBidderId(userId)));
-      out.flush();
+      clientHandler.sendMessage(new Message("SUCCESS", "GET_BIDS_HISTORY", new BidDAO().getBidsByBidderId(userId)));
 
     } catch (Exception e) {
       logger.error("Lỗi tải lịch sử đặt giá: ", e);
-      out.writeObject(new Message("ERROR", "GET_BIDS_HISTORY", "Lỗi hệ thống khi tải lịch sử."));
-      out.flush();
+      clientHandler.sendMessage(new Message("ERROR", "GET_BIDS_HISTORY", "Lỗi hệ thống khi tải lịch sử."));
     }
   }
 }

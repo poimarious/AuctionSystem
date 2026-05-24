@@ -53,16 +53,12 @@ public class GetAllAuctionsCommand implements Command {
         }
       }
 
-      out.reset();
-      out.writeObject(new Message("SUCCESS", "GET_ALL_AUCTIONS", activeAuctionsDTO));
-      out.flush();
+      clientHandler.sendMessage(new Message("SUCCESS", "GET_ALL_AUCTIONS", activeAuctionsDTO));
 
     } catch (Exception e) {
       logger.error("Lỗi khi gửi danh sách Auction cho Client: ", e);
       if (out != null) {
-        out.reset();
-        out.writeObject(new Message("FAIL", "GET_ALL_AUCTIONS", "Lỗi tải dữ liệu."));
-        out.flush();
+        clientHandler.sendMessage(new Message("FAIL", "GET_ALL_AUCTIONS","Lỗi tải dữ liệu."));
       }
 
     }

@@ -33,8 +33,7 @@ public class FinishAuctionCommand implements Command {
       Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
 
       if (auction == null) {
-        out.writeObject(new Message("FAIL", "FINISH_AUCTION", "Không tìm thấy phiên đấu giá."));
-        out.flush();
+        clientHandler.sendMessage(new Message("FAIL", "FINISH_AUCTION", "Không tìm thấy phiên đấu giá."));
         return;
       }
 
@@ -53,9 +52,7 @@ public class FinishAuctionCommand implements Command {
         }
       }
 
-      out.reset();
-      out.writeObject(new Message("SUCCESS", "FINISH_AUCTION", "Đã xử lý xong"));
-      out.flush();
+      clientHandler.sendMessage(new Message("SUCCESS", "FINISH_AUCTION", "Đã xử lý xong"));
 
     } catch (Exception e) {
       logger.error("Lỗi khi kết thúc phiên đấu giá: ", e);
