@@ -39,19 +39,16 @@ public class UpdatePasswordCommand implements Command {
       }
 
       if (userDAO.updatePassword(userId, newPassword)) {
-        out.writeObject(new Message("SUCCESS", "UPDATE_PASSWORD", "Cập nhật mật khẩu thành công!"));
+        clientHandler.sendMessage(new Message("SUCCESS", "UPDATE_PASSWORD", "Cập nhật mật khẩu thành công!"));
       } else {
         throw new Exception("Lỗi CSDL khi update mật khẩu.");
       }
-      out.flush();
 
     } catch (AuthenticationException | ResourceNotFoundException e) {
-      out.writeObject(new Message("FAIL", "UPDATE_PASSWORD", e.getMessage()));
-      out.flush();
+      clientHandler.sendMessage(new Message("FAIL", "UPDATE_PASSWORD", e.getMessage()));
     } catch (Exception e) {
       logger.error("Lỗi cập nhật mật khẩu: ", e);
-      out.writeObject(new Message("ERROR", "UPDATE_PASSWORD", "Định dạng dữ liệu không hợp lệ hoặc lỗi Server."));
-      out.flush();
+      clientHandler.sendMessage(new Message("ERROR", "UPDATE_PASSWORD", "Định dạng dữ liệu không hợp lệ hoặc lỗi Server."));
     }
   }
 }

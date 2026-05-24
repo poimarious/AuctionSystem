@@ -22,17 +22,15 @@ public class UnbanUserCommand implements Command {
       String targetUserId = (String) data[1];
 
       if (!(requester instanceof Admin) || ((Admin) requester).getAdminLevel() < 2) {
-        out.writeObject(new Message("FAIL", "UNBAN_USER", "Bạn không có quyền Gỡ cấm người dùng!"));
-        out.flush();
+        clientHandler.sendMessage(new Message("FAIL", "UNBAN_USER", "Bạn không có quyền Gỡ cấm người dùng!"));
         return;
       }
 
       if (new UserDAO().unbanUser(targetUserId)) {
-        out.writeObject(new Message("SUCCESS", "UNBAN_USER", "Đã gỡ cấm thành công!"));
+        clientHandler.sendMessage(new Message("SUCCESS", "UNBAN_USER", "Đã gỡ cấm thành công!"));
       } else {
-        out.writeObject(new Message("FAIL", "UNBAN_USER", "Lỗi CSDL khi gỡ cấm."));
+        clientHandler.sendMessage(new Message("FAIL", "UNBAN_USER", "Lỗi CSDL khi gỡ cấm."));
       }
-      out.flush();
 
     } catch (Exception e) {
       logger.error("Lỗi gỡ ban: ", e);

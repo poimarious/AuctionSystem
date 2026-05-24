@@ -36,16 +36,14 @@ public class LoginCommand implements Command {
 
       // Đăng nhập thành công
       clientHandler.setAuthenticatedUser(user);
-      out.writeObject(new Message("SUCCESS", "LOGIN", user));
-      out.flush();
+
+      clientHandler.sendMessage(new Message("SUCCESS", "LOGIN", user));
 
     } catch (AuthenticationException e) {
-      out.writeObject(new Message("FAIL", "LOGIN", e.getMessage()));
-      out.flush();
+      clientHandler.sendMessage(new Message("FAIL", "LOGIN", e.getMessage()));
     } catch (Exception e) {
       logger.error("Lỗi hệ thống khi đăng nhập: ", e);
-      out.writeObject(new Message("ERROR", "LOGIN", "Lỗi Server nội bộ."));
-      out.flush();
+      clientHandler.sendMessage(new Message("ERROR", "LOGIN", "Lỗi Server nội bộ."));
     }
   }
 }

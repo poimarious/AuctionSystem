@@ -48,19 +48,16 @@ public class RegisterCommand implements Command {
       }
 
       if (userDAO.insertUser(newUser, role)) {
-        out.writeObject(new Message("SUCCESS", "REGISTER", "Đăng ký thành công"));
+        clientHandler.sendMessage(new Message("SUCCESS", "REGISTER", "Đăng ký thành công"));
       } else {
         throw new Exception("Không thể insertUser xuống CSDL.");
       }
-      out.flush();
 
     } catch (AuthenticationException e) {
-      out.writeObject(new Message("FAIL", "REGISTER", e.getMessage()));
-      out.flush();
+      clientHandler.sendMessage(new Message("FAIL", "REGISTER", e.getMessage()));
     } catch (Exception e) {
       logger.error("Lỗi đăng ký: ", e);
-      out.writeObject(new Message("ERROR", "REGISTER", "Lỗi DB khi tạo tài khoản."));
-      out.flush();
+      clientHandler.sendMessage(new Message("ERROR", "REGISTER", "Lỗi DB khi tạo tài khoản."));
     }
   }
 }
