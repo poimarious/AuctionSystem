@@ -24,7 +24,8 @@ public class ServerMainTest {
     clientInputs = new ArrayList<>();
 
     // 1. Mở một cổng phụ (5010) để test, tránh đụng cổng 5000 của Server thật
-    dummyServerSocket = new ServerSocket(5010);
+    dummyServerSocket = new ServerSocket(0);
+    int testPort = dummyServerSocket.getLocalPort();
 
     // Xóa sạch danh sách client cũ của hệ thống (nếu có)
     ServerMain.activeClients.clear();
@@ -39,7 +40,7 @@ public class ServerMainTest {
       // Chạy Client trên một luồng riêng để đi qua quá trình Handshake với Server
       Thread clientThread = new Thread(() -> {
         try {
-          tempSocket[0] = new Socket("localhost", 5010);
+          tempSocket[0] = new Socket("localhost", testPort);
           // Bắt buộc mở luồng Output trước
           ObjectOutputStream out = new ObjectOutputStream(tempSocket[0].getOutputStream());
           out.flush();

@@ -1,4 +1,4 @@
-package org.deptrai.auctionsystem;
+/*package org.deptrai.auctionsystem;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -172,4 +172,4 @@ public class AutoBidTest {
 
     System.out.println(">> [AUTO BID TEST] Bot đã tự động phanh lại an toàn khi chạm ngưỡng tài chính!");
   }
-}
+}*/

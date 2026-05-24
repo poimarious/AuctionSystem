@@ -37,7 +37,8 @@ public class NotificationSystemTest {
     notiDAO = new NotificationDAO();
 
     // 1. Khởi chạy Server ảo trên cổng 5010 (Để không đụng chạm các bài test khác)
-    serverSocket = new ServerSocket(5010);
+    serverSocket = new ServerSocket(0);
+    int testPort = serverSocket.getLocalPort();
     serverThread = new Thread(() -> {
       try {
         while (!serverSocket.isClosed()) {
@@ -50,7 +51,7 @@ public class NotificationSystemTest {
     serverThread.start();
 
     // 2. Kết nối Client
-    SocketClient.connect("localhost", 5010);
+    SocketClient.connect("localhost", testPort);
 
     // 3. Tạo một người dùng ảo để nhận thông báo
     String username = "noti_user_" + System.currentTimeMillis();
