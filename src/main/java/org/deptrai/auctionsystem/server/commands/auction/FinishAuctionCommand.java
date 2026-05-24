@@ -80,7 +80,7 @@ public class FinishAuctionCommand implements Command {
         if (winner == null) {
           targetUsers.put(sellerId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC nhưng không có người đặt giá.");
         } else {
-          targetUsers.put(sellerId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC và được bán với giá $" + finalPrice + ".");
+          targetUsers.put(sellerId, timeStampStr + " || Phiên đấu giá [" + itemName + "] đã KẾT THÚC và được bán với giá $" + finalPrice + " cho " + winner.getUsername() + ".");
         }
       }
 

@@ -53,6 +53,18 @@ public class CheckoutCommand implements Command {
           return;
         }
 
+
+        // Lấy ID của người đang thực sự gửi request này lên Server
+        String requesterId = clientHandler.getAuthenticatedUser().getUserId();
+
+        // Kiểm tra xem người gửi có phải là người chiến thắng không?
+        if (!requesterId.equals(winner.getUserId())) {
+          out.writeObject(new Message("FAIL", "CHECKOUT", "Xác thực thất bại: Bạn không phải là người chiến thắng của phiên đấu giá này!"));
+          out.flush();
+          return;
+        }
+        // =============================================================
+
         String buyerId = winner.getUserId();
         String sellerId = auction.getItem().getSeller().getUserId();
         double finalPrice = auction.getCurrentPrice();

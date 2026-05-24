@@ -91,7 +91,7 @@ public class ItemCardController implements AuctionUpdateListener {
   private void updateTimer() {
     if (auction == null || timerLabel == null) return;
     java.time.Duration remaining =
-        java.time.Duration.between(LocalDateTime.now(), auction.getEndTime());
+            java.time.Duration.between(LocalDateTime.now(), auction.getEndTime());
 
     if (remaining.isNegative() || remaining.isZero()) {
 
@@ -99,23 +99,58 @@ public class ItemCardController implements AuctionUpdateListener {
 
       timerLabel.setText("00:00:00");
       timerLabel.setStyle("-fx-text-fill: red;");
-      if (bidButton != null) {
-        if(currentUser instanceof Bidder) {
-          if(auction.getStatus().equals(AuctionStatus.PAID)) {
-            bidButton.setText("Đã thanh toán");
-            bidButton.setDisable(true);
-          }
-          else {
-            bidButton.setText("Thanh toán");
-            bidButton.setOnAction(_ -> handleDirectCheckout());
-          }
-        }
-      }
       if (timeline != null) timeline.stop();
 
+      // ================= LỚP KHÓA GIAO DIỆN MỚI =================
+      if (bidButton != null) {
+        if (currentUser instanceof Bidder) {
+          // 1. Mặc định ẨN nút thanh toán để đảm bảo an toàn
+          bidButton.setVisible(false);
+          bidButton.setManaged(false);
+
+          // 2. Gửi request hỏi Server lấy dữ liệu chi tiết của phiên đấu giá (Bản gốc có chứa Winner)
+          SocketClient.runAsync(() -> {
+            Message req = new Message("GET_AUCTION_BY_ID", auction.getAuctionId());
+            Message res = SocketClient.sendRequest(req);
+
+            Platform.runLater(() -> {
+              if ("SUCCESS".equals(res.getStatus())) {
+                // Lấy đối tượng Auction đầy đủ từ Server
+                Auction fullAuction = (Auction) res.getData();
+
+                // 3. Kiểm tra xem user hiện tại có khớp ID với Winner không
+                boolean isWinner = false;
+                if (fullAuction.getWinner() != null && fullAuction.getWinner().getUserId().equals(currentUser.getUserId())) {
+                  isWinner = true;
+                }
+
+                if (isWinner) {
+                  // Nếu ĐÚNG LÀ NGƯỜI THẮNG -> Bật nút lên
+                  bidButton.setVisible(true);
+                  bidButton.setManaged(true);
+
+                  if (fullAuction.getStatus() == AuctionStatus.PAID) {
+                    bidButton.setText("Đã thanh toán");
+                    bidButton.setDisable(true);
+                  } else {
+                    bidButton.setText("Thanh toán");
+                    bidButton.setOnAction(_ -> handleDirectCheckout());
+                  }
+                }
+              }
+            });
+          });
+        } else {
+          // Nếu là người bán (Seller) hoặc khách vãng lai thì giấu luôn nút
+          bidButton.setVisible(false);
+          bidButton.setManaged(false);
+        }
+      }
+      // ===========================================================
+
       // Chỉ gửi yêu cầu kết thúc lên Server nếu phiên đấu giá thực sự ĐANG MỞ
-      if (auction.getStatus() == org.deptrai.auctionsystem.shared.models.auction.AuctionStatus.OPEN ||
-              auction.getStatus() == org.deptrai.auctionsystem.shared.models.auction.AuctionStatus.RUNNING) {
+      if (auction.getStatus() == AuctionStatus.OPEN ||
+              auction.getStatus() == AuctionStatus.RUNNING) {
 
         SocketClient.runAsync(() -> {
           Message request = new Message("FINISH_AUCTION", auction.getAuctionId());
@@ -124,9 +159,9 @@ public class ItemCardController implements AuctionUpdateListener {
       }
     } else {
       timerLabel.setText(
-          String.format(
-              "%02d:%02d:%02d",
-              remaining.toHours(), remaining.toMinutesPart(), remaining.toSecondsPart()));
+              String.format(
+                      "%02d:%02d:%02d",
+                      remaining.toHours(), remaining.toMinutesPart(), remaining.toSecondsPart()));
     }
   }
 
