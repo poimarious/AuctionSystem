@@ -1,4 +1,4 @@
-/*package org.deptrai.auctionsystem;
+package org.deptrai.auctionsystem;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -100,14 +100,30 @@ public class AutoBidTest {
 
   @AfterAll
   static void tearDown() throws Exception {
-    SocketClient.disconnect();
-    if (serverSocket != null) serverSocket.close();
-    if (serverThread != null) serverThread.interrupt();
-  }
+    // 1. [QUAN TRỌNG] Tắt Bot TRƯỚC KHI ngắt kết nối mạng!
+    // Lúc này SocketClient vẫn còn sống nên nó có thể gửi lệnh STOP lên Server.
+    if (targetAuction != null) {
+      AutoBidManager.getInstance().stopAutoBid(targetAuction.getAuctionId());
+    }
 
-  // ==========================================
-  // TEST 1: TỰ ĐỘNG ĐẶT GIÁ KHI BỊ NGƯỜI KHÁC DẪN ĐẦU
-  // ==========================================
+    // Đợi 200 mili-giây để đảm bảo tin nhắn báo tắt bot đã bay tới Server
+    Thread.sleep(200);
+
+    // 2. Bắt đầu rút cáp mạng và đóng Server ảo
+    SocketClient.disconnect();
+    if (serverSocket != null && !serverSocket.isClosed()) {
+      serverSocket.close();
+    }
+    if (serverThread != null && serverThread.isAlive()) {
+      serverThread.interrupt();
+    }
+
+    // 3. Xóa sạch RAM
+    SessionManager.getInstance().setCurrentUser(null);
+    if (ServerMain.activeClients != null) {
+      ServerMain.activeClients.clear();
+    }
+  }
   // ==========================================
   // TEST 1: TỰ ĐỘNG ĐẶT GIÁ KHI BỊ NGƯỜI KHÁC DẪN ĐẦU
   // ==========================================
@@ -115,9 +131,8 @@ public class AutoBidTest {
   @Order(1)
   void testAutoBid_ShouldTrigger_WhenCompetitorIsWinning() throws Exception {
     // 1. Giả lập đối thủ (competitor) đang dẫn đầu với giá 100$
-    // SỬA LỖI: Thêm 1 lượt Bid thực tế vào danh sách thay vì gọi setWinner()
     org.deptrai.auctionsystem.shared.models.bid.Bid compBid = new org.deptrai.auctionsystem.shared.models.bid.Bid(
-            java.util.UUID.randomUUID().toString(), competitor, targetAuction, 100.0, LocalDateTime.now());
+        java.util.UUID.randomUUID().toString(), competitor, targetAuction, 100.0, LocalDateTime.now());
     targetAuction.getBids().add(compBid);
     targetAuction.setCurrentPrice(100.0);
 
@@ -128,12 +143,11 @@ public class AutoBidTest {
     // Khẳng định trạng thái đang bật
     assertTrue(AutoBidManager.getInstance().isAutoBidActive(targetAuction.getAuctionId()));
 
-    // 3. CHỜ ĐỢI: Vì AutoBidManager có lệnh Thread.sleep(1000), ta phải chờ nó bắn súng
+    // 3. CHỜ ĐỢI
     System.out.println(">> Đang chờ AutoBidManager tính toán và gửi lệnh (6.5s)...");
     Thread.sleep(6500);
 
     // 4. KIỂM TRA KẾT QUẢ TRÊN SERVER:
-    // Giá mới phải là 100 + 15 = 115, và người chiến thắng hiện tại phải là autoBidUser
     Auction ramAuction = AuctionManager.getInstance().getAuctionById(targetAuction.getAuctionId());
 
     assertEquals(115.0, ramAuction.getCurrentPrice(), "Giá phải được Auto Bid nâng lên thành 115.0");
@@ -148,17 +162,12 @@ public class AutoBidTest {
   @Order(2)
   void testAutoBid_ShouldStop_WhenExceedingMaxBid() throws Exception {
     // 1. Đối thủ tung cú đòn hiểm, nâng giá lên tận 490$
-    // SỬA LỖI: Thêm lượt Bid mới của đối thủ
     org.deptrai.auctionsystem.shared.models.bid.Bid compBid2 = new org.deptrai.auctionsystem.shared.models.bid.Bid(
-            java.util.UUID.randomUUID().toString(), competitor, targetAuction, 490.0, LocalDateTime.now());
+        java.util.UUID.randomUUID().toString(), competitor, targetAuction, 490.0, LocalDateTime.now());
     targetAuction.getBids().add(compBid2);
     targetAuction.setCurrentPrice(490.0);
 
-    // 2. AutoBidManager sẽ tự động bắt được tín hiệu
-    // Nó sẽ cố gắng lấy 490 + 15 = 505$. Nhưng 505$ > 500$ (maxBid).
-    // Do đó, logic sẽ gọi stopAutoBid().
-
-    // Gọi lại hàm mồi để giả lập sự kiện Socket nhận tin Broadcast
+    // 2. Giả lập sự kiện Socket nhận tin Broadcast để kích bot
     java.lang.reflect.Method method = AutoBidManager.class.getDeclaredMethod("onGlobalAuctionUpdated", Auction.class);
     method.setAccessible(true);
     method.invoke(AutoBidManager.getInstance(), targetAuction);
@@ -172,4 +181,4 @@ public class AutoBidTest {
 
     System.out.println(">> [AUTO BID TEST] Bot đã tự động phanh lại an toàn khi chạm ngưỡng tài chính!");
   }
-}*/
+}

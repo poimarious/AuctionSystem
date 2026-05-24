@@ -56,7 +56,7 @@ public class BiddingCoreTest {
     String sellerName = "bid_seller_" + System.currentTimeMillis();
     Seller dummySeller = new Seller(null, sellerName, "Test1234!", sellerName + "@gmail.com");
     userDAO.insertUser(dummySeller, "SELLER");
-    userDAO.insertUser(dummySeller, "SELLER");
+
     dummySeller = (Seller) userDAO.getUserByUsername(sellerName);
 
     // 2. Tạo vật phẩm với giá khởi điểm 100.0
