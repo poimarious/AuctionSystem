@@ -1,5 +1,7 @@
 package org.deptrai.auctionsystem.client.controllers;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -80,6 +82,8 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
   private Auction currentAuction;
   private Timeline countdownTimeline;
+
+  private static final Map<String, Image> imageCache = new ConcurrentHashMap<>();
 
   @FXML
   public void initialize() {
@@ -168,27 +172,36 @@ public class BiddingDetailController implements AuctionUpdateListener {
     currentIntendedBid = current + getIncrementStep(current);
     quickBidLabel.setText(String.format("$%.2f", currentIntendedBid));
 
-    //byte[] imageBytes = auction.getItem().getImageBytes();
+    productImageView.setImage(null);
+
     String imagePath = auction.getItem().getImageUrl();
     if (imagePath != null && !imagePath.isEmpty()) {
-      SocketClient.runAsync(() -> {
-        Message request = new Message("GET_IMAGE", imagePath);
-        Message response = SocketClient.sendRequest(request);
+      if (imageCache.containsKey(imagePath)) {
+        productImageView.setImage(imageCache.get(imagePath));
+      } else {
+        SocketClient.runAsync(
+            () -> {
+              Message request = new Message("GET_IMAGE", imagePath);
+              Message response = SocketClient.sendRequest(request);
 
-        Platform.runLater(() -> {
-          if ("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
-            try {
-              byte[] imageBytes = (byte[]) response.getData();
-              Image image = new Image(new ByteArrayInputStream(imageBytes));
-              productImageView.setImage(image);
-            } catch (Exception e) {
-              logger.error("Lỗi khi load ảnh:", e);
-            }
-          } else {
-            logger.info("Không tìm thấy file ảnh gốc trên server!");
-          }
-        });
-      });
+              Platform.runLater(
+                  () -> {
+                    if ("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
+                      try {
+                        byte[] imageBytes = (byte[]) response.getData();
+                        Image image =
+                            new Image(new ByteArrayInputStream(imageBytes), 600, 400, true, true);
+                        imageCache.put(imagePath, image);
+                        productImageView.setImage(image);
+                      } catch (Exception e) {
+                        logger.error("Lỗi khi load ảnh:", e);
+                      }
+                    } else {
+                      logger.info("Không tìm thấy file ảnh gốc trên server!");
+                    }
+                  });
+            });
+      }
     } else {
       logger.info("Sản phẩm không đi kèm ảnh.");
     }

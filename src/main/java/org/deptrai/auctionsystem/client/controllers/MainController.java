@@ -274,6 +274,8 @@ public class MainController {
           Node itemCard = loader.load();
           ItemCardController cardController = loader.getController();
           if (cardController != null) {
+            itemCard.setUserData(cardController);
+
             cardController.setData(auctionsToDisplay.get(i));
           }
           productsContainer.getChildren().add(itemCard);

@@ -1,6 +1,8 @@
 package org.deptrai.auctionsystem.client.controllers;
 
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -41,29 +43,41 @@ public class ItemCardController implements AuctionUpdateListener {
   private AuctionSummary auction;
   private Timeline timeline;
 
+  private static final Map<String, Image> imageCache = new ConcurrentHashMap<>();
+
   public void setData(AuctionSummary auction) {
     this.auction = auction;
     nameLabel.setText(auction.getItemName());
     priceLabel.setText(String.format("$%.2f", auction.getCurrentPrice()));
+
+    itemImageView.setImage(null);
+
     String imagePath = auction.getImageUrl();
+
     if(imagePath != null && !imagePath.isEmpty()) {
-      SocketClient.runAsync(() -> {
-        Message request = new Message("GET_IMAGE", imagePath);
-        Message response = SocketClient.sendRequest(request);
-        Platform.runLater(() -> {
-          if("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
-            try {
-              byte[] imageBytes = (byte[]) response.getData();
-              Image image = new Image(new ByteArrayInputStream(imageBytes));
-              itemImageView.setImage(image);
-            } catch(Exception e) {
-              logger.error(e.getMessage());
+      if (imageCache.containsKey(imagePath)) {
+        itemImageView.setImage(imageCache.get(imagePath));
+      } else{
+        SocketClient.runAsync(() -> {
+          Message request = new Message("GET_IMAGE", imagePath);
+          Message response = SocketClient.sendRequest(request);
+          Platform.runLater(() -> {
+            if("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
+              try {
+                byte[] imageBytes = (byte[]) response.getData();
+                Image image = new Image(new ByteArrayInputStream(imageBytes), 600, 400, true, true);
+
+                imageCache.put(imagePath, image);
+                itemImageView.setImage(image);
+              } catch(Exception e) {
+                logger.error(e.getMessage());
+              }
+            } else {
+              logger.info("Không tìm thấy ảnh trên server!");
             }
-          } else {
-            logger.info("Không tìm thấy ảnh trên server!");
-          }
+          });
         });
-      });
+      }
     }
 
 
