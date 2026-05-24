@@ -85,6 +85,22 @@ public class BiddingDetailController implements AuctionUpdateListener {
   public void initialize() {
     // Cấu hình bảng
     amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+    // Cấu hình bảng
+    amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+
+    // THÊM ĐOẠN NÀY ĐỂ ÉP ĐỊNH DẠNG SỐ (BỎ CHỮ E)
+    amountColumn.setCellFactory(tc -> new TableCell<Bid, Double>() {
+      @Override
+      protected void updateItem(Double price, boolean empty) {
+        super.updateItem(price, empty);
+        if (empty || price == null) {
+          setText(null);
+        } else {
+          // Định dạng hiển thị đầy đủ: có dấy phẩy ngăn cách hàng nghìn, lấy 2 số lẻ
+          setText(String.format("%,.2f", price));
+        }
+      }
+    });
     timeColumn.setCellValueFactory(cellData -> {
       DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM HH:mm:ss");
       return new SimpleStringProperty(cellData.getValue().getTimestamp().format(fmt));
