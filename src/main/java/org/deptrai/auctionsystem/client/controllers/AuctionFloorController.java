@@ -46,11 +46,25 @@ public class AuctionFloorController {
 
   private List<AuctionSummary> allAuctionsList = new ArrayList<>();
 
+  private boolean isLoading = false;
+
   /**
    * 1. SỬA NÚT QUAY LẠI: Ép về thẳng Home View
    */
   @FXML
-  public void handleGoBack() {SceneManager.getInstance().navigateToHome();}
+  public void handleGoBack() {
+    cleanupListeners();
+    SceneManager.getInstance().navigateToHome();
+  }
+
+  private void cleanupListeners() {
+    if (productsContainer == null) return;
+    for (Node node : productsContainer.getChildren()) {
+      if (node.getUserData() instanceof ItemCardController oldController) {
+        SocketClient.removeListener(oldController);
+      }
+    }
+  }
 
   @FXML
   public void initialize() {
@@ -72,7 +86,7 @@ public class AuctionFloorController {
 
     if (floorScrollPane != null) {
       floorScrollPane.vvalueProperty().addListener((ignoredObs, ignoredOld, newValue) -> {
-        if (newValue.doubleValue() >= 0.85) {
+        if (newValue.doubleValue() >= 0.85 && !isLoading) {
           loadMoreAuctions();
         }
       });
@@ -156,12 +170,7 @@ public class AuctionFloorController {
     this.currentFilteredList = finalResults;
     this.currentIndex = 0;
 
-    for (Node node : productsContainer.getChildren()) {
-      if (node.getUserData() instanceof ItemCardController oldController) {
-        SocketClient.removeListener(oldController);
-      }
-    }
-
+    cleanupListeners();
     productsContainer.getChildren().clear();
 
     if (floorScrollPane != null) {
@@ -175,6 +184,8 @@ public class AuctionFloorController {
     if (currentIndex >= currentFilteredList.size()) {
       return;
     }
+
+    isLoading = true;
 
     // Tính toán điểm dừng cho lô tiếp theo
     int endIndex = Math.min(currentIndex + PAGE_SIZE, currentFilteredList.size());
@@ -204,6 +215,8 @@ public class AuctionFloorController {
 
       // Cập nhật lại chỉ số cho lần cuộn tiếp theo
       currentIndex = endIndex;
+
+      isLoading = false;
     });
   }
 }
