@@ -78,6 +78,8 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
   private double currentIntendedBid = 0.0;
 
+  private boolean isManualStop = false;
+
   private XYChart.Series<String, Number> priceSeries;
 
   private Auction currentAuction;
@@ -348,11 +350,9 @@ public class BiddingDetailController implements AuctionUpdateListener {
     String auctionId = currentAuction.getAuctionId();
 
     if (AutoBidManager.getInstance().isAutoBidActive(auctionId)) {
+      isManualStop = true;
       AutoBidManager.getInstance().stopAutoBid(auctionId);
-      btnAutoBid.setText("⚙️ KÍCH HOẠT AUTO-BID");
-      btnAutoBid.setStyle("");
-      maxBidField.setDisable(false);
-      incrementField.setDisable(false);
+      isManualStop = false;
       return;
     }
 
@@ -369,16 +369,21 @@ public class BiddingDetailController implements AuctionUpdateListener {
       }
 
       AutoBidManager.getInstance().startAutoBid(currentAuction, maxBid, increment, () -> {
+
+        boolean wasManual = isManualStop;
+
         Platform.runLater(() -> {
           btnAutoBid.setText("⚙️ KÍCH HOẠT AUTO-BID");
           btnAutoBid.setStyle("");
           maxBidField.setDisable(false);
           incrementField.setDisable(false);
           Alert alert = new Alert(Alert.AlertType.WARNING);
-          alert.setTitle("Auto-Bid Đã Dừng");
-          alert.setHeaderText("Hệ thống tự động dừng Auto-Bid");
-          alert.setContentText("Auto-Bid cho phiên này đã bị tắt. Nguyên nhân có thể do số dư khả dụng của bạn không đủ để theo cược tiếp!");
-          alert.show();
+          if(!wasManual) {
+            alert.setTitle("Auto-Bid Đã Dừng");
+            alert.setHeaderText("Hệ thống tự động dừng Auto-Bid");
+            alert.setContentText("Auto-Bid cho phiên này đã bị tắt. Nguyên nhân có thể do số dư khả dụng của bạn không đủ để theo cược tiếp!");
+            alert.show();
+          }
         });
       });
 
