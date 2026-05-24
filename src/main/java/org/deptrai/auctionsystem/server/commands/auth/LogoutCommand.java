@@ -19,9 +19,7 @@ public class LogoutCommand implements Command {
 
       clientHandler.setAuthenticatedUser(null);
 
-      out.reset();
-      out.writeObject(new Message("SUCCESS", "LOGOUT", "Đã đăng xuất an toàn khỏi Server"));
-      out.flush();
+      clientHandler.sendMessage(new Message("SUCCESS", "LOGOUT", "Đã đăng xuất an toàn khỏi Server"));
 
       logger.info("Người dùng [{}] đã chủ động hủy Session và đăng xuất.", username);
     } catch (Exception e) {
