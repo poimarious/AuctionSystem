@@ -57,10 +57,7 @@ public class GetAllAuctionsCommand implements Command {
 
     } catch (Exception e) {
       logger.error("Lỗi khi gửi danh sách Auction cho Client: ", e);
-      if (out != null) {
-        clientHandler.sendMessage(new Message("FAIL", "GET_ALL_AUCTIONS","Lỗi tải dữ liệu."));
-      }
-
+      clientHandler.sendMessage(new Message("ERROR", "GET_ALL_AUCTIONS", "Lỗi hệ thống Server."));
     }
   }
 }

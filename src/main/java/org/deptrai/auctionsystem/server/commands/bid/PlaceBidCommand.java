@@ -104,16 +104,12 @@ public class PlaceBidCommand implements Command {
     }
     // ================= LƯỚI BẮT LỖI NGHIỆP VỤ =================
     catch (AuthenticationException | ResourceNotFoundException | AuctionClosedException | InvalidBidException | InsufficientBalanceException businessError) {
-      if (out != null) {
-        clientHandler.sendMessage(new Message("FAIL", "PLACE_BID", businessError.getMessage()));
-      }
+      clientHandler.sendMessage(new Message("FAIL", "PLACE_BID", businessError.getMessage()));
     }
     // ================= LƯỚI BẮT LỖI HỆ THỐNG =================
     catch (Exception systemError) {
       logger.error("Lỗi khi đặt giá: ", systemError);
-      if (out != null) {
-        clientHandler.sendMessage(new Message("ERROR", "PLACE_BID", "Lỗi hệ thống Server: " + systemError.getMessage()));
-      }
+      clientHandler.sendMessage(new Message("ERROR", "PLACE_BID", "Lỗi hệ thống Server: " + systemError.getMessage()));
     }
   }
 

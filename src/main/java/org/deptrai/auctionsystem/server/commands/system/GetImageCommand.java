@@ -27,7 +27,7 @@ public class GetImageCommand implements Command {
       }
     } catch (Exception e) {
       logger.warn("Không thể tải ảnh cho Client, Path có thể không hợp lệ.");
-      clientHandler.sendMessage(new Message("FAIL", "GET_IMAGE", null));
+      clientHandler.sendMessage(new Message("ERROR", "GET_IMAGE", "Lỗi hệ thống khi đọc file ảnh."));
     }
   }
 }

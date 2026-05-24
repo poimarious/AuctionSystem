@@ -38,7 +38,7 @@ public class StartAutoBidCommand implements Command {
       }
     } catch(Exception e) {
       logger.error("Lỗi khi xử lí Auto-Bid:", e);
-      clientHandler.sendMessage(new Message("FAIL", "START_AUTOBID", "Lỗi hệ thống Server."));
+      clientHandler.sendMessage(new Message("ERROR", "START_AUTOBID", "Lỗi hệ thống Server."));
     }
   }
 

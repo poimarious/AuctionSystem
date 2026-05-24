@@ -40,7 +40,7 @@ public class CloseAuctionCommand implements Command {
       }
     } catch (Exception e) {
       logger.error("Lỗi đóng phiên đấu giá: ", e);
-
+      clientHandler.sendMessage(new Message("ERROR", "CLOSE_AUCTION", "Lỗi hệ thống Server."));
     }
   }
 }

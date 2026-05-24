@@ -24,6 +24,7 @@ public class LogoutCommand implements Command {
       logger.info("Người dùng [{}] đã chủ động hủy Session và đăng xuất.", username);
     } catch (Exception e) {
       logger.error("Lỗi gửi phản hồi đăng xuất: ", e);
+      clientHandler.sendMessage(new Message("ERROR", "LOGOUT", "Lỗi hệ thống Server khi đăng xuất."));
     }
   }
 }

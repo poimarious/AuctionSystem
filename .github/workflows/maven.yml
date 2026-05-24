@@ -23,3 +23,10 @@ jobs:
 
       - name: Build and Test with Maven
         run: mvn -B package --file pom.xml
+
+      - name: Save file (Uber JAR)
+        uses: actions/upload-artifact@v4
+        with:
+          name: AuctionSystem-FatJARs
+          path: target/*-client.jar, target/*-server.jar
+          retention-days: 7

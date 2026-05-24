@@ -24,6 +24,7 @@ public class GetNotificationsCommand implements Command {
       clientHandler.sendMessage(new Message("SUCCESS", "GET_NOTIFICATIONS", unreadNotifs));
     } catch (Exception e) {
       logger.error("Lỗi tải thông báo: ", e);
+      clientHandler.sendMessage(new Message("ERROR", "GET_NOTIFICATIONS", "Lỗi hệ thống Server."));
     }
   }
 }

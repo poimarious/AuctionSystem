@@ -32,7 +32,7 @@ public class GetSellerAuctionsCommand implements Command {
 
     } catch (Exception e) {
       logger.error("Lỗi khi tải kho hàng Seller: ", e);
-      clientHandler.sendMessage(new Message("FAIL", "GET_SELLER_AUCTIONS", "Lỗi tải kho hàng."));
+      clientHandler.sendMessage(new Message("ERROR", "GET_SELLER_AUCTIONS", "Lỗi hệ thống Server."));
     }
   }
 }

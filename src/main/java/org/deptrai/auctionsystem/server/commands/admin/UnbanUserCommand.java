@@ -34,6 +34,7 @@ public class UnbanUserCommand implements Command {
 
     } catch (Exception e) {
       logger.error("Lỗi gỡ ban: ", e);
+      clientHandler.sendMessage(new Message("ERROR", "UNBAN_USER", "Lỗi hệ thống Server."));
     }
   }
 }

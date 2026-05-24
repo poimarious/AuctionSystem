@@ -1,5 +1,6 @@
 package org.deptrai.auctionsystem.server.commands.auth;
 
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.deptrai.auctionsystem.server.ClientHandler;
 import org.deptrai.auctionsystem.server.commands.Command;
 import org.deptrai.auctionsystem.server.dao.UserDAO;
@@ -44,7 +45,7 @@ public class RegisterCommand implements Command {
       if (role.equals("SELLER")) {
         newUser = new Seller(null, username, password, email);
       } else {
-        newUser = new Bidder(null, username, password, email, new java.util.ArrayList<>());
+        newUser = new Bidder(null, username, password, email, new CopyOnWriteArrayList<>());
       }
 
       if (userDAO.insertUser(newUser, role)) {
