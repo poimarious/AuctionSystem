@@ -27,8 +27,7 @@ public class ChangeBalanceCommand implements Command {
         User user = userDAO.getUserById(userId);
 
         if (user == null) {
-          out.writeObject(new Message("FAIL", "CHANGE_BALANCE", "Tài khoản không tồn tại."));
-          out.flush();
+          clientHandler.sendMessage(new Message("FAIL", "CHANGE_BALANCE", "Tài khoản không tồn tại."));
           return;
         }
 
@@ -38,25 +37,21 @@ public class ChangeBalanceCommand implements Command {
         if (user instanceof Seller) {
           newBalance = user.getBalance() - amount;
           if (newBalance < 0) {
-            out.writeObject(new Message("FAIL", "CHANGE_BALANCE", "Số tiền rút không được vượt quá số dư hiện tại!"));
-            out.flush();
+            clientHandler.sendMessage(new Message("FAIL", "CHANGE_BALANCE", "Số tiền rút không được vượt quá số dư hiện tại!"));
             return;
           }
         }
 
         if (userDAO.updateBalance(userId, newBalance)) {
-          out.reset();
-          out.writeObject(new Message("SUCCESS", "CHANGE_BALANCE", newBalance));
+          clientHandler.sendMessage(new Message("SUCCESS", "CHANGE_BALANCE", newBalance));
         } else {
-          out.writeObject(new Message("FAIL", "CHANGE_BALANCE", "Lỗi CSDL khi cập nhật số dư."));
+          clientHandler.sendMessage(new Message("FAIL", "CHANGE_BALANCE", "Lỗi CSDL khi cập nhật số dư."));
         }
-        out.flush();
       }
 
     } catch (Exception e) {
       logger.error("Lỗi giao dịch đổi số dư: ", e);
-      out.writeObject(new Message("ERROR", "CHANGE_BALANCE", "Lỗi hệ thống khi xử lý giao dịch."));
-      out.flush();
+      clientHandler.sendMessage(new Message("ERROR", "CHANGE_BALANCE", "Lỗi hệ thống khi xử lý giao dịch."));
     }
   }
 }

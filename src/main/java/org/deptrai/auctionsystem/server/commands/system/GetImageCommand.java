@@ -21,16 +21,13 @@ public class GetImageCommand implements Command {
 
       if (file.exists()) {
         byte[] imageBytes = Files.readAllBytes(file.toPath());
-        out.reset();
-        out.writeObject(new Message("SUCCESS", "GET_IMAGE", imageBytes));
+        clientHandler.sendMessage(new Message("SUCCESS", "GET_IMAGE", imageBytes));
       } else {
-        out.writeObject(new Message("FAIL", "GET_IMAGE", null));
+        clientHandler.sendMessage(new Message("FAIL", "GET_IMAGE", null));
       }
-      out.flush();
     } catch (Exception e) {
       logger.warn("Không thể tải ảnh cho Client, Path có thể không hợp lệ.");
-      out.writeObject(new Message("FAIL", "GET_IMAGE", null));
-      out.flush();
+      clientHandler.sendMessage(new Message("FAIL", "GET_IMAGE", null));
     }
   }
 }

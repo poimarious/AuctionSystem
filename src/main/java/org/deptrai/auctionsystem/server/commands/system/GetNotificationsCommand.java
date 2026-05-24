@@ -21,10 +21,7 @@ public class GetNotificationsCommand implements Command {
 
       List<String> unreadNotifs = notiDAO.getUnreadNotifications(userId);
       notiDAO.deleteNotificationsByUserId(userId); // Xóa sau khi đọc
-
-      out.reset();
-      out.writeObject(new Message("SUCCESS", "GET_NOTIFICATIONS", unreadNotifs));
-      out.flush();
+      clientHandler.sendMessage(new Message("SUCCESS", "GET_NOTIFICATIONS", unreadNotifs));
     } catch (Exception e) {
       logger.error("Lỗi tải thông báo: ", e);
     }

@@ -36,23 +36,20 @@ public class CheckoutCommand implements Command {
       Auction auction = AuctionManager.getInstance().getAuctionById(auctionId);
 
       if (auction == null) {
-        out.writeObject(new Message("FAIL", "CHECKOUT", "Phiên đấu giá không tồn tại."));
-        out.flush();
+        clientHandler.sendMessage(new Message("FAIL", "CHECKOUT", "Phiên đấu giá không tồn tại."));
         return;
       }
 
       // ================= LỚP KHÓA 1: CHỐNG RACE CONDITION (DOUBLE-SPENDING) =================
       synchronized (auction) {
         if (auction.getStatus() != AuctionStatus.FINISHED) {
-          out.writeObject(new Message("FAIL", "CHECKOUT", "Phiên đấu giá không hợp lệ hoặc đã được thanh toán."));
-          out.flush();
+          clientHandler.sendMessage(new Message("FAIL", "CHECKOUT", "Phiên đấu giá không hợp lệ hoặc đã được thanh toán."));
           return;
         }
 
         Bidder winner = auction.getWinner();
         if (winner == null) {
-          out.writeObject(new Message("FAIL", "CHECKOUT", "Không có người chiến thắng để thanh toán."));
-          out.flush();
+          clientHandler.sendMessage(new Message("FAIL", "CHECKOUT", "Không có người chiến thắng để thanh toán."));
           return;
         }
 
@@ -60,8 +57,7 @@ public class CheckoutCommand implements Command {
 
         // Kiểm tra xem người gửi có phải là người chiến thắng không?
         if (!requesterId.equals(winner.getUserId())) {
-          out.writeObject(new Message("FAIL", "CHECKOUT", "Xác thực thất bại: Bạn không phải là người chiến thắng của phiên đấu giá này!"));
-          out.flush();
+          clientHandler.sendMessage(new Message("FAIL", "CHECKOUT", "Xác thực thất bại: Bạn không phải là người chiến thắng của phiên đấu giá này!"));
           return;
         }
         // =============================================================
@@ -96,26 +92,22 @@ public class CheckoutCommand implements Command {
                 ServerMain.broadcast(new Message("SUCCESS", "AUCTION_UPDATE", auction));
                 pushCheckoutNotifications(auction, buyerId, sellerId, dbWinner.getUsername(), finalPrice);
 
-                out.reset();
-                out.writeObject(new Message("SUCCESS", "CHECKOUT", "Thanh toán thành công!"));
+                clientHandler.sendMessage(new Message("SUCCESS", "CHECKOUT", "Thanh toán thành công!"));
               } else {
-                out.writeObject(new Message("FAIL", "CHECKOUT", "Lỗi chuyển tiền cho người bán."));
+                clientHandler.sendMessage(new Message("FAIL", "CHECKOUT", "Lỗi chuyển tiền cho người bán."));
               }
             } else {
-              out.writeObject(new Message("FAIL", "CHECKOUT", "Lỗi khi trừ tiền người mua."));
+              clientHandler.sendMessage(new Message("FAIL", "CHECKOUT", "Lỗi khi trừ tiền người mua."));
             }
           }
         }
       }
-      out.flush();
 
     } catch (InsufficientBalanceException e) {
-      out.writeObject(new Message("FAIL", "CHECKOUT", e.getMessage()));
-      out.flush();
+      clientHandler.sendMessage(new Message("FAIL", "CHECKOUT", e.getMessage()));
     } catch (Exception e) {
       logger.error("Lỗi Server khi xử lý thanh toán: ", e);
-      out.writeObject(new Message("ERROR", "CHECKOUT", "Lỗi Server khi xử lý thanh toán."));
-      out.flush();
+      clientHandler.sendMessage(new Message("ERROR", "CHECKOUT", "Lỗi Server khi xử lý thanh toán."));
     }
   }
 
