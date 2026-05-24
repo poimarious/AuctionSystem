@@ -60,7 +60,7 @@ public class MainController {
   private boolean isShowingPending = false;
   private final List<AuctionSummary> runningAuctions = new ArrayList<>();
   private final List<AuctionSummary> pendingAuctions = new ArrayList<>();
-
+  private final java.util.Set<String> processedPaidAuctions = new java.util.HashSet<>();
 
   @FXML
   public void initialize() {
@@ -73,6 +73,33 @@ public class MainController {
     }
 
     loadFeaturedAuctions();
+    SocketClient.addListener(updatedAuction -> {
+      // Nếu có tín hiệu 1 phiên đấu giá bất kỳ vừa được thanh toán xong (PAID)
+      if (updatedAuction.getStatus() == AuctionStatus.PAID) {
+
+
+        // Kiểm tra 2 điều kiện: User hiện tại phải là Seller VÀ Seller này chính là chủ nhân của món đồ
+        if (currentUser instanceof Seller &&
+                updatedAuction.getItem().getSeller().getUserId().equals(currentUser.getUserId())) {
+
+          String aucId = updatedAuction.getAuctionId();
+
+          // Đảm bảo phiên này chưa từng được cộng tiền trên RAM trước đó
+          if (!processedPaidAuctions.contains(aucId)) {
+            processedPaidAuctions.add(aucId);
+
+            // Tính toán số dư mới
+            double newBalance = currentUser.getBalance() + updatedAuction.getCurrentPrice();
+            currentUser.setBalance(newBalance);
+
+            // Báo cho UI quét và vẽ lại số tiền mới ngay lập tức
+            Platform.runLater(() -> {
+              SessionManager.getInstance().notifyBalanceChanged();
+            });
+          }
+        }
+      }
+    });
 
     // ĐĂNG KÝ NHẬN THÔNG BÁO KHI SỐ DƯ VÍ THAY ĐỔI
     SessionManager.getInstance().setBalanceListener(() -> {
