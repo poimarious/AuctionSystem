@@ -94,9 +94,7 @@ public class PlaceBidCommand implements Command {
         auction.getBids().add(newBid);
 
         // PHẢN HỒI THÀNH CÔNG CHO CLIENT ĐẶT GIÁ
-        out.reset();
-        out.writeObject(new Message("SUCCESS", "PLACE_BID", newBid));
-        out.flush();
+        clientHandler.sendMessage(new Message("SUCCESS", "PLACE_BID", newBid));
       }
 
       // BROADCAST CHO TẤT CẢ MỌI NGƯỜI VÀ GỬI THÔNG BÁO (Đoạn này giữ nguyên của bạn)
@@ -107,18 +105,14 @@ public class PlaceBidCommand implements Command {
     // ================= LƯỚI BẮT LỖI NGHIỆP VỤ =================
     catch (AuthenticationException | ResourceNotFoundException | AuctionClosedException | InvalidBidException | InsufficientBalanceException businessError) {
       if (out != null) {
-        out.reset();
-        out.writeObject(new Message("FAIL", "PLACE_BID", businessError.getMessage()));
-        out.flush();
+        clientHandler.sendMessage(new Message("FAIL", "PLACE_BID", businessError.getMessage()));
       }
     }
     // ================= LƯỚI BẮT LỖI HỆ THỐNG =================
     catch (Exception systemError) {
       logger.error("Lỗi khi đặt giá: ", systemError);
       if (out != null) {
-        out.reset();
-        out.writeObject(new Message("ERROR", "PLACE_BID", "Lỗi hệ thống Server: " + systemError.getMessage()));
-        out.flush();
+        clientHandler.sendMessage(new Message("ERROR", "PLACE_BID", "Lỗi hệ thống Server: " + systemError.getMessage()));
       }
     }
   }

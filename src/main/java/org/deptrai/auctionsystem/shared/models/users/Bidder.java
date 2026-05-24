@@ -1,5 +1,6 @@
 package org.deptrai.auctionsystem.shared.models.users;
 
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ public class Bidder extends User {
 
   public Bidder(String username, String password, String email) {
     super(username, password, email);
-    bidHistory = new ArrayList<>();
+    bidHistory = new CopyOnWriteArrayList<>();
   }
 
   public Bidder(

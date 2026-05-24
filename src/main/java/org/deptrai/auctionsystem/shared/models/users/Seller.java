@@ -2,6 +2,7 @@ package org.deptrai.auctionsystem.shared.models.users;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.deptrai.auctionsystem.shared.models.items.Item;
 
 public class Seller extends User {
@@ -9,12 +10,12 @@ public class Seller extends User {
 
   public Seller(String username, String password, String email) {
     super(username, password, email);
-    this.listedItems = new ArrayList<>();
+    this.listedItems = new CopyOnWriteArrayList<>();
   }
 
   public Seller(String userId, String username, String password, String email) {
     super(userId, username, password, email);
-    this.listedItems = new ArrayList<>();
+    this.listedItems = new CopyOnWriteArrayList<>();
   }
 
   public void addItem(Item item) {

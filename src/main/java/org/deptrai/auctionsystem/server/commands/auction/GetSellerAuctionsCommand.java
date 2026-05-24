@@ -28,14 +28,11 @@ public class GetSellerAuctionsCommand implements Command {
         }
       }
 
-      out.reset();
-      out.writeObject(new Message("SUCCESS", "GET_SELLER_AUCTIONS", sellerAuctions));
-      out.flush();
+      clientHandler.sendMessage(new Message("SUCCESS", "GET_SELLER_AUCTIONS", sellerAuctions));
 
     } catch (Exception e) {
       logger.error("Lỗi khi tải kho hàng Seller: ", e);
-      out.writeObject(new Message("FAIL", "GET_SELLER_AUCTIONS", "Lỗi tải kho hàng."));
-      out.flush();
+      clientHandler.sendMessage(new Message("FAIL", "GET_SELLER_AUCTIONS", "Lỗi tải kho hàng."));
     }
   }
 }

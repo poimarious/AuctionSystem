@@ -1,5 +1,6 @@
 package org.deptrai.auctionsystem.shared.models.auction;
 
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.deptrai.auctionsystem.shared.models.bid.Bid;
 import org.deptrai.auctionsystem.shared.models.items.Item;
 import org.deptrai.auctionsystem.shared.models.users.Bidder;
@@ -23,7 +24,7 @@ public class Auction implements Serializable {
     this.currentPrice = item.getStartingPrice();
     this.status = AuctionStatus.OPEN;
     this.endTime = endTime;
-    this.bids = new ArrayList<>();
+    this.bids = new CopyOnWriteArrayList<>();
   }
 
   public Auction(

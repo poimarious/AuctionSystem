@@ -123,15 +123,20 @@ public class ClientHandler implements Runnable {
 
   public void sendMessage(Message msg) {
     try {
-      if (out != null) {
+      synchronized (out) {
         out.reset();
         out.writeObject(msg);
         out.flush();
       }
-
     } catch (IOException e) {
-      // Nếu lỗi tức là client này rớt mạng -> Rút cáp, xóa khỏi danh sách
       ServerMain.activeClients.remove(this);
+
+      String clientInfo = (authenticatedUser != null) ?
+          authenticatedUser.getUsername() :
+          socket.getInetAddress().toString();
+      String errorType = e.getClass().getSimpleName();
+
+      logger.warn("Client [{}] rớt mạng khi đang nhận dữ liệu ({}). Đã xóa khỏi danh sách.", clientInfo, errorType);
     }
   }
 }
