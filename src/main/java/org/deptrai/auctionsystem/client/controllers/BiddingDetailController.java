@@ -3,6 +3,7 @@ package org.deptrai.auctionsystem.client.controllers;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -62,12 +63,18 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
   @FXML
   private RadioButton radioQuick;
+
+  @FXML
+  private RadioButton radioCustom;
+
   @FXML
   private ToggleGroup bidModeGroup;
   @FXML
   private HBox quickBidBox;
   @FXML
   private Label quickBidLabel;
+  @FXML
+  private Button btnPlaceBid;
 
   @FXML
   private TextField maxBidField;
@@ -95,7 +102,7 @@ public class BiddingDetailController implements AuctionUpdateListener {
     amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
     // THÊM ĐOẠN NÀY ĐỂ ÉP ĐỊNH DẠNG SỐ (BỎ CHỮ E)
-    amountColumn.setCellFactory(tc -> new TableCell<Bid, Double>() {
+    amountColumn.setCellFactory(_ -> new TableCell<>() {
       @Override
       protected void updateItem(Double price, boolean empty) {
         super.updateItem(price, empty);
@@ -224,6 +231,11 @@ public class BiddingDetailController implements AuctionUpdateListener {
       incrementField.setText(String.valueOf(config.increment));
       maxBidField.setDisable(true);
       incrementField.setDisable(true);
+      quickBidLabel.setDisable(true);
+      quickBidBox.setDisable(true);
+      radioQuick.setDisable(true);
+      radioCustom.setDisable(true);
+      btnPlaceBid.setDisable(true);
       btnAutoBid.setText("🛑 ĐANG CHẠY AUTO-BID (BẤM ĐỂ TẮT)");
       btnAutoBid.setStyle("-fx-background-color: #ff003c; -fx-text-fill: white; -fx-border-color: transparent;");
     }
@@ -347,6 +359,12 @@ public class BiddingDetailController implements AuctionUpdateListener {
 
   @FXML
   public void handleActivateAutoBid() {
+
+    btnAutoBid.setDisable(true);
+    PauseTransition pause = new PauseTransition(javafx.util.Duration.seconds(1));
+    pause.setOnFinished(_ -> btnAutoBid.setDisable(false));
+    pause.play();
+
     String auctionId = currentAuction.getAuctionId();
 
     if (AutoBidManager.getInstance().isAutoBidActive(auctionId)) {
@@ -377,8 +395,13 @@ public class BiddingDetailController implements AuctionUpdateListener {
           btnAutoBid.setStyle("");
           maxBidField.setDisable(false);
           incrementField.setDisable(false);
-          Alert alert = new Alert(Alert.AlertType.WARNING);
+          quickBidBox.setDisable(false);
+          quickBidLabel.setDisable(false);
+          radioQuick.setDisable(false);
+          radioCustom.setDisable(false);
+          btnPlaceBid.setDisable(false);
           if(!wasManual) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Auto-Bid Đã Dừng");
             alert.setHeaderText("Hệ thống tự động dừng Auto-Bid");
             alert.setContentText("Auto-Bid cho phiên này đã bị tắt. Nguyên nhân có thể do số dư khả dụng của bạn không đủ để theo cược tiếp!");
@@ -391,6 +414,11 @@ public class BiddingDetailController implements AuctionUpdateListener {
       incrementField.setText(String.format("%.2f", increment));
       maxBidField.setDisable(true);
       incrementField.setDisable(true);
+      quickBidLabel.setDisable(true);
+      quickBidBox.setDisable(true);
+      radioQuick.setDisable(true);
+      radioCustom.setDisable(true);
+      btnPlaceBid.setDisable(true);
       btnAutoBid.setText("🛑 ĐANG CHẠY AUTO-BID (BẤM ĐỂ TẮT)");
       btnAutoBid.setStyle("-fx-background-color: #ff003c; -fx-text-fill: white; -fx-border-color: transparent;");
     } catch (NumberFormatException e) {

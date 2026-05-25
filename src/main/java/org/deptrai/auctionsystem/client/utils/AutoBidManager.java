@@ -7,10 +7,8 @@ import org.deptrai.auctionsystem.shared.network.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class AutoBidManager {
 
@@ -58,9 +56,7 @@ public class AutoBidManager {
     User currentUser = SessionManager.getInstance().getCurrentUser();
     if(currentUser != null) {
       Object[] payload = {currentUser.getUserId(), auctionId};
-      SocketClient.runAsync(() -> {
-        SocketClient.sendRequest(new Message("STOP_AUTOBID", payload));
-      });
+      SocketClient.sendRequest(new Message("STOP_AUTOBID", payload));
     }
     if(config != null && config.onStop != null) {
       config.onStop.run();
