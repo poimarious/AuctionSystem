@@ -82,7 +82,7 @@ public class AuthenticationTest {
     assertEquals("FAIL", response.getStatus(), "Đăng ký phải thất bại do mật khẩu yếu");
 
     // SỬA TẠI ĐÂY: Khớp chính xác với câu thông báo lỗi được ném ra từ RegisterCommand
-    String expectedErrorMessage = "Mật khẩu phải chứa chữ thường, in hoa, số và ký tự đặc biệt!";
+    String expectedErrorMessage = "Mật khẩu phải đủ 8 ký tự trở lên, chứa chữ thường, in hoa, số và ký tự đặc biệt!";
     assertEquals(expectedErrorMessage, response.getData(), "Nên trả về câu cảnh báo mật khẩu chính xác");
   }
 
