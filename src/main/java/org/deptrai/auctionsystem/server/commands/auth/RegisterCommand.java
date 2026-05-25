@@ -31,7 +31,10 @@ public class RegisterCommand implements Command {
 
       // Lưới bắt lỗi xác thực
       if (ValidationUtils.isInvalidPassword(password)) {
-        throw new AuthenticationException("Mật khẩu phải chứa chữ thường, in hoa, số và ký tự đặc biệt!");
+        throw new AuthenticationException("Mật khẩu phải đủ 8 ký tự trở lên, chứa chữ thường, in hoa, số và ký tự đặc biệt!");
+      }
+      if(!ValidationUtils.isValidEmail(email)) {
+        throw new AuthenticationException("Email của bạn không hợp lệ!");
       }
       if (userDAO.isUsernameTaken(username)) {
         throw new AuthenticationException("Tên đăng nhập đã tồn tại!");
