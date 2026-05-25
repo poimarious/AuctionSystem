@@ -13,6 +13,7 @@ import org.deptrai.auctionsystem.client.utils.SceneManager;
 import org.deptrai.auctionsystem.client.utils.SearchEngine;
 import org.deptrai.auctionsystem.client.utils.SessionManager;
 import org.deptrai.auctionsystem.client.utils.SocketClient;
+import org.deptrai.auctionsystem.server.dao.UserDAO;
 import org.deptrai.auctionsystem.shared.models.auction.Auction;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
 import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
@@ -88,10 +89,6 @@ public class MainController {
           if (!processedPaidAuctions.contains(aucId)) {
             processedPaidAuctions.add(aucId);
 
-            // Tính toán số dư mới
-            double newBalance = currentUser.getBalance() + updatedAuction.getCurrentPrice();
-            currentUser.setBalance(newBalance);
-
             // Báo cho UI quét và vẽ lại số tiền mới ngay lập tức
             Platform.runLater(() -> {
               SessionManager.getInstance().notifyBalanceChanged();
@@ -105,7 +102,8 @@ public class MainController {
     SessionManager.getInstance().setBalanceListener(() -> {
       // Phải dùng Platform.runLater vì UI chỉ được cập nhật trên luồng chính (Main Thread)
       javafx.application.Platform.runLater(() -> {
-        User user = SessionManager.getInstance().getCurrentUser();
+        UserDAO userDAO = new UserDAO();
+        User user = userDAO.getUserById(SessionManager.getInstance().getCurrentUser().getUserId());
         if (user != null) {
           walletLabel.setText(String.format("Ví: $%,.2f", user.getBalance()));
         }
