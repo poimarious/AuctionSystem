@@ -1,0 +1,64 @@
+@startuml
+!theme plain
+skinparam roundCorner 10
+skinparam defaultFontName Arial
+skinparam shadowing true
+
+' Thiết lập màu sắc các khối
+skinparam node {
+    BackgroundColor White
+    BorderColor #2C3E50
+    BorderThickness 2
+}
+skinparam component {
+    BackgroundColor #F8F9F9
+    BorderColor #7F8C8D
+}
+skinparam database {
+    BackgroundColor #FEF9E7
+    BorderColor #F1C40F
+}
+skinparam queue {
+    BackgroundColor #E8F8F5
+    BorderColor #1ABC9C
+}
+
+' Hướng vẽ từ trên xuống dưới
+top to bottom direction
+
+node "💻 TẦNG CLIENT (Khách - Ứng dụng JavaFX)" as ClientTier #F0F8FF {
+    component "Giao diện (Views FXML)\nTrang chủ, Hồ sơ, Sản phẩm..." as View #D6EAF8
+    component "Bộ điều khiển (Controllers)\nMain, Profile, Inventory..." as Controller #AED6F1
+    component "Lõi Mạng & Phiên Đăng Nhập\n(SocketClient, SessionManager)" as ClientCore #85C1E9
+
+    View --> Controller : Gửi sự kiện (Click/Nhập chữ)
+    Controller --> ClientCore : Yêu cầu xử lý / Lấy dữ liệu
+    ClientCore --> Controller : Trả kết quả (Platform.runLater)
+}
+
+queue "🌐 Giao thức TCP/IP Socket (Cổng 5000)\nTruyền tải các đối tượng Message" as Network #D1F2EB
+
+node "⚙️ TẦNG SERVER (Chủ - Máy chủ Java)" as ServerTier #FDEDEC {
+    component "Lắng nghe Kết nối & Đa luồng\n(ServerMain, ClientHandler, ThreadPool)" as SrvListener #FADBD8
+    component "Định tuyến Chỉ lệnh (Command Router)\nCheckoutCommand, PlaceBidCommand..." as Router #F5B7B1
+    component "Bộ đệm Trạng thái Real-time\n(AuctionManager, AutoBidManager)" as Cache #F1948A
+    component "Lớp Truy xuất Dữ liệu (DAOs)\nUserDAO, AuctionDAO, ItemDAO..." as DAO #E6B0AA
+
+    SrvListener --> Router : Nhận và chuyển tiếp Message
+    Router <--> Cache : Kiểm tra/Cập nhật trạng thái RAM
+    Router --> DAO : Ra lệnh Ghi/Đọc dữ liệu bền vững
+}
+
+database "🗄️ TẦNG DỮ LIỆU & LƯU TRỮ" as DataTier #FCF3CF {
+    artifact "auctionsystem.db\n(Cơ sở dữ liệu SQLite)" as DB #F9E79F
+    folder "server_uploads/\n(Lưu trữ ảnh sản phẩm)" as Storage #F7DC6F
+}
+
+' Kết nối xuyên tầng
+ClientCore <==> Network : Gửi/Nhận ObjectStream
+Network <==> SrvListener : Xử lý luồng vào/ra song song
+
+DAO ==> DB : Thực thi câu lệnh SQL (CRUD)
+DAO ==> Storage : Lưu/Tải mảng byte ảnh (byte[])
+
+@enduml
