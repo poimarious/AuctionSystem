@@ -81,7 +81,6 @@ public class SellerController {
         }
 
         for (Auction auction : sellerAuctions) {
-          if (auction.getStatus() != AuctionStatus.PAID) continue;
           for (Bid bid : auction.getBids()) {
             if (bid.getTimestamp() != null) {
               DayOfWeek day = bid.getTimestamp().getDayOfWeek();
