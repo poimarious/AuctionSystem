@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<HBox prefHeight="720.0" prefWidth="1280.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.deptrai.auctionsystem.client.controllers.SellerController">
+    <VBox prefWidth="260.0" spacing="15.0"
+          style="-fx-background-color: #1a162e; -fx-border-color: transparent #2b244d transparent transparent; -fx-border-width: 0 2px 0 0;"
+          styleClass="sidebar">
+        <padding>
+            <Insets bottom="20.0" left="15.0" right="15.0" top="20.0"/>
+        </padding>
+        <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ QUAY LẠI">
+            <padding>
+                <Insets bottom="8.0" left="12.0" right="15.0" top="8.0"/>
+            </padding>
+        </Button>
+        <Label style="-fx-font-size: 22; -fx-font-weight: bold;" text="🏪 SELLER CENTER" textFill="#bd93f9">
+            <VBox.margin>
+                <Insets top="10.0"/>
+            </VBox.margin>
+        </Label>
+        <Separator opacity="0.3"/>
+        <Button maxWidth="Infinity" onAction="#handleOpenInventory" styleClass="btn-sidebar"
+                text="📦 Kho hàng của tôi"/>
+        <Button maxWidth="Infinity" onAction="#handleShowRevenue" styleClass="btn-sidebar"
+                text="📈 Thống kê doanh thu"/>
+        <Separator opacity="0.3"/>
+        <Button maxWidth="Infinity" onAction="#handleAddNewProduct" styleClass="btn-success"
+                text="➕ Đăng sản phẩm mới"/>
+        <Region VBox.vgrow="ALWAYS"/>
+        <Button maxWidth="Infinity" onAction="#handleLogout" styleClass="btn-accent" text="🚪 ĐĂNG XUẤT"/>
+    </VBox>
+
+    <VBox spacing="25.0" style="-fx-background-color: #151226;" HBox.hgrow="ALWAYS">
+        <padding>
+            <Insets bottom="30.0" left="40.0" right="40.0" top="30.0"/>
+        </padding>
+        <HBox alignment="CENTER_LEFT">
+            <Label style="-fx-font-size: 28; -fx-font-weight: bold;" text="📊 Bảng Điều Khiển (Tổng Quan)"
+                   textFill="#bd93f9"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <TextField prefHeight="40.0" prefWidth="300.0" promptText="🔍 Tìm kiếm..."
+                       styleClass="text-field"/>
+        </HBox>
+
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;"
+                    VBox.vgrow="ALWAYS">
+            <VBox spacing="25.0">
+                <padding>
+                    <Insets bottom="20.0"/>
+                </padding>
+
+                <HBox spacing="20.0">
+                    <VBox alignment="CENTER" prefHeight="100.0" spacing="10.0"
+                          style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
+                          HBox.hgrow="ALWAYS">
+                        <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="💰 Tổng Doanh Thu"
+                               textFill="#50fa7b"/>
+                        <Label fx:id="balanceLabel" style="-fx-font-size: 24; -fx-font-weight: bold;"
+                               textFill="WHITE"/>
+                    </VBox>
+
+                    <VBox alignment="CENTER" prefHeight="100.0" spacing="10.0"
+                          style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
+                          HBox.hgrow="ALWAYS">
+                        <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="🔥 Đang Đấu Giá"
+                               textFill="#ffb86c"/>
+                        <Label fx:id="ongoingCountLabel" style="-fx-font-size: 24; -fx-font-weight: bold;"
+                               textFill="WHITE"/>
+                    </VBox>
+
+                    <VBox alignment="CENTER" prefHeight="100.0" spacing="10.0"
+                          style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
+                          HBox.hgrow="ALWAYS">
+                        <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="✅ Đã Bán Thành Công"
+                               textFill="#8be9fd"/>
+                        <Label fx:id="successCountLabel" style="-fx-font-size: 24; -fx-font-weight: bold;"
+                               textFill="WHITE"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+                    <VBox prefHeight="350.0" prefWidth="600.0"
+                          style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
+                          HBox.hgrow="ALWAYS">
+                        <padding>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+                        </padding>
+                        <Label style="-fx-font-size: 18; -fx-font-weight: bold;"
+                               text="📈 Lượt đặt giá tuần này" textFill="WHITE">
+                            <padding>
+                                <Insets bottom="15.0"/>
+                            </padding>
+                        </Label>
+                        <LineChart fx:id="revenueChart" styleClass="dark-chart" VBox.vgrow="ALWAYS">
+                            <xAxis>
+                                <CategoryAxis label="Ngày trong tuần"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="Lượt tương tác"/>
+                            </yAxis>
+                        </LineChart>
+                    </VBox>
+                </HBox>
+
+            </VBox>
+        </ScrollPane>
+    </VBox>
+</HBox>

@@ -1,0 +1,255 @@
+package org.deptrai.auctionsystem.client.controllers;
+
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.util.Duration;
+import org.deptrai.auctionsystem.client.utils.AuctionUpdateListener;
+import org.deptrai.auctionsystem.client.utils.SceneManager;
+import org.deptrai.auctionsystem.client.utils.SessionManager;
+import org.deptrai.auctionsystem.client.utils.SocketClient;
+import org.deptrai.auctionsystem.shared.models.auction.Auction;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionStatus;
+import org.deptrai.auctionsystem.shared.models.auction.AuctionSummary;
+import org.deptrai.auctionsystem.shared.models.users.Bidder;
+import org.deptrai.auctionsystem.shared.models.users.User;
+import org.deptrai.auctionsystem.shared.network.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.time.LocalDateTime;
+
+public class ItemCardController implements AuctionUpdateListener {
+
+  private static final Logger logger = LoggerFactory.getLogger(ItemCardController.class);
+
+  @FXML private ImageView itemImageView;
+  @FXML private Label nameLabel;
+  @FXML private Label priceLabel;
+  @FXML private Label timerLabel;
+  @FXML private Button bidButton;
+
+  private AuctionSummary auction;
+  private Timeline timeline;
+
+  private static final Map<String, Image> imageCache = new ConcurrentHashMap<>();
+
+  public void setData(AuctionSummary auction) {
+    this.auction = auction;
+    nameLabel.setText(auction.getItemName());
+    priceLabel.setText(String.format("$%.2f", auction.getCurrentPrice()));
+
+    itemImageView.setImage(null);
+
+    String imagePath = auction.getImageUrl();
+
+    if(imagePath != null && !imagePath.isEmpty()) {
+      if (imageCache.containsKey(imagePath)) {
+        itemImageView.setImage(imageCache.get(imagePath));
+      } else{
+        SocketClient.runAsync(() -> {
+          Message request = new Message("GET_IMAGE", imagePath);
+          Message response = SocketClient.sendRequest(request);
+          Platform.runLater(() -> {
+            if("SUCCESS".equals(response.getStatus()) && response.getData() != null) {
+              try {
+                byte[] imageBytes = (byte[]) response.getData();
+                Image image = new Image(new ByteArrayInputStream(imageBytes), 600, 400, true, true);
+
+                imageCache.put(imagePath, image);
+                itemImageView.setImage(image);
+              } catch(Exception e) {
+                logger.error(e.getMessage());
+              }
+            } else {
+              logger.info("Không tìm thấy ảnh trên server!");
+            }
+          });
+        });
+      }
+    }
+
+
+    User currentUser = SessionManager.getInstance().getCurrentUser();
+    if(currentUser == null) {
+      bidButton.setVisible(false);
+      bidButton.setManaged(false);
+    } else {
+      bidButton.setVisible(true);
+      bidButton.setManaged(true);
+    }
+
+    startCountdown();
+    SocketClient.addListener(this);
+  }
+
+  private void startCountdown() {
+    if (timeline != null) timeline.stop();
+    timeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> updateTimer()));
+    timeline.setCycleCount(Timeline.INDEFINITE);
+    timeline.play();
+    updateTimer();
+  }
+
+  private void updateTimer() {
+    if (auction == null || timerLabel == null) return;
+    java.time.Duration remaining =
+            java.time.Duration.between(LocalDateTime.now(), auction.getEndTime());
+
+    if (remaining.isNegative() || remaining.isZero()) {
+
+      User currentUser = SessionManager.getInstance().getCurrentUser();
+
+      timerLabel.setText("00:00:00");
+      timerLabel.setStyle("-fx-text-fill: red;");
+      if (timeline != null) timeline.stop();
+
+      // ================= LỚP KHÓA GIAO DIỆN MỚI =================
+      if (bidButton != null) {
+        if (currentUser instanceof Bidder) {
+          // 1. Mặc định ẨN nút thanh toán để đảm bảo an toàn
+          bidButton.setVisible(false);
+          bidButton.setManaged(false);
+
+          // 2. Gửi request hỏi Server lấy dữ liệu chi tiết của phiên đấu giá (Bản gốc có chứa Winner)
+          SocketClient.runAsync(() -> {
+            Message req = new Message("GET_AUCTION_BY_ID", auction.getAuctionId());
+            Message res = SocketClient.sendRequest(req);
+
+            Platform.runLater(() -> {
+              if ("SUCCESS".equals(res.getStatus())) {
+                // Lấy đối tượng Auction đầy đủ từ Server
+                Auction fullAuction = (Auction) res.getData();
+
+                // 3. Kiểm tra xem user hiện tại có khớp ID với Winner không
+                boolean isWinner = false;
+                if (fullAuction.getWinner() != null && fullAuction.getWinner().getUserId().equals(currentUser.getUserId())) {
+                  isWinner = true;
+                }
+
+                if (isWinner) {
+                  // Nếu ĐÚNG LÀ NGƯỜI THẮNG -> Bật nút lên
+                  bidButton.setVisible(true);
+                  bidButton.setManaged(true);
+
+                  if (fullAuction.getStatus() == AuctionStatus.PAID) {
+                    bidButton.setText("Đã thanh toán");
+                    bidButton.setDisable(true);
+                  } else {
+                    bidButton.setText("Thanh toán");
+                    bidButton.setOnAction(_ -> handleDirectCheckout());
+                  }
+                }
+              }
+            });
+          });
+        } else {
+          // Nếu là người bán (Seller) hoặc khách vãng lai thì giấu luôn nút
+          bidButton.setVisible(false);
+          bidButton.setManaged(false);
+        }
+      }
+      // ===========================================================
+
+      // Chỉ gửi yêu cầu kết thúc lên Server nếu phiên đấu giá thực sự ĐANG MỞ
+      if (auction.getStatus() == AuctionStatus.OPEN ||
+              auction.getStatus() == AuctionStatus.RUNNING) {
+
+        SocketClient.runAsync(() -> {
+          Message request = new Message("FINISH_AUCTION", auction.getAuctionId());
+          SocketClient.sendRequest(request);
+        });
+      }
+    } else {
+      timerLabel.setText(
+              String.format(
+                      "%02d:%02d:%02d",
+                      remaining.toHours(), remaining.toMinutesPart(), remaining.toSecondsPart()));
+    }
+  }
+
+  private void handleDirectCheckout() {
+    User currentUser = SessionManager.getInstance().getCurrentUser();
+    double price = auction.getCurrentPrice();
+
+    Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION,
+            "Bạn có chắc muốn thanh toán $" + String.format("%.2f", price) + "?",
+            ButtonType.YES, ButtonType.NO);
+    confirmAlert.setTitle("Xác nhận than toán");
+    confirmAlert.setHeaderText(null);
+
+    confirmAlert.showAndWait().ifPresent(response -> {
+      if(response == ButtonType.YES) {
+        //Đổi quy ước :{auctionid,userid} để check userid và winner id
+        Object[] payload = {auction.getAuctionId(), currentUser.getUserId()};
+        Message request = new Message("CHECKOUT", payload);
+        SocketClient.runAsync(() -> {
+          Message server_response = SocketClient.sendRequest(request);
+          Platform.runLater(() -> {
+            if (server_response.getStatus().equals("SUCCESS")) {
+              double newBalance = currentUser.getBalance() - price;
+              currentUser.setBalance(newBalance);
+              SessionManager.getInstance().notifyBalanceChanged();
+
+              if (bidButton != null) {
+                bidButton.setText("Đã thanh toán");
+                bidButton.setDisable(true);
+              }
+
+              Alert successAlert = new Alert(Alert.AlertType.INFORMATION,
+                      "Thanh toán hoàn tất sản phẩm thuộc về sở hữu của bạn");
+              successAlert.show();
+            }
+            else {
+              Alert failAlert = new Alert(Alert.AlertType.ERROR,
+                      (String) server_response.getData()); // Lấy thông báo lỗi hiển thị
+              failAlert.show();
+            }
+          });
+        });
+      }
+    });
+  }
+  /**
+   * HÀM QUAN TRỌNG: Chuyển sang trang bidding-detail
+   */
+  @FXML
+  public void handleBidAction() {
+    if(this.auction == null) return ;
+    if(timeline != null) timeline.stop();
+
+    SocketClient.removeListener(this);
+
+    // 1. Lưu auction vào Session để trang sau có cái mà hiển thị
+    SessionManager.getInstance().setSelectedAuctionId(auction.getAuctionId());
+
+    // 2. Chuyển sang đúng file FXML bạn vừa gửi
+    SceneManager.getInstance().switchScene(
+        "/org/deptrai/auctionsystem/client/views/bidding-detail.fxml",
+        "Chi tiết đấu giá - " + auction.getItemName());
+  }
+
+  @Override
+  public void onAuctionUpdated(Auction updatedAuction) {
+    // Kiểm tra xem tin nhắn đổi giá có phải dành cho món hàng của cái thẻ này không
+    if (this.auction.getAuctionId().equals(updatedAuction.getAuctionId())) {
+      // Update this card's RAM
+      this.auction.setStatus(updatedAuction.getStatus());
+      this.auction.setCurrentPrice(updatedAuction.getCurrentPrice());
+
+      // Nhảy số tiền trên giao diện
+      Platform.runLater(() -> priceLabel.setText(String.format("$%.2f", updatedAuction.getCurrentPrice())));
+    }
+  }
+}

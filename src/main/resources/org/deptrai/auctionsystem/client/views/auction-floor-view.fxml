@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: #151226;"
+      spacing="20.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25"
+      fx:controller="org.deptrai.auctionsystem.client.controllers.AuctionFloorController">
+    <children>
+
+        <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ QUAY LẠI">
+            <padding>
+                <Insets bottom="8.0" left="12.0" right="15.0" top="8.0"/>
+            </padding>
+        </Button>
+
+        <HBox
+                style="-fx-background-color: #1e1936; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5); -fx-padding: 15; -fx-background-radius: 12; -fx-border-color: #2b244d; -fx-border-radius: 12; -fx-border-width: 1.5;"
+                alignment="CENTER_LEFT"
+                spacing="15.0">
+            <VBox.margin>
+                <Insets left="20.0" right="20.0" top="10.0"/>
+            </VBox.margin>
+            <children>
+                <ComboBox prefWidth="150.0" promptText="📁 Tất cả danh mục" fx:id="categoryCombo"
+                          styleClass="combo-box"/>
+
+                <ComboBox prefWidth="150.0" promptText="⚡ Trạng thái" fx:id="statusCombo" styleClass="combo-box"/>
+
+                <TextField styleClass="text-field"
+                           prefWidth="350.0"
+                           promptText="🔍 Tìm tên sản phẩm, nghệ sĩ, hãng xe..." fx:id="searchField"/>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="20.0" right="20.0" top="10.0"/>
+            </padding>
+        </HBox>
+
+        <ScrollPane style="-fx-background-color: transparent; -fx-background: transparent;"
+                    fitToWidth="true"
+                    fitToHeight="true"
+                    hbarPolicy="NEVER"
+                    vbarPolicy="AS_NEEDED"
+                    VBox.vgrow="ALWAYS"
+                    fx:id="floorScrollPane">
+            <content>
+                <FlowPane hgap="25.0" stylesheets="@style.css" vgap="25.0" fx:id="productsContainer">
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+                    </padding>
+                </FlowPane>
+            </content>
+        </ScrollPane>
+    </children>
+</VBox>

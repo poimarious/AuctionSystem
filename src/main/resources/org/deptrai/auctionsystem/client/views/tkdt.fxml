@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="25.0" style="-fx-background-color: #151226;" stylesheets="@style.css"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.deptrai.auctionsystem.client.controllers.TransactionHistoryController">
+    <children>
+        <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ QUAY LẠI">
+            <padding>
+                <Insets bottom="8.0" left="12.0" right="15.0" top="8.0"/>
+            </padding>
+        </Button>
+
+        <HBox alignment="CENTER_LEFT">
+            <children>
+                <VBox>
+                    <children>
+                        <Label style="-fx-font-size: 28; -fx-font-weight: bold;" text="📑 Lịch sử Giao dịch"
+                               textFill="#bd93f9"/>
+                        <Label style="-fx-font-size: 14;" text="Quản lý danh sách các đơn hàng và trạng thái thanh toán"
+                               textFill="#6272a4"/>
+                    </children>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+            </children>
+        </HBox>
+
+        <VBox spacing="10.0"
+              style="-fx-background-color: #1a162e; -fx-background-radius: 10; -fx-border-color: #2b244d; -fx-border-radius: 10; -fx-border-width: 1;"
+              VBox.vgrow="ALWAYS">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+            </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="Danh sách giao dịch hoàn tất"
+                               textFill="WHITE"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                    </children>
+                </HBox>
+
+                <TableView fx:id="revenueTable" styleClass="modern-table" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colDate" prefWidth="114.39999842643738" text="Ngày giao dịch"/>
+                        <TableColumn fx:id="colOrderId" minWidth="0.0" prefWidth="153.6000213623047"
+                                     text="Mã đơn hàng"/>
+                        <TableColumn fx:id="colProduct" prefWidth="140.19998168945312" text="Tên sản phẩm"/>
+                        <TableColumn fx:id="colBuyer" prefWidth="150.0" text="Người mua"/>
+                        <TableColumn fx:id="colFinalPrice" prefWidth="120.0" text="Giá chốt ($)"/>
+                        <TableColumn fx:id="colStatus" prefWidth="130.0" text="Trạng thái ví"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+            </children>
+        </VBox>
+    </children>
+    <padding>
+        <Insets bottom="30.0" left="40.0" right="40.0" top="30.0"/>
+    </padding>
+</VBox>

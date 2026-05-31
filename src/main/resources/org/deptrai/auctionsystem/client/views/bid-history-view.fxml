@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<VBox spacing="25.0" style="-fx-background-color: #151226;" stylesheets="@style.css"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.deptrai.auctionsystem.client.controllers.BidHistoryController">
+    <children>
+        <Button mnemonicParsing="false" onAction="#handleGoBack" styleClass="btn-back" text="⬅ QUAY LẠI">
+            <padding>
+                <Insets bottom="8.0" left="12.0" right="15.0" top="8.0"/>
+            </padding>
+        </Button>
+
+        <HBox spacing="15.0">
+            <children>
+                <Button onAction="#handleShowAll" styleClass="btn-tab" text="📊 Tất cả"/>
+                <Button onAction="#handleShowRunning" styleClass="btn-tab" text="⚡ Đang diễn ra"/>
+                <Button onAction="#handleShowWon" styleClass="btn-tab" text="🏆 Đã thắng"/>
+                <Button onAction="#handleShowFinished" styleClass="btn-tab" text="🔒 Đã kết thúc"/>
+            </children>
+        </HBox>
+
+        <Label text="📜 LỊCH SỬ ĐẶT GIÁ CỦA BẠN" textFill="#bd93f9">
+            <font>
+                <Font name="System Bold" size="28.0"/>
+            </font>
+        </Label>
+
+        <TableView fx:id="bidHistoryTable"
+                   style="-fx-background-color: #1e1936; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);"
+                   styleClass="item-card" VBox.vgrow="ALWAYS">
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+            <columns>
+                <TableColumn fx:id="productNameColumn" prefWidth="250.0" text="Tên sản phẩm"/>
+                <TableColumn fx:id="myBidPriceColumn" prefWidth="150.0" text="Giá bạn đặt"/>
+                <TableColumn fx:id="currentPriceColumn" prefWidth="150.0" text="Giá hiện tại"/>
+                <TableColumn fx:id="timeRemainingColumn" prefWidth="150.0" text="Thời gian còn lại"/>
+                <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Trạng thái"/>
+            </columns>
+        </TableView>
+    </children>
+    <padding>
+        <Insets bottom="40.0" left="60.0" right="60.0" top="40.0"/>
+    </padding>
+</VBox>
