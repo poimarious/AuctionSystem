@@ -136,4 +136,4 @@ Mặc định các tài khoản Admin đang không cho đăng ký mà phải c�
 ### Link báo cáo PDF và Video demo
 
 * Video demo: https://drive.google.com/file/d/1fiYmBQntVEdknnPiybV0k0gmfIYrT6c7/view?usp=sharing
-* Báo cáo PDF: https://drive.google.com/file/d/1VuS6x-0JAS1BBiR7eE-1sWjoQn2Hcq5Q/view?usp=sharing
+* Báo cáo PDF: https://drive.google.com/file/d/1PKr2koPM0ElIRlexlHcWY6tSyFLjvpEK/view?usp=sharing
