@@ -58,6 +58,13 @@ AuctionSystem/
 
 ### Hướng dẫn chạy chương trình
 
+> **Lưu ý:**
+> Máy chủ (Server) được cấu hình mặc định để hoạt động trên **cổng (port) 5000**. Trước khi khởi chạy, hãy đảm bảo cổng 5000 trên máy tính đang trống và không bị chặn bởi tường lửa (Firewall) hay các phần mềm diệt virus.
+
+> **Cách đổi sang cổng khác (Tùy chọn):** Nếu cổng 5000 bị trùng với ứng dụng khác trên máy thì có thể tự đổi sang cổng mới bằng cách cập nhật 2 vị trí sau trong mã nguồn và chạy lệnh build lại:
+> 1. **Bên Server:** Mở file `ServerMain.java`, tìm dòng `new ServerSocket(5000)` và sửa số.
+> 2. **Bên Client:** Mở file `ClientApplication.java`, tìm dòng `SocketClient.connect("localhost", 5000)` và đổi tham số thứ hai cho khớp với Server.
+
 **Bước 1:** Khởi động Server *(khởi động TRƯỚC Client)*
 * Mở Command Prompt (CMD) hoặc Terminal tại thư mục chứa file .jar.
 * Gõ lệnh khởi động Server:
@@ -127,3 +134,6 @@ Mặc định các tài khoản Admin đang không cho đăng ký mà phải c�
 * Quản lý, kiểm duyệt hoặc xóa các phiên đấu giá không hợp lệ khỏi hệ thống (Admin level 1/2)
 
 ### Link báo cáo PDF và Video demo
+
+* Video demo: https://drive.google.com/file/d/1fiYmBQntVEdknnPiybV0k0gmfIYrT6c7/view?usp=sharing
+* Báo cáo PDF: https://drive.google.com/file/d/1VuS6x-0JAS1BBiR7eE-1sWjoQn2Hcq5Q/view?usp=sharing
